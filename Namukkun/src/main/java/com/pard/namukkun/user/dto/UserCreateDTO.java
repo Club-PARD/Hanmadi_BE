@@ -9,4 +9,5 @@ import lombok.Setter;
 public class UserCreateDTO {
     private String email;
     private String name;
+    private Long authId;
 }

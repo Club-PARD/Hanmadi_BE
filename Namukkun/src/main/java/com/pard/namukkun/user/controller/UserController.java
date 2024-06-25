@@ -1,18 +1,28 @@
 package com.pard.namukkun.user.controller;
 
+import com.pard.namukkun.user.dto.UserCreateDTO;
+import com.pard.namukkun.user.dto.UserReadDTO;
+import com.pard.namukkun.user.entity.User;
+import com.pard.namukkun.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
+    private final UserService userService;
+
+    @PostMapping("")
+    public String createUser(@RequestBody UserCreateDTO userCreateDTO){
+        userService.createUser(userCreateDTO);
+        return "User created";
+    }
 
     @GetMapping("")
-    public String test(){
-        return "test";
+    public List<UserReadDTO> findAllUser(){
+        return userService.findAllUser();
     }
 }

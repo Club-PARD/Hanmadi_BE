@@ -13,11 +13,13 @@ public class UserReadDTO {
     private Long userId;
     private String name;
     private String email;
+    private Long authId;
 
     public UserReadDTO(User user){
         this.userId = user.getUserId();
         this.name = user.getName();
         this.email = user.getEmail();
+        this.authId = user.getAuthId();
     }
 
 }
