@@ -23,7 +23,7 @@ public class Post {
 
     // 첨부파일 넣는것도 추가해야함
     @JoinColumn(nullable = false, name = "user_Id")
-    @ManyToOne
+    @OneToOne
     private User user;
 
     public Post(String title, String content, String region, User user) {
