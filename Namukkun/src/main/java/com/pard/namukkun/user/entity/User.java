@@ -33,10 +33,6 @@ public class User {
         this.name = user.getName();
     }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Post> posts = new ArrayList<>();
-
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()
                 .name(userCreateDTO.getName())
