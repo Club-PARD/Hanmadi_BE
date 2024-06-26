@@ -48,4 +48,5 @@ out/
 ### properties
 *.properties
 *.yml
+*.gradle
 
