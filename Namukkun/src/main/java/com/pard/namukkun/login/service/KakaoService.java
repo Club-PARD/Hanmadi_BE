@@ -29,7 +29,7 @@ public class KakaoService {
 
     @Autowired
     public KakaoService(@Value("${kakao.client_id}") String clientId,
-                        @Value("&{kakao.client_secret_id}") String clientSecretId) {
+                        @Value("${kakao.client_secret_id}") String clientSecretId) {
         this.clientSecretId = clientSecretId;
         this.clientId = clientId;
         KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
@@ -37,6 +37,8 @@ public class KakaoService {
     }
 
     public String getAccessTokenFromKakao(String code) {
+
+        log.info(clientSecretId);
 
         KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
@@ -51,7 +53,6 @@ public class KakaoService {
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .retrieve()
-                //TODO : Custom Exception
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
                 .bodyToMono(KakaoTokenResponseDto.class)
