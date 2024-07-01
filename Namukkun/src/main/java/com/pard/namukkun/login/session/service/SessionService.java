@@ -21,7 +21,7 @@ public class SessionService {
     //Todo test데이터 바꾸기
     public void addSessionData(String id, String test) {
         session.setAttribute(id, test);
-        log.info(session.getAttribute(id).toString());
+//        log.info(session.getAttribute(id).toString());
     }
 
     public Object getSessionData(String id){

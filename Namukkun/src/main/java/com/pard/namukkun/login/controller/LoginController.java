@@ -51,7 +51,6 @@ public class LoginController {
     public ResponseEntity<?> callback(HttpServletResponse response, @RequestParam("code") String code) {
 //    public String callback(@RequestParam("code") String code) {
         String accessToken = kakaoService.getAccessTokenFromKakao(code); // getting token
-        log.info("!");
         KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken); // get user info
 
 
@@ -59,15 +58,11 @@ public class LoginController {
         // TODO : create user here
 
 
-//        return "redirect:/test";
-//        return new ResponseEntity<>(HttpStatus.OK);
 
         String seesionId = sessionService.createRandomKey();
-
         loginCookieService.createCookie(response, seesionId);
+        System.out.println(loginCookieService.getCookie(seesionId));
         sessionService.addSessionData(seesionId, "test");
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .header(HttpHeaders.LOCATION, "/test")
-                .build();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
