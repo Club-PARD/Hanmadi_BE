@@ -42,7 +42,7 @@ public class LoginController {
             model.addAttribute("location", location);
             return location;
         } else {
-            return cookieId;
+            return (String) sessionService.getSessionData(cookieId);
         }
     }
 
@@ -62,9 +62,10 @@ public class LoginController {
 //        return "redirect:/test";
 //        return new ResponseEntity<>(HttpStatus.OK);
 
+        String seesionId = sessionService.createRandomKey();
 
-        loginCookieService.createCookie(response, "1");
-
+        loginCookieService.createCookie(response, seesionId);
+        sessionService.addSessionData(seesionId, "test");
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.LOCATION, "/test")
                 .build();
