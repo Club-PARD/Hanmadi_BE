@@ -49,7 +49,6 @@ public class LoginController {
     // 로그인 완료 했을떄 오는 경로
     @GetMapping("/oauth2/code/kakao")
     public ResponseEntity<?> callback(HttpServletResponse response, @RequestParam("code") String code) {
-//    public String callback(@RequestParam("code") String code) {
         String accessToken = kakaoService.getAccessTokenFromKakao(code); // getting token
         KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken); // get user info
 
@@ -60,8 +59,8 @@ public class LoginController {
 
 
         String seesionId = sessionService.createRandomKey();
+
         loginCookieService.createCookie(response, seesionId);
-        System.out.println(loginCookieService.getCookie(seesionId));
         sessionService.addSessionData(seesionId, "test");
         return new ResponseEntity<>(HttpStatus.OK);
     }
