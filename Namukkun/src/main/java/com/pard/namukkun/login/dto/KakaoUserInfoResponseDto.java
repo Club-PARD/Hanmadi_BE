@@ -13,6 +13,8 @@ import java.util.HashMap;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KakaoUserInfoResponseDto {
 
+    // TODO 필요한것들만 남기기
+
     //회원 번호
     @JsonProperty("id")
     public Long id;
