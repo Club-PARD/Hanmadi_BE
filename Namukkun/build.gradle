@@ -1,3 +1,4 @@
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.1'
@@ -18,6 +19,8 @@ repositories {
 }
 
 dependencies {
+
+
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.projectlombok:lombok'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -31,8 +34,19 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.111.Final:osx-x86_64'
+
+
+	//Webflux
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	//thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+

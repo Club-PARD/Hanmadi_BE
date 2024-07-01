@@ -5,11 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
+@AllArgsConstructor
 public class UserCreateDTO {
     private Integer local;
     private String nickName;
     private String email;
     private String profileImage;
-
 }
