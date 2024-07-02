@@ -51,7 +51,7 @@ public class AttachmentService {
             headers.setContentType(MediaType.parseMediaType(s3Object.getObjectMetadata().getContentType()));
             headers.setContentLength(bytes.length);
             headers.setContentDispositionFormData("attachment", fileName);
-
+            System.out.println(new ResponseEntity<>(bytes, headers, HttpStatus.OK));
             return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace();
