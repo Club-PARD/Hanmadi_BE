@@ -27,11 +27,11 @@ public class PostService {
         }
     }
 
-    public List<PostReadDTO> findAllPost(){
-        return postRepo.findAll()
-                .stream()
-                .map(post -> new PostReadDTO(post,
-                        new User(post.getUser())))
-                .collect(Collectors.toList());
-    }
+//    public List<PostReadDTO> findAllPost(){
+//        return postRepo.findAll()
+//                .stream()
+//                .map(post -> new PostReadDTO(post,
+//                        new User(post.getUser())))
+//                .collect(Collectors.toList());
+//    }
 }

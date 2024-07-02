@@ -22,11 +22,15 @@ public class UserService {
         userRepo.save(User.toEntity(dto));
     }
 
-    public List<UserReadDTO> findAllUser(){
+    public List<UserReadDTO> findAllUser() {
         return userRepo.findAll()
                 .stream()
                 .map(UserReadDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    public UserReadDTO findUserByOauth(Long id) {
+        return new UserReadDTO(userRepo.findByOauthID(id));
     }
 
 
@@ -39,7 +43,12 @@ public class UserService {
     }
 
 
-    public void deleteUser(UserDeleteDTO dto){
+    public void deleteUser(UserDeleteDTO dto) {
         userRepo.deleteById(dto.getId());
+    }
+
+    // 가입 한적 있는지 검사
+    public Boolean checkSigned(Long oauthID) {
+        return userRepo.existsByOauthID(oauthID);
     }
 }

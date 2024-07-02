@@ -1,4 +1,4 @@
-package com.pard.namukkun.user.dto;
+package com.pard.namukkun.login.session.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,11 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserCreateDTO {
-    private Long oauthID;
+public class SessionUserDTO {
+    private Long userId;
+    private Integer local;
     private String nickName;
     private String profileImage;
-    private String email;
-    private Integer local;
-
 }
