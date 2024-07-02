@@ -1,9 +1,12 @@
 package com.pard.namukkun.post.entity;
 
+import com.pard.namukkun.Data;
 import com.pard.namukkun.post.dto.PostCreateDTO;
 import com.pard.namukkun.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -16,31 +19,44 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
 
-    private String title;
-    private String content;
-    private String region;
-    private Integer upCount;
+    private String title; // 제목
+    private Integer postRegion; // 지역
+    private Integer upCountPost; // 추천수
+    private String problem; //문제정의
+    private String solution; //해결방법
+    private String benefit; // 기대효과
+    private boolean isDone; // 제출완료 (작성 후 7일이 지난거)
+    private String postTime; // 작성된 날짜 및 시간
+
 
     // 첨부파일 넣는것도 추가해야함
     @JoinColumn(nullable = false, name = "user_Id")
-    @OneToOne
+    @ManyToOne
     private User user;
 
-    public Post(String title, String content, String region, User user) {
+
+    public Post(String title, Integer region, Integer upCountPost,
+                String problem, String solution, String benefit) {
         this.title = title;
-        this.content = content;
-        this.region = region;
-        this.user = user;
-        this.upCount = 0;
+        this.postRegion = region;
+        this.upCountPost = upCountPost;
+        this.problem = problem;
+        this.solution = solution;
+        this.benefit = benefit;
+        this.isDone = false;
     }
 
-    public static Post toEntity(PostCreateDTO postCreateDTO, User user, Integer upCount) {
+    public static Post toEntity(PostCreateDTO postCreateDTO, User user) {
         return Post.builder()
                 .title(postCreateDTO.getTitle())
-                .content(postCreateDTO.getContent())
-                .region(postCreateDTO.getRegion())
+                .postRegion(postCreateDTO.getPostRegion())
+                .upCountPost(postCreateDTO.getUpCountPost())
+                .problem(postCreateDTO.getProblem())
+                .solution(postCreateDTO.getSolution())
+                .benefit(postCreateDTO.getBenefit())
+                .postTime(Data.getNowDate())
+                .isDone(false)
                 .user(user)
-                .upCount(upCount)
                 .build();
     }
 }
