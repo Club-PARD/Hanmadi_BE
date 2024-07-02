@@ -19,6 +19,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long userId;
+    private Long oauthID;
     private String kakaoId;
     private String nickName;
     private String email;
@@ -38,6 +39,7 @@ public class User {
 
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()
+                .oauthID(userCreateDTO.getOauthID())
                 .nickName(userCreateDTO.getNickName())
                 .email(userCreateDTO.getEmail())
                 .build();

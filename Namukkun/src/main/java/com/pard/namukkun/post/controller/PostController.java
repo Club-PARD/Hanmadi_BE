@@ -22,8 +22,8 @@ public class PostController {
         return "Post created";
     }
 
-    @GetMapping("")
-    public List<PostReadDTO> findAllPost() {
-        return postService.findAllPost();
-    }
+//    @GetMapping("")
+//    public List<PostReadDTO> findAllPost() {
+//        return postService.findAllPost();
+//    }
 }

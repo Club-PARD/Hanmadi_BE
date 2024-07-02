@@ -11,7 +11,7 @@ public class LoginService {
 
 
     // login
-    public void signIp(){
+    public void signIn(Long oauthID){
 
     }
 
