@@ -41,11 +41,17 @@ public class User {
         return User.builder()
                 .oauthID(userCreateDTO.getOauthID())
                 .nickName(userCreateDTO.getNickName())
+                .profileImage(userCreateDTO.getProfileImage())
                 .email(userCreateDTO.getEmail())
+                .local(userCreateDTO.getLocal())
                 .build();
     }
 
     public void updateNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public void updateLocal(Integer local) {
+        this.local = local;
     }
 }
