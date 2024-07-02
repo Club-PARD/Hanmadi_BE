@@ -11,14 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 
-@RestController("/file")
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/file")
 public class AttachmentController {
 
     private final AttachmentService attachmentService;
 
     @PostMapping("/upload")
-    @Operation(summary = "파일등록",description = "파일 이름을 입력하고 파일음 첨부합니다.")
+    @Operation(summary = "파일등록",description = "파일 이름을 입력하고 파일음 첨부합니다. key값 : fileNmae 이거 그대로")
     public ResponseEntity<String> uploadFile(@RequestParam("fileName") MultipartFile fileName) {
         return attachmentService.upload(fileName);
     }
