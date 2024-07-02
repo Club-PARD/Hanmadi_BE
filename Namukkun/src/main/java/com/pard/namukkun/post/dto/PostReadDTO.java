@@ -11,18 +11,37 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
 public class PostReadDTO {
-    private Long postId;
-    private String title;
-    private String content;
-    private String region;
-    private User user;
-    private Integer upCount;
+    private String title; // 제목
+    private Integer postRegion; // 지역
+    private Integer upCountPost; // 추천수
+    private String problem; //문제정의
+    private String solution; //해결방법
+    private String benefit; // 기대효과
+    private String postTime; // 작성된 시간
+    private boolean isDone; // 제출완료 (작성 후 7일이 지난거)
+    private String userName;
+
+    public PostReadDTO(Post post) {
+        this.title = post.getTitle();
+        this.postRegion = post.getPostRegion();
+        this.upCountPost = post.getUpCountPost();
+        this.problem = post.getProblem();
+        this.solution = post.getSolution();
+        this.benefit = post.getBenefit();
+        this.isDone = post.isDone();
+        this.postTime = post.getPostTime();
+        this.userName = post.getUser().getNickName();
+    }
 
     public PostReadDTO(Post post, User user) {
         this.title = post.getTitle();
-        this.content = post.getContent();
-        this.region = post.getRegion();
-        this.upCount = post.getUpCount();
-        this.user = user;
+        this.postRegion = post.getPostRegion();
+        this.upCountPost = post.getUpCountPost();
+        this.problem = post.getProblem();
+        this.solution = post.getSolution();
+        this.benefit = post.getBenefit();
+        this.isDone = post.isDone();
+        this.postTime = post.getPostTime();
     }
+
 }
