@@ -4,19 +4,18 @@ import com.pard.namukkun.login.cookie.service.LoginCookieService;
 import com.pard.namukkun.login.dto.KakaoUserInfoResponseDto;
 import com.pard.namukkun.login.service.KakaoService;
 import com.pard.namukkun.login.service.LoginService;
+import com.pard.namukkun.login.session.DTO.SessionUserDTO;
 import com.pard.namukkun.login.session.service.SessionService;
 import com.pard.namukkun.user.dto.UserCreateDTO;
-import com.pard.namukkun.user.entity.User;
-import com.pard.namukkun.user.repo.UserRepo;
+import com.pard.namukkun.user.dto.UserUpdateDTO;
 import com.pard.namukkun.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -37,88 +36,74 @@ public class LoginController {
     private final SessionService sessionService;
     private final LoginCookieService loginCookieService;
 
-
-    // move to login page
-    @GetMapping("")
-    public String login(Model model, @CookieValue(name = "id", required = false) String id) {
-        String cookieId = loginCookieService.getCookie(id);
-
-
-        if (cookieId == null) {
-            String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id + "&redirect_uri=" + redirect_uri;
-            model.addAttribute("location", location);
-            return location;
-        } else {
-//            return (String) sessionService.getSessionData(cookieId);
-
-            return null;
-        }
-    }
-
     // 로그인 완료 했을떄 오는 경로
     @GetMapping("/oauth2/code/kakao")
-    public ResponseEntity<?> callback(HttpServletResponse response, @RequestParam("code") String code) {
-        log.info("들어옴");
+    public ResponseEntity<?> callback(HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest, @RequestParam("code") String code) {
         String accessToken = kakaoService.getAccessTokenFromKakao(code); // get token from kakao
         KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken); // get user info
+
         Long oauthId = userInfo.getId();
 
         if (userService.checkSigned(oauthId)) {// login
+            log.info("로그인");
             loginService.signIn(oauthId);
             return new ResponseEntity<>(HttpStatus.OK); // 200
-            // sign up
-        } else {
+        } else { // sign up
+            log.info("회원가입");
 
+            // 유저 생성
+            UserCreateDTO user = new UserCreateDTO(
+                    userInfo.getId(),
+                    userInfo.getKakaoAccount().getProfile().getNickName(),
+                    userInfo.getKakaoAccount().getProfile().getProfileImageUrl(),
+                    userInfo.getKakaoAccount().getEmail(),
+                    0
+            );
+
+            userService.createUser(user);
+
+
+            // 쿠키, 세션 세팅
+            Long userId = userService.findUserByOauth(oauthId).getUserId();
+
+
+            String randomId = sessionService.createRandomKey();
+            loginCookieService.createCookie(httpServletResponse, randomId);
+
+            SessionUserDTO dto = new SessionUserDTO(user, userId);
+
+            sessionService.addSessionData(httpServletRequest, randomId, dto);
 
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // 401
         }
     }
 
-
-    // 회원가입
+    // 회원가입 -> update local
     @PostMapping("/create/user")
-    public ResponseEntity<?> createUser(HttpServletResponse response, @RequestParam("code") String code,
-                                        @RequestParam("local") Integer local) {
-        log.info("회원가입");
-        log.info(code);
-        String accessToken = kakaoService.getAccessTokenFromKakao(code); // get token from kakao
-        KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken); // get user info
-        Long oauthId = userInfo.getId();
+    public ResponseEntity<?> createUser(
+            HttpServletRequest request,
+            @CookieValue(name = "id", required = true) String id,
+            @RequestParam("local") Integer local
+    ) {
+        Long userId = sessionService.getSessionData(request, id).getUserId();
 
-        // 잘못된 접근
-        if (userService.checkSigned(oauthId)) return new ResponseEntity<>(HttpStatus.CONFLICT);
 
-        // 유저 생성
-        UserCreateDTO user = new UserCreateDTO(
-                userInfo.getId(),
-                userInfo.getKakaoAccount().getProfile().getNickName(),
-                userInfo.getKakaoAccount().getProfile().getProfileImageUrl(),
-                userInfo.getKakaoAccount().getEmail(),
-                local
-        );
-
-        // 유저 저장
-        userService.createUser(user);
-        Long userId = userService.findUserByOauth(oauthId).getUserId();
-
-        String randomId = sessionService.createRandomKey();
-        loginCookieService.createCookie(response, randomId);
-
-//        sessionService.addSessionData(randomId, userId);
+        UserUpdateDTO dto = new UserUpdateDTO(userId, local, null); // nickname 변경 상황 아니라 null 처리
+        try {
+            userService.updateUserLocal(dto);
+        } catch (Exception e) {
+            log.info("sign up error");
+        }
 
         return new ResponseEntity<>(HttpStatus.OK); // 200
     }
 
-
     @PostMapping("/logout")
-    public ResponseEntity<?> logOut(HttpServletResponse response,
-                                    @CookieValue(name = "id", required = true) String id) {
-
+    public ResponseEntity<?> logOut(HttpServletResponse response, @CookieValue(name = "id", required = true) String id) {
         loginCookieService.deleteCookie(response);
-//        loginSessionSe
-//        loginsession
+        sessionService.removeSession(id);
 
-
+        //        loginService.logOut(response, id);
         return new ResponseEntity<>(HttpStatus.OK); // 200
     }
 }

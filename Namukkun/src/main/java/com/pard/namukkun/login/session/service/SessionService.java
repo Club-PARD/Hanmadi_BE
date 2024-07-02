@@ -24,7 +24,8 @@ public class SessionService {
         return UUID.randomUUID().toString();
     }
 
-    public void addSessionData(HttpServletRequest request, String sessionId, UserReadDTO dto) {
+
+    public void addSessionData(HttpServletRequest request, String sessionId, SessionUserDTO dto) {
         HttpSession session = request.getSession(true);
 
         session.setAttribute("id", dto.getUserId());
@@ -35,25 +36,23 @@ public class SessionService {
         session.setMaxInactiveInterval(Data.cookieSessionTime);
 
         sessionMap.put(sessionId, session);
+        log.info("세션 생성 완료");
     }
 
-//    public SessionUserDTO getSessionData(HttpServletRequest request, String sessionId) {
-//
-//        sessionMap.get(sessionId).getAttribute("");
-//        Long id = (Long) sessionMap.get(sessionId).getAttribute("id");
-//        String nickName = (String) sessionMap.get(sessionId).getAttribute("nickName");
-////        Integer local
-//
-//
-////        SessionUserDTO dto = new SessionUserDTO();
-//
-//        return dto;
-//    }
+    public SessionUserDTO getSessionData(HttpServletRequest request, String sessionId) {
+        Long id = (Long) sessionMap.get(sessionId).getAttribute("id");
+        String nickName = (String) sessionMap.get(sessionId).getAttribute("nickName");
+        Integer local = (Integer) sessionMap.get(sessionId).getAttribute("local");
+        String profileImage = (String) sessionMap.get(sessionId).getAttribute("profileImage");
+        SessionUserDTO dto = new SessionUserDTO(id, nickName, local, profileImage);
+        return dto;
+    }
 
-//    public Boolean removeSession(String sessionId){
-//        session.removeAttribute(sessionId);
-//        return true;
-//    }
+    public Boolean removeSession(String sessionId) {
+        if (sessionMap.get(sessionId) != null)
+            sessionMap.get(sessionId).invalidate();
+        return true;
+    }
 //    }
 }
 

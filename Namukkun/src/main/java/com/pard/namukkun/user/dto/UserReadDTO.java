@@ -18,12 +18,11 @@ public class UserReadDTO {
     private String email;
     private String profileImage;
 
-    public UserReadDTO(User user){
+    public UserReadDTO(User user) {
         this.userId = user.getUserId();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
         this.email = user.getEmail();
         this.local = user.getLocal();
     }
-
-}
+    }
