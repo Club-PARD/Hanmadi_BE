@@ -33,7 +33,7 @@ public class User {
 
     //---------------------준현수정----------------
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
+    private List<Post> posts;
 
 //    private // TODO 유저가 쓴 글 저장
 //
