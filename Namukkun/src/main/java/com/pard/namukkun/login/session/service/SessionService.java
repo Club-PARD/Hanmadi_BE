@@ -1,58 +1,58 @@
 package com.pard.namukkun.login.session.service;
 
 import com.pard.namukkun.Data;
-import com.pard.namukkun.login.session.DTO.SessionUserDTO;
-import com.pard.namukkun.user.dto.UserReadDTO;
+import com.pard.namukkun.login.session.DTO.UserSessionDTO;
+import com.pard.namukkun.login.session.DTO.UserSessionData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.session.StandardSession;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class SessionService {
-    private Map<String, HttpSession> sessionMap;
-
-
-    public String createRandomKey() {
+    public String createSessionId() {
         return UUID.randomUUID().toString();
     }
 
+    public Boolean sessionCheck(HttpServletRequest request, String sessionId) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            return session.getAttribute(sessionId) != null;
+        }
+        return false;
+    }
 
-    public void addSessionData(HttpServletRequest request, String sessionId, SessionUserDTO dto) {
+    public void addSessionData(HttpServletRequest request, String sessionId, UserSessionDTO dto) {
         HttpSession session = request.getSession(true);
+        UserSessionData data = new UserSessionData(dto);
 
-        session.setAttribute("id", dto.getUserId());
-        session.setAttribute("nickName", dto.getNickName());
-        session.setAttribute("local", dto.getLocal());
-        session.setAttribute("profileImage", dto.getProfileImage());
-
+        session.setAttribute(sessionId, data);
         session.setMaxInactiveInterval(Data.cookieSessionTime);
-
-        sessionMap.put(sessionId, session);
         log.info("세션 생성 완료");
     }
 
-    public SessionUserDTO getSessionData(HttpServletRequest request, String sessionId) {
-        Long id = (Long) sessionMap.get(sessionId).getAttribute("id");
-        String nickName = (String) sessionMap.get(sessionId).getAttribute("nickName");
-        Integer local = (Integer) sessionMap.get(sessionId).getAttribute("local");
-        String profileImage = (String) sessionMap.get(sessionId).getAttribute("profileImage");
-        SessionUserDTO dto = new SessionUserDTO(id, nickName, local, profileImage);
-        return dto;
+    public UserSessionDTO getUserSessionData(HttpServletRequest request, String sessionId) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            UserSessionData data = (UserSessionData) session.getAttribute(sessionId);
+            if (data != null) {
+                return new UserSessionDTO(data);
+            }
+        }
+        return null;
     }
 
-    public Boolean removeSession(String sessionId) {
-        if (sessionMap.get(sessionId) != null)
-            sessionMap.get(sessionId).invalidate();
-        return true;
+    public void removeSession(HttpServletRequest request, String sessionId) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.removeAttribute(sessionId);
+            session.invalidate();
+        }
     }
-//    }
 }
 

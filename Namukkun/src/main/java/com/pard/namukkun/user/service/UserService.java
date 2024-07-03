@@ -22,6 +22,8 @@ public class UserService {
         userRepo.save(User.toEntity(dto));
     }
 
+//    public void findby
+
     public List<UserReadDTO> findAllUser() {
         return userRepo.findAll()
                 .stream()
@@ -43,10 +45,10 @@ public class UserService {
     }
 
 
-    public void updateUserLocal(UserUpdateDTO dto) throws Exception {
-        Long id = dto.getId();
-        User user = userRepo.findById(dto.getId())
-                .orElseThrow(() -> new Exception("User not found"));
+    public void updateUserLocal(UserUpdateDTO dto) {
+        Long userId = dto.getId();
+        User user = userRepo.findById(userId).get();
+
         user.updateLocal(dto.getLocal());
         userRepo.save(user);
     }
