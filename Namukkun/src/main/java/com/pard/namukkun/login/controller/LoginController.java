@@ -9,6 +9,7 @@ import com.pard.namukkun.login.session.service.SessionService;
 import com.pard.namukkun.user.dto.UserCreateDTO;
 import com.pard.namukkun.user.dto.UserUpdateDTO;
 import com.pard.namukkun.user.service.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class LoginController {
 
         if (userService.checkSigned(oauthId)) {// login
             log.info("로그인");
+
             loginService.signIn(oauthId);
             return new ResponseEntity<>(HttpStatus.OK); // 200
         } else { // sign up
@@ -82,10 +84,18 @@ public class LoginController {
     @PostMapping("/create/user")
     public ResponseEntity<?> createUser(
             HttpServletRequest request,
-            @CookieValue(name = "id", required = true) String id,
+            @CookieValue(name = "id", required = false) String id,
             @RequestParam("local") Integer local
     ) {
         Long userId = sessionService.getSessionData(request, id).getUserId();
+
+        Cookie[] cookies = request.getCookies();
+
+        for (var cookie : cookies) {
+            if (cookie.getAttribute("id") != null) {
+                System.out.println("찾았어요");
+            }
+        }
 
 
         UserUpdateDTO dto = new UserUpdateDTO(userId, local, null); // nickname 변경 상황 아니라 null 처리

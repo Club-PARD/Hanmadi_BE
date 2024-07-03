@@ -20,8 +20,9 @@ public class LoginCookieService {
 
         cookie.setPath("/"); // 사용범위  TODO 이후 로그인에만 사용하게 할 수 있을 듯
         //cookie.setSecure(true); //https 사용시
-        cookie.setAttribute("SameSite", "Lax"); // CSRF 공격 방지
+//        cookie.setAttribute("SameSite", "Lax"); // CSRF 공격 방지
         cookie.setMaxAge(Data.cookieSessionTime); // 쿠키 유지 시간
+//        cookie.setDomain("localhost");
         cookie.setHttpOnly(true); // JS 접근 제어
         response.addCookie(cookie);
 
