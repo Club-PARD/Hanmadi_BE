@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -28,6 +31,9 @@ public class User {
 
     private String profileImage; // kakao profile image
 
+    //---------------------준현수정----------------
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
 
 //    private // TODO 유저가 쓴 글 저장
 //
