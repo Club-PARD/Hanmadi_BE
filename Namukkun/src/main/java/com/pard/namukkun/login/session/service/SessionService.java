@@ -33,6 +33,7 @@ public class SessionService {
 
         session.setAttribute(sessionId, data);
         session.setMaxInactiveInterval(Data.cookieSessionTime);
+        log.info(sessionId);
         log.info("세션 생성 완료");
     }
 

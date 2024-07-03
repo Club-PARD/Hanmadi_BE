@@ -1,5 +1,5 @@
 package com.pard.namukkun;
 
 public class Data {
-    public static Integer cookieSessionTime = 2 * 60;
+    public static Integer cookieSessionTime = 60 * 60;
 }

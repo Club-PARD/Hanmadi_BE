@@ -7,6 +7,7 @@ import com.pard.namukkun.login.service.LoginService;
 import com.pard.namukkun.login.session.service.SessionService;
 import com.pard.namukkun.user.dto.UserUpdateDTO;
 import com.pard.namukkun.user.service.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class LoginController {
 
     @PostMapping("")
     public ResponseEntity<?> sessionCheck(HttpServletRequest request, @CookieValue(name = "id") String sessionId) {
-        if (sessionService.sessionCheck(request,sessionId)) return new ResponseEntity<>(HttpStatus.OK);
+        if (sessionService.sessionCheck(request, sessionId)) return new ResponseEntity<>(HttpStatus.OK);
         else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // 안돼요
 
     }
@@ -64,8 +65,23 @@ public class LoginController {
     }
 
     // 회원가입 -> update local
-    @PostMapping("/create/user")
-    public ResponseEntity<?> createUser(HttpServletRequest request, @CookieValue(name = "id") String sessionId, @RequestParam("local") Integer local) {
+    @GetMapping("/create/user")
+    public ResponseEntity<?> createUser(HttpServletRequest request, HttpServletResponse response,
+                                        @CookieValue(name = "id", required = true) String sessionId,
+//                                        @CookieValue(name = "id", required = false) String sessionId,
+                                        @RequestParam("local") Integer local) {
+
+//        log.info(String.valueOf(request.getCookies().length));
+//        Cookie[] cookie = request.getCookies();
+//
+//        for (var i : cookie) {
+//            log.info(i.getName());
+//            if (i != null && i.getAttribute("id") != null)
+//                System.out.println(i.getAttribute("id"));
+//
+//        }
+//        String sessionId = "";
+        log.info("id inputted : " + sessionId);
         Long userId = sessionService.getUserSessionData(request, sessionId).getUserId();
         UserUpdateDTO dto = new UserUpdateDTO(userId, local, null);
         userService.updateUserLocal(dto);
@@ -73,7 +89,7 @@ public class LoginController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logOut(HttpServletResponse response, HttpServletRequest request,  @CookieValue(name = "id", required = true) String id) {
+    public ResponseEntity<?> logOut(HttpServletResponse response, HttpServletRequest request, @CookieValue(name = "id", required = true) String id) {
         loginCookieService.deleteCookie(response);
         sessionService.removeSession(request, id);
         return new ResponseEntity<>(HttpStatus.OK); // 200

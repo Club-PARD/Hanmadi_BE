@@ -3,9 +3,11 @@ package com.pard.namukkun.login.cookie.service;
 import com.pard.namukkun.Data;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
 
+@Slf4j
 @Service
 public class LoginCookieService {
 
@@ -19,14 +21,15 @@ public class LoginCookieService {
 
 
         cookie.setPath("/"); // 사용범위  TODO 이후 로그인에만 사용하게 할 수 있을 듯
-        //cookie.setSecure(true); //https 사용시
+//        cookie.setSecure(true); //https 사용시
 //        cookie.setAttribute("SameSite", "Lax"); // CSRF 공격 방지
+        cookie.setAttribute("SameSite", "None"); // CSRF 공격 방지
         cookie.setMaxAge(Data.cookieSessionTime); // 쿠키 유지 시간
-//        cookie.setDomain("localhost");
-        cookie.setHttpOnly(true); // JS 접근 제어
+//        cookie.setDomain("hanmadi.site"); // 이 친구 설정하면 쿠키 안날아감. -> 이후 도메인 통일하고 사용해야하는 친구
+//        cookie.setHttpOnly(true); // JS 접근 제어
         response.addCookie(cookie);
 
-        System.out.println("쿠키 냠냠");
+        log.info("쿠키 생성됨 : " + id);
     }
 
     public void deleteCookie(HttpServletResponse response) {
