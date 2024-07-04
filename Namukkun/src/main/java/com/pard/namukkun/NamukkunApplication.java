@@ -8,13 +8,13 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 //@SpringBootApplication
-// ------------- 이거 로컬에서 할 때는 빼고 ------------//
+// ------------- 이거 로컬에서 할 때는 빼고 ------------ //
 //@OpenAPIDefinition(
 //        servers = {
 //                @Server(url="https://hanmadi.site", description = "Default Server url")
 //        }
 //)
-// -----------------------------------------------//
+// ----------------------------------------------- //
 public class NamukkunApplication {
     public static void main(String[] args) {
         SpringApplication.run(NamukkunApplication.class, args);
