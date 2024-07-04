@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -122,12 +124,9 @@ public class PostService {
         Post post = postRepo.findById(postId).get(); //postId로 post find
 
         // 내용 넣어주기
-        post.updateTitle(postCreateDTO.getTitle());
-        post.updatePostRegion(postCreateDTO.getPostRegion());
-        post.updateUpCountPost(postCreateDTO.getUpCountPost());
-        post.updateProBackground(postCreateDTO.getProBackground());
-        post.updateSolution(postCreateDTO.getSolution());
-        post.updateBenefit(postCreateDTO.getBenefit());
+        // 이거 한번에 뭉쳐놓기
+        post.updatePost(postCreateDTO.getTitle(),postCreateDTO.getPostRegion(),postCreateDTO.getUpCountPost()
+        ,postCreateDTO.getProBackground(),postCreateDTO.getSolution(),postCreateDTO.getBenefit());
 
         // 기존에 있던 S3 파일 삭제
         List<S3Attachment> existS3Attachments = post.getS3Attachments();
@@ -157,20 +156,22 @@ public class PostService {
     }
 
     // 첨부파일 업로드
-    public String uploadAttachment(List<MultipartFile> files) {
-        try{
-            for(MultipartFile file : files){
-                /*String uuid = UUID.randomUUID().toString(); // 랜덤 string생성
-                String fileName = uuid + "_" + file.getOriginalFilename();*/
+    public List<String> uploadAttachment(List<MultipartFile> files) {
+        List<String> fileUrls = new ArrayList<>();
+        try {
+            for (MultipartFile file : files) {
+                String uuid = UUID.randomUUID().toString(); // 랜덤 string생성
+                String fileName = uuid + "_" + file.getOriginalFilename();
                 // uuid를 이름 앞에 붙여서 같은 이름으로 들어와도 중복저장이 되도록한다.
-                String fileName = file.getOriginalFilename();
-                s3AttachmentService.upload(file,fileName);
+                //String fileName = file.getOriginalFilename();
+                s3AttachmentService.upload(file, fileName);
                 //postService.addFileUrlToPost(file.getOriginalFilename(),fileName);
+                fileUrls.add(fileName);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return "File uploaded";
+        return fileUrls;
     }
 
 }

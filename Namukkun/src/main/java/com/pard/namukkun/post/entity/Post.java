@@ -73,27 +73,12 @@ public class Post {
         this.isReturn = isReturn;
     }
 
-    public void updateTitle(String title) {
+    public void updatePost(String title, Integer postRegion, Integer upCountPost, String proBackground, String solution, String benefit) {
         this.title = title;
-    }
-
-    public void updatePostRegion(Integer postRegion) {
         this.postRegion = postRegion;
-    }
-
-    public void updateUpCountPost(Integer upCountPost) {
         this.upCountPost = upCountPost;
-    }
-
-    public void updateProBackground(String proBackground) {
         this.proBackground = proBackground;
-    }
-
-    public void updateSolution(String solution) {
         this.solution = solution;
-    }
-
-    public void updateBenefit(String benefit) {
         this.benefit = benefit;
     }
 

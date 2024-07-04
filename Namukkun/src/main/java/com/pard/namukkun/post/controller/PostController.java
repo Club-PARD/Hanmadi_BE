@@ -41,7 +41,7 @@ public class PostController {
 
     @PostMapping(value = "/uploadfile", consumes = {"multipart/form-data"})
     @Operation(summary = "첨부파일 첨부", description = "첨부파일을 첨부합니다.")
-    public String uploadFile(@RequestPart("files") List<MultipartFile> files) throws JsonProcessingException {
+    public List<String> uploadFile(@RequestPart("files") List<MultipartFile> files) throws JsonProcessingException {
         return postService.uploadAttachment(files);
     }
 
