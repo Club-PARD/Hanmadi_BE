@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
-//@SpringBootApplication
 // ------------- 이거 로컬에서 할 때는 빼고 ------------ //
 //@OpenAPIDefinition(
 //        servers = {
