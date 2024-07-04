@@ -27,20 +27,21 @@ public class SessionService {
         return false;
     }
 
-    public void addSessionData(HttpServletRequest request, String sessionId, UserSessionDTO dto) {
-        HttpSession session = request.getSession(true);
-        UserSessionData data = new UserSessionData(dto);
+    public void addSessionData(HttpServletRequest request, UserSessionDTO dto) {
+        HttpSession session = request.getSession(true); // 없으면 새로 만들어요
+        UserSessionData data = new UserSessionData(dto); // dto -> data
 
-        session.setAttribute(sessionId, data);
-        session.setMaxInactiveInterval(Data.cookieSessionTime);
-        log.info(sessionId);
+        session.setAttribute("userinfo", data); // session save
+        session.setMaxInactiveInterval(Data.cookieSessionTime); // time set
+
+
         log.info("세션 생성 완료");
     }
 
-    public UserSessionDTO getUserSessionData(HttpServletRequest request, String sessionId) {
+    public UserSessionDTO getUserSessionData(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
-            UserSessionData data = (UserSessionData) session.getAttribute(sessionId);
+            UserSessionData data = (UserSessionData) session.getAttribute("userinfo");
             if (data != null) {
                 return new UserSessionDTO(data);
             }
@@ -48,10 +49,10 @@ public class SessionService {
         return null;
     }
 
-    public void removeSession(HttpServletRequest request, String sessionId) {
+    public void removeSession(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
-            session.removeAttribute(sessionId);
+            session.removeAttribute("userinfo");
             session.invalidate();
         }
     }
