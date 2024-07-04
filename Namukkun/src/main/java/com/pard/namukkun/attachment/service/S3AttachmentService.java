@@ -41,6 +41,7 @@ public class S3AttachmentService {
         }
     }
 
+
     public ResponseEntity<UrlResource> download(String fileName) {
         UrlResource urlResource = new UrlResource(amazonS3Client.getUrl(bucket,fileName));
 
