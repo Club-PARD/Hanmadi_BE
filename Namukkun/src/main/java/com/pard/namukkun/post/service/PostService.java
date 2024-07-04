@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,13 +30,9 @@ import java.util.stream.Collectors;
 
 public class PostService {
 
-    @Autowired
     private final PostRepo postRepo;
-    @Autowired
     private final UserRepo userRepo;
-    @Autowired
     private final S3AttachmentService s3AttachmentService;
-    @Autowired
     private final ImageService imageService;
 
 
@@ -125,8 +122,8 @@ public class PostService {
 
         // 내용 넣어주기
         // 이거 한번에 뭉쳐놓기
-        post.updatePost(postCreateDTO.getTitle(),postCreateDTO.getPostRegion(),postCreateDTO.getUpCountPost()
-        ,postCreateDTO.getProBackground(),postCreateDTO.getSolution(),postCreateDTO.getBenefit());
+        post.updatePost(postCreateDTO.getTitle(),postCreateDTO.getPostLocal(),postCreateDTO.getUpCountPost()
+        ,postCreateDTO.getPostitCount(),postCreateDTO.getProBackground(),postCreateDTO.getSolution(),postCreateDTO.getBenefit());
 
         // 기존에 있던 S3 파일 삭제
         List<S3Attachment> existS3Attachments = post.getS3Attachments();
@@ -172,6 +169,50 @@ public class PostService {
             e.printStackTrace();
         }
         return fileUrls;
+    }
+
+    public Integer IncreaseUpCountPost(Long postId) {
+        Post post = postRepo.findById(postId).get();
+        post.increaseUpCountPost();
+        postRepo.save(post);
+        return post.getUpCountPost();
+    }
+
+    public Integer decreaseUpCountPost(Long postId) {
+        Post post = postRepo.findById(postId).get();
+        post.decreaseUpCountPost();
+        postRepo.save(post);
+        return post.getUpCountPost();
+    }
+
+    public List<PostReadDTO> sortByUpCountPost(List<PostReadDTO> postReadDTOS){
+        return postReadDTOS.stream()
+                .sorted(Comparator.comparingInt(PostReadDTO::getUpCountPost).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<PostReadDTO> findByLocal(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(() ->
+                new RuntimeException("Can't find user-> "+userId));
+
+        List<Post> posts = postRepo.findByPostLocal(user.getLocal());
+        return posts.stream()
+                .map(post -> new PostReadDTO(post,
+                        post.getS3Attachments().stream()
+                                .map(S3AttachmentReadDTO::new)
+                                .collect(Collectors.toList())))
+                .collect(Collectors.toList());
+    }
+
+    public List<PostReadDTO> sortByRecentPost(List<PostReadDTO> postReadDTOS){
+        return postReadDTOS.stream()
+                .sorted(Comparator.comparing(PostReadDTO::getPostTime).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<PostReadDTO> findByUpCountPost(){
+        List<PostReadDTO> postReadDTOS = readAllPosts();
+        return sortByUpCountPost(postReadDTOS);
     }
 
 }

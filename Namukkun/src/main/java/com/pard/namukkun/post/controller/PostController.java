@@ -7,6 +7,8 @@ import com.pard.namukkun.post.dto.PostCreateDTO;
 import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.service.PostService;
+import com.pard.namukkun.user.entity.User;
+import com.pard.namukkun.user.repo.UserRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -46,15 +48,15 @@ public class PostController {
     }
 
 
-    @GetMapping("/readall")
+    @GetMapping("/read/all")
     @Operation(summary = "모든 게시물을 읽습니다.")
     public List<PostReadDTO> findAllPost() {
         return postService.readAllPosts();
     }
 
     @PatchMapping("/update/{postId}")
-    @Operation(summary = "게시물을 수정합니다.", description = "이거 실행하면 기존의 S3 파일은 삭제되기 때문에" +
-            " 다시 /uploadfile로 s3에 첨부파일을 업로드 해야합니다.")
+    @Operation(summary = "게시물을 수정합니다.", description = "이거 실행하기전에 /post/decreaseUpCount에 가서 파일 첨부먼저 하고 리턴값을" +
+            "fileName에 넣어줘야합니다.")
     public PostReadDTO updatePost(@RequestBody PostCreateDTO postCreateDTO, @PathVariable("postId") Long postId) {
         return postService.updatePost(postId, postCreateDTO);
     }
@@ -64,4 +66,37 @@ public class PostController {
     public String deletePost(@RequestParam("postId") Long postId) {
         return postService.deletePost(postId);
     }
+
+    @PostMapping("/increaeUpCount")
+    @Operation(summary = "게시물 채택")
+    public Integer increaeUpCount(@RequestParam("postId") Long postId) {
+        return postService.IncreaseUpCountPost(postId);
+    }
+
+    @PostMapping("/decreaseUpCount")
+    @Operation(summary = "게시물 채택 취소")
+    public Integer decreaseUpCount(@RequestParam("postId") Long postId) {
+        return postService.decreaseUpCountPost(postId);
+    }
+
+    @GetMapping("/read/by-local/by-up-count")
+    @Operation(summary = "선택된 지역 게시물중 추천순으로 나열합니다.")
+    public List<PostReadDTO> findByUpCount(Long userId) {
+        List<PostReadDTO> postReadDTOS = postService.findByLocal(userId);
+        return postService.sortByUpCountPost(postReadDTOS);
+    }
+
+    @GetMapping("read/by-local")
+    @Operation(summary = "선택된 지역 게시물중 최신순으로 나열합니다.")
+    public List<PostReadDTO> findByRecent(Long userId) {
+        List<PostReadDTO> postReadDTOS = postService.findByLocal(userId);
+        return postService.sortByRecentPost(postReadDTOS);
+    }
+
+    @GetMapping("read/by-Upcount")
+    @Operation(summary = "게시물을 추천 높은순으로 정렬해 나열합니다.")
+    public List<PostReadDTO> findByUpCount(){
+        return postService.findByUpCountPost();
+    }
+
 }
