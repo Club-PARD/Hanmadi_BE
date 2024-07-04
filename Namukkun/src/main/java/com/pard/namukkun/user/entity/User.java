@@ -31,9 +31,19 @@ public class User {
 
     private String profileImage; // kakao profile image
 
-    //---------------------준현수정----------------
+    //---------------------준현수정----------------//
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Post tempPost;
+
+    public void setTempPost(Post tempPost) {
+        this.tempPost = tempPost;
+    }
+
+    //-------------------------------------------//
 
 //    private // TODO 유저가 쓴 글 저장
 //
