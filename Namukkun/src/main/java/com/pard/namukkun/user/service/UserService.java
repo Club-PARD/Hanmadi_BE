@@ -1,9 +1,7 @@
 package com.pard.namukkun.user.service;
 
-import com.pard.namukkun.user.dto.UserCreateDTO;
-import com.pard.namukkun.user.dto.UserDeleteDTO;
-import com.pard.namukkun.user.dto.UserReadDTO;
-import com.pard.namukkun.user.dto.UserUpdateDTO;
+import com.pard.namukkun.post.dto.PostReadDTO;
+import com.pard.namukkun.user.dto.*;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -45,10 +43,10 @@ public class UserService {
     }
 
 
+
     public void updateUserLocal(UserUpdateDTO dto) {
         Long userId = dto.getId();
         User user = userRepo.findById(userId).get();
-
         user.updateLocal(dto.getLocal());
         userRepo.save(user);
     }
@@ -61,5 +59,20 @@ public class UserService {
     // 가입 한적 있는지 검사
     public Boolean checkSigned(Long oauthID) {
         return userRepo.existsByOauthID(oauthID);
+    }
+
+    public UserPostDTO getUserPosts(Long id) throws Exception {
+        User user = userRepo.findById(id).orElseThrow();
+        UserPostDTO dto = new UserPostDTO();
+        dto.setId(id);
+        if (user.getPosts().isEmpty()) dto.setPosts(null);
+        else dto.setPosts(user.getPosts().stream().map(PostReadDTO::new).toList());
+
+        if (user.getTempPost() == null) dto.setTempPost(null);
+        else dto.setTempPost(new PostReadDTO(user.getTempPost()));
+
+
+        return dto;
+
     }
 }

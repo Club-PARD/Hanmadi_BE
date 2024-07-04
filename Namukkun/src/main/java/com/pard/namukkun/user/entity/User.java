@@ -2,10 +2,10 @@ package com.pard.namukkun.user.entity;
 
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.user.dto.UserCreateDTO;
-import com.pard.namukkun.user.dto.UserUpdateDTO;
 import jakarta.persistence.*;
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
+
+import java.util.List;
 
 
 @Entity
@@ -28,14 +28,11 @@ public class User {
 
     private String profileImage; // kakao profile image
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 
-//    private // TODO 유저가 쓴 글 저장
-//
-//    public User(User user) {
-//        this.authId = user.getAuthId();
-//        this.email = user.getEmail();
-//        this.nickName = user.getNickName();
-//    }
+    @OneToOne
+    private Post tempPost;
 
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()

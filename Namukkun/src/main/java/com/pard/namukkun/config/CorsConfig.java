@@ -16,9 +16,6 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true); //frontEnd에서 axios로 처리 가능하게 만들겠다
-
-//        config.setAllowCredentials();
-//        config.setAllowedHeaders();
         config.addAllowedOrigin("*"); //모든 ip에 응답을 허용하겠다
         // 따른 orgin에서오는 것을 허락함
         config.addAllowedHeader("*"); //모든 header에 응답을 허용하겠다
