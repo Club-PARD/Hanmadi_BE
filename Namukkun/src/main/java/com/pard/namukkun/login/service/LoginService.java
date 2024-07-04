@@ -7,15 +7,17 @@ import com.pard.namukkun.user.dto.UserCreateDTO;
 import com.pard.namukkun.user.repo.UserRepo;
 import com.pard.namukkun.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.stereotype.Service;
 
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class LoginService {
+public class LoginService extends DefaultOAuth2UserService {
 
     private final UserService userService;
     private final SessionService sessionService;
@@ -23,13 +25,13 @@ public class LoginService {
 
 
     // login
-    public void signIn(HttpServletRequest request, String sessionId, Long oauthID) {
+    public void signIn(HttpServletRequest request, Long oauthID) {
         UserSessionDTO dto = new UserSessionDTO(userRepo.findByOauthID(oauthID));
-        sessionService.addSessionData(request, sessionId, dto);
+        sessionService.addSessionData(request, dto);
     }
 
     // 회원가입 - 유저 생성은 완료된 상태. 지역 설정
-    public void signUp(HttpServletRequest request, KakaoUserInfoResponseDto userInfo, String sessionId, Long oauthId) {
+    public void signUp(HttpServletRequest request, KakaoUserInfoResponseDto userInfo, Long oauthId) {
         // 유저 생성
         UserCreateDTO user = new UserCreateDTO(
                 userInfo.getId(),
@@ -39,10 +41,11 @@ public class LoginService {
                 0
         );
         userService.createUser(user);
+
         // 세션 세팅
         Long userId = userService.findUserByOauth(oauthId).getUserId();
         UserSessionDTO dto = new UserSessionDTO(user, userId);
-        sessionService.addSessionData(request, sessionId, dto);
+        sessionService.addSessionData(request, dto);
     }
 
 
