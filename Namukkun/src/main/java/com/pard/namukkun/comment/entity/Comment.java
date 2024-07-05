@@ -1,5 +1,8 @@
 package com.pard.namukkun.comment.entity;
 
+import com.pard.namukkun.comment.dto.CommentReadDTO;
+import com.pard.namukkun.postit.entity.PostIt;
+import jakarta.persistence.*;
 import com.pard.namukkun.Data;
 import com.pard.namukkun.comment.dto.CommentCreateDTO;
 import jakarta.persistence.Entity;
@@ -49,6 +52,5 @@ public class Comment {
     public void minUpCounter() {
         upCounter--;
     }
-
 
 }

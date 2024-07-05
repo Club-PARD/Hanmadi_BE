@@ -27,5 +27,4 @@ public class CommentReadDTO {
         this.commentTime = comment.getCommentTime();
         this.content = comment.getContent();
     }
-
 }
