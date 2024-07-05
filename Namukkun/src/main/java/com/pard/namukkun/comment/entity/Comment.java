@@ -30,11 +30,11 @@ public class Comment {
     private Boolean isTaken;    // 채택됨
 
     @JoinColumn(nullable = false)
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Post post;
 
     @JoinColumn(nullable = false)
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private User user;        // 작성자
 
     @OneToOne

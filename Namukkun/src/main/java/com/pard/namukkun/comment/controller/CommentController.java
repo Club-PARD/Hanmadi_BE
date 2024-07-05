@@ -29,7 +29,7 @@ public class CommentController {
             @RequestBody() CommentCreateDTO dto
     ) {
         // 권한 확인
-        if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        if (userId == null || !userId.equals(dto.getUserId())) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         commentService.createComment(postId, userId, dto);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -53,8 +53,8 @@ public class CommentController {
     ) {
         // 권한 확인
         Long commentWriterId = commentService.getCommentWriterId(commentId);
-        log.info("userId = {}",userId);
-        log.info("commentId = {}", commentId);
+//        log.info("userId = {}",userId);
+//        log.info("commentId = {}", commentId);
         if (userId == null || !userId.equals(commentWriterId))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
