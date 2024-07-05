@@ -57,7 +57,7 @@ public class Post {
 
     public void addS3Attachment(String fileUrl) {
 
-        if(this.s3Attachments == null) {
+        if (this.s3Attachments == null) {
             this.s3Attachments = new ArrayList<>();
         }
         S3Attachment s3Attachment = new S3Attachment();
@@ -84,6 +84,9 @@ public class Post {
         this.isReturn = isReturn;
         this.deadLine = deadLine.toString();
     }
+    //----------------------------------
+    public void setIsDone(boolean isDone) { this.isDone = isDone; }
+    //----------------------------------
 
     public void updatePost(String title, Integer postLocal, Integer upCountPost,Integer postitCount, String proBackground, String solution, String benefit) {
         this.title = title;

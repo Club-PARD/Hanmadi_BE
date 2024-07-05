@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -106,7 +108,6 @@ public class PostService {
         Post tempPost = Post.toEntity(postCreateDTO, user);
         tempPost.setInitial(true, Data.getDeadLine(tempPost.getPostTime()));
         List<String> fileNames = postCreateDTO.getFileName();
-
         for (String fileName : fileNames) {
             String S3FileUrl = s3AttachmentService.getUrlWithFileName(fileName);
             tempPost.addS3Attachment(S3FileUrl);
@@ -136,14 +137,15 @@ public class PostService {
     }
 
     //post 업데이트 메서드
+
     public PostReadDTO updatePost(Long postId, PostUpdateDTO postUpdateDTO){
         Post post = postRepo.findById(postId).get(); //postId로 post find
 
         // 내용 넣어주기
         // 이거 한번에 뭉쳐놓기
+
         post.updatePost(postUpdateDTO.getTitle(),postUpdateDTO.getPostLocal(),postUpdateDTO.getUpCountPost()
         ,postUpdateDTO.getPostitCount(),postUpdateDTO.getProBackground(),postUpdateDTO.getSolution(),postUpdateDTO.getBenefit());
-
 
         // 기존에 있던 S3 파일 삭제
         List<S3Attachment> existS3Attachments = post.getS3Attachments();
@@ -190,6 +192,30 @@ public class PostService {
         }
         return fileUrls;
     }
+
+
+    //-----------------------------------
+
+    // 포스트의 시간과 현재 시간을 비교하여
+    public void postCheck(String presentTime) {
+
+        // isDone 이 false 인 post 가져오기
+        List<Post> posts = postRepo.findByIsDoneFalse();
+
+        // 포메터 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 서버타임 설정
+        LocalDate serverTime = LocalDate.parse(presentTime, formatter);
+
+        for (Post post : posts) {
+            // 포스트의 시간 가져오기
+            LocalDate postTime = LocalDate.parse(post.getPostTime(), formatter);
+            // 포스트 시간에 7일을 더한 것이 서버 시간보다 이전이라면 = 7일이 지났다면
+            if (serverTime.isBefore(postTime.plusDays(7))) post.setIsDone(true); // isdone -> true
+        }
+    }
+    //-----------------------------------
 
 
     // 이미지 업로드
@@ -344,6 +370,4 @@ public class PostService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
         }
     }
-
-
 }
