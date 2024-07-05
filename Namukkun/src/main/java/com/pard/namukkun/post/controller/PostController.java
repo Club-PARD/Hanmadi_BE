@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pard.namukkun.attachment.service.S3AttachmentService;
 import com.pard.namukkun.post.dto.PostCreateDTO;
 import com.pard.namukkun.post.dto.PostReadDTO;
+import com.pard.namukkun.post.dto.PostUpdateDTO;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.service.PostService;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +25,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/post")
 @RequiredArgsConstructor
-
+@Slf4j
 public class PostController {
     private final PostService postService;
     private final S3AttachmentService s3AttachmentService;
@@ -30,14 +34,23 @@ public class PostController {
     @Operation(summary = "게시물 등록", description = "게시물 내용을 입력합니다. " +
             "fileName : 첨부파일 이름 ex) text.png " +
             "/post를 통해서 게시물을 등록하고, /post/uploadfile로 가서 첨부파일을 업로드 해야지 객체 url로 첨부파일을 볼 수 있습니다.")
-    public String createPost(@RequestBody() PostCreateDTO postCreateDTO) {
+    public ResponseEntity<?> createPost(@RequestBody() PostCreateDTO postCreateDTO) {
         // Post에서 첨부파일을 제외한 데이터는 CreateDTO형태로 받고, 첨부파일은 List형태로 따로 받음
+        log.info("컨트롤러들어옴");
         return postService.createPost(postCreateDTO);
     }
 
+    //-----------------------------------
+    @PostMapping("/test")
+    public ResponseEntity<?> test(){
+        log.info("test");
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    //-----------------------------------
+
     @PostMapping("/uploadtemppost")
     @Operation(summary = "게시물 임시저장", description = "게시물을 임시저장합니다. 임시저장 후에도 /post/uploadfile로 가서 첨부파일을 업로드 해야합니다.")
-    public String createTempPost(@RequestBody() PostCreateDTO postCreateDTO) {
+    public ResponseEntity<?> createTempPost(@RequestBody() PostCreateDTO postCreateDTO) {
         return postService.saveTempPost(postCreateDTO);
     }
 
@@ -47,6 +60,11 @@ public class PostController {
         return postService.uploadAttachment(files);
     }
 
+    @PostMapping(value = "/uploadimg", consumes = {"multipart/form-data"})
+    @Operation(summary = "이미지 첨부", description = "이미지를 첨부합니다.")
+    public List<String> uploadImg(@RequestPart("files") List<MultipartFile> files) throws JsonProcessingException {
+        return postService.uploadImge(files);
+    }
 
     @GetMapping("/read/all")
     @Operation(summary = "모든 게시물을 읽습니다.")
@@ -57,13 +75,13 @@ public class PostController {
     @PatchMapping("/update/{postId}")
     @Operation(summary = "게시물을 수정합니다.", description = "이거 실행하기전에 /post/decreaseUpCount에 가서 파일 첨부먼저 하고 리턴값을" +
             "fileName에 넣어줘야합니다.")
-    public PostReadDTO updatePost(@RequestBody PostCreateDTO postCreateDTO, @PathVariable("postId") Long postId) {
-        return postService.updatePost(postId, postCreateDTO);
+    public PostReadDTO updatePost(@RequestBody PostUpdateDTO postUpdateDTO, @PathVariable("postId") Long postId) {
+        return postService.updatePost(postId, postUpdateDTO);
     }
 
     @DeleteMapping("/delete")
     @Operation(summary = "게시물을 삭제합니다.")
-    public String deletePost(@RequestParam("postId") Long postId) {
+    public ResponseEntity<?> deletePost(@RequestParam("postId") Long postId) {
         return postService.deletePost(postId);
     }
 

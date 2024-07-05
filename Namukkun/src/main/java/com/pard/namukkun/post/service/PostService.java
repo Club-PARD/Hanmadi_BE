@@ -1,12 +1,12 @@
 package com.pard.namukkun.post.service;
 
+import com.pard.namukkun.Data;
 import com.pard.namukkun.attachment.dto.S3AttachmentReadDTO;
 import com.pard.namukkun.attachment.entity.S3Attachment;
 import com.pard.namukkun.attachment.service.S3AttachmentService;
-import com.pard.namukkun.image.dto.ImageCreateDTO;
-import com.pard.namukkun.image.service.ImageService;
 import com.pard.namukkun.post.dto.PostCreateDTO;
 import com.pard.namukkun.post.dto.PostReadDTO;
+import com.pard.namukkun.post.dto.PostUpdateDTO;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
 import com.pard.namukkun.user.entity.UpPost;
@@ -15,6 +15,12 @@ import com.pard.namukkun.user.repo.UpPostRepo;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,13 +40,12 @@ public class PostService {
     private final PostRepo postRepo;
     private final UserRepo userRepo;
     private final S3AttachmentService s3AttachmentService;
-    private final ImageService imageService;
     private final UpPostRepo upPostRepo;
 
 
-    // PostCreateDTO 받아서 postDTO 생성
+    /*// PostCreateDTO 받아서 postDTO 생성
     @Transactional
-    public String createPost(PostCreateDTO postCreateDTO) {
+    public ResponseEntity<?> createPost(PostCreateDTO postCreateDTO) {
 
         // post 정보 저장할 때 User의 모든 정보 받을 필요 없이 User Id만 받고
         // UserId로 User 찾아서 저장한 뒤에 Post 생성후 save함.
@@ -51,7 +56,7 @@ public class PostService {
         List<String> fileNames = postCreateDTO.getFileName();
 
         Post post = Post.toEntity(postCreateDTO, user);
-        post.setIsReturn(true);
+        post.setInitial(true, Data.getDeadLine(post.getPostTime()));
 
         // 파일 저장
         post = s3AttachmentService.saveS3File(fileNames, post);
@@ -60,13 +65,13 @@ public class PostService {
 
         // 이미지 저장
         saveImage(postCreateDTO,post);
-        return "Post created";
-    }
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }*/
 
     @Transactional
     // 게시물 임시저장
-    public String saveTempPost(PostCreateDTO postCreateDTO) {
-        // User 불러옴
+    public ResponseEntity<?> saveTempPost(PostCreateDTO postCreateDTO) {
+        /*// User 불러옴
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
                 -> new RuntimeException("Error saving temp post -> "+postCreateDTO.getUserId()));
 
@@ -87,7 +92,7 @@ public class PostService {
 
         // 임시 게시물 생성
         Post tempPost = Post.toEntity(postCreateDTO, user);
-        tempPost.setIsReturn(false);
+        tempPost.setInitial(true, Data.getDeadLine(tempPost.getPostTime()));
         List<String> fileNames = postCreateDTO.getFileName();
         s3AttachmentService.saveS3File(fileNames, tempPost);
 
@@ -95,9 +100,9 @@ public class PostService {
         user.setTempPost(tempPost);
         postRepo.save(tempPost);
         saveImage(postCreateDTO,tempPost);
-        userRepo.save(user);
+        userRepo.save(user);*/
 
-        return "temp post saved.";
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // 모든 게시물 read
@@ -112,13 +117,13 @@ public class PostService {
     }
 
     //post 업데이트 메서드
-    public PostReadDTO updatePost(Long postId, PostCreateDTO postCreateDTO){
+    public PostReadDTO updatePost(Long postId, PostUpdateDTO postUpdateDTO){
         Post post = postRepo.findById(postId).get(); //postId로 post find
 
         // 내용 넣어주기
         // 이거 한번에 뭉쳐놓기
-        post.updatePost(postCreateDTO.getTitle(),postCreateDTO.getPostLocal(),postCreateDTO.getUpCountPost()
-        ,postCreateDTO.getPostitCount(),postCreateDTO.getProBackground(),postCreateDTO.getSolution(),postCreateDTO.getBenefit());
+        post.updatePost(postUpdateDTO.getTitle(),postUpdateDTO.getPostLocal(),postUpdateDTO.getUpCountPost()
+        ,postUpdateDTO.getPostitCount(),postUpdateDTO.getProBackground(),postUpdateDTO.getSolution(),postUpdateDTO.getBenefit());
 
         // 기존에 있던 S3 파일 삭제
         List<S3Attachment> existS3Attachments = post.getS3Attachments();
@@ -126,7 +131,7 @@ public class PostService {
             s3AttachmentService.delete(s3Attachments.getFileUrl());
         }
 
-        List<String> fileNames = postCreateDTO.getFileName();
+        List<String> fileNames = postUpdateDTO.getFileName();
         post.getS3Attachments().clear(); // 기존에 있던 url제거
         for(String fileName : fileNames) {
             String S3FileUrl = s3AttachmentService.getUrlWithFileName(fileName);
@@ -142,9 +147,9 @@ public class PostService {
     }
 
     // postId로 찾아 삭제
-    public String deletePost(Long postId) {
+    public ResponseEntity<?> deletePost(Long postId) {
         postRepo.deleteById(postId);
-        return "Post deleted";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // 첨부파일 업로드
@@ -161,6 +166,23 @@ public class PostService {
                 fileUrls.add(fileName);
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return fileUrls;
+    }
+
+    // 이미지 업로드
+    public List<String> uploadImge(List<MultipartFile> files) {
+        List<String> fileUrls = new ArrayList<>();
+        try{
+            for (MultipartFile file : files) {
+                String uuid = UUID.randomUUID().toString();
+                String fileName = uuid + "_" + file.getOriginalFilename();
+                s3AttachmentService.upload(file, fileName);
+                fileUrls.add(s3AttachmentService.getUrlWithFileName(fileName));
+            }
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
         return fileUrls;
@@ -245,10 +267,53 @@ public class PostService {
         return sortByUpCountPost(postReadDTOS);
     }
 
-    // 이미지 저장 메서드
-    public void saveImage(PostCreateDTO postCreateDTO, Post post) {
-        for(ImageCreateDTO imageCreateDTO : postCreateDTO.getImageCreateDTOS()) {
-            imageService.saveImage(imageCreateDTO,post);
+    public ResponseEntity<?> createPost(PostCreateDTO postCreateDTO) {
+        log.info("서비스 들어옴");
+        User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
+                -> new RuntimeException("Error creating post -> "+postCreateDTO.getUserId()));
+        try {
+            // HTML 파싱
+            String proBackgroundHtml = postCreateDTO.getProBackground();
+            Document probackgroundDocument = Jsoup.parse(proBackgroundHtml);
+            String probackgroundText = probackgroundDocument.body().text();
+            System.out.println(probackgroundText);
+
+            String solutionHtml = postCreateDTO.getSolution();
+            Document solutionDocument = Jsoup.parse(solutionHtml);
+            String solutionText = solutionDocument.body().text();
+
+            String benefitHtml = postCreateDTO.getBenefit();
+            Document benefitDocument = Jsoup.parse(benefitHtml);
+            String benefitText = benefitDocument.body().text();
+
+            // s3attachment에 url 저장하기 위해서 filename을 받음
+            List<String> fileNames = postCreateDTO.getFileName();
+
+            Post post = Post.toEntity(postCreateDTO,probackgroundText,solutionText,benefitText, user);
+            post.setInitial(true, Data.getDeadLine(post.getPostTime()));
+
+            // 파일 저장
+            post = s3AttachmentService.saveS3File(fileNames, post);
+
+            postRepo.save(post);
+
+            /*// 예시: <div> 태그 내의 모든 텍스트 추출
+            Elements divElements = doc.select("div");
+            for (Element div : divElements) {
+                String text = div.text();
+                System.out.println("Text in <div>: " + text);
+            }
+
+            // 예시: 이미지 태그 내의 src 속성 추출
+            Elements imgElements = doc.select("img");
+            for (Element img : imgElements) {
+                String imageUrl = img.attr("src");
+                System.out.println("Image URL: " + imageUrl);
+            }*/
+
+            return ResponseEntity.status(HttpStatus.OK).body("HTML 파싱 완료");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
         }
     }
 
