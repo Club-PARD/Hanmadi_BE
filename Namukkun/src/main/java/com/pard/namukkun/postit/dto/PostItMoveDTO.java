@@ -1,4 +1,4 @@
-package com.pard.namukkun.comment.dto;
+package com.pard.namukkun.postit.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -6,13 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentReadDTO {
+public class PostItMoveDTO {
     private Long id;
     private Long userId;
 
-    private String content;
+    private Float x;
+    private Float y;
+    private Float z;
 }
