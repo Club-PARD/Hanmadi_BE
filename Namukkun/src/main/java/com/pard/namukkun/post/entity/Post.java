@@ -50,8 +50,7 @@ public class Post {
             this.s3Attachments = new ArrayList<>();
         }
         S3Attachment s3Attachment = new S3Attachment();
-        s3Attachment.setFileUrl(fileUrl);
-        s3Attachment.setPost(this);
+        s3Attachment.setFileUrl(fileUrl,this);
         this.s3Attachments.add(s3Attachment);
     }
 

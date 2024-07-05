@@ -9,11 +9,12 @@ import com.pard.namukkun.post.dto.PostCreateDTO;
 import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
+import com.pard.namukkun.user.entity.UpPost;
 import com.pard.namukkun.user.entity.User;
+import com.pard.namukkun.user.repo.UpPostRepo;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +35,7 @@ public class PostService {
     private final UserRepo userRepo;
     private final S3AttachmentService s3AttachmentService;
     private final ImageService imageService;
+    private final UpPostRepo upPostRepo;
 
 
     // PostCreateDTO 받아서 postDTO 생성
@@ -52,17 +54,12 @@ public class PostService {
         post.setIsReturn(true);
 
         // 파일 저장
-        for(String fileName : fileNames) {
-            String S3FileUrl = s3AttachmentService.getUrlWithFileName(fileName);
-            post.addS3Attachment(S3FileUrl);
-        }
+        post = s3AttachmentService.saveS3File(fileNames, post);
 
         postRepo.save(post);
 
         // 이미지 저장
-        for(ImageCreateDTO imageCreateDTO : postCreateDTO.getImageCreateDTOS()) {
-            imageService.saveImage(imageCreateDTO,post);
-        }
+        saveImage(postCreateDTO,post);
         return "Post created";
     }
 
@@ -88,18 +85,16 @@ public class PostService {
             postRepo.delete(exsitedPost);
         }
 
-        // 임기 게시물 생성
+        // 임시 게시물 생성
         Post tempPost = Post.toEntity(postCreateDTO, user);
         tempPost.setIsReturn(false);
         List<String> fileNames = postCreateDTO.getFileName();
-        for(String fileName : fileNames) {
-            String S3FileUrl = s3AttachmentService.getUrlWithFileName(fileName);
-            tempPost.addS3Attachment(S3FileUrl);
-        }
+        s3AttachmentService.saveS3File(fileNames, tempPost);
 
         // 임시게시물 저장
         user.setTempPost(tempPost);
         postRepo.save(tempPost);
+        saveImage(postCreateDTO,tempPost);
         userRepo.save(user);
 
         return "temp post saved.";
@@ -171,18 +166,53 @@ public class PostService {
         return fileUrls;
     }
 
-    public Integer IncreaseUpCountPost(Long postId) {
-        Post post = postRepo.findById(postId).get();
+    // 채택하는 메서드
+    public Integer IncreaseUpCountPost(Long postId, Long userId) {
+        User user = returnUser(userId);
+
+        Post post = returnPost(postId);
         post.increaseUpCountPost();
         postRepo.save(post);
+
+        UpPost upPost = new UpPost();
+        upPost.setPostId(postId);
+        user.addUpPost(upPost);
+
+        upPostRepo.save(upPost);
+
         return post.getUpCountPost();
     }
 
-    public Integer decreaseUpCountPost(Long postId) {
-        Post post = postRepo.findById(postId).get();
+    // 채택 취소하는 메서드
+    @Transactional
+    public Integer decreaseUpCountPost(Long postId, Long userId) {
+        Post post = returnPost(postId);
         post.decreaseUpCountPost();
         postRepo.save(post);
+
+        User user = returnUser(userId);
+        List<UpPost> upPosts = user.getUpPosts();
+        for(UpPost upPost : upPosts) {
+            if(upPost.getPostId().equals(postId)) {
+                upPostRepo.deleteById(upPost.getUpPostId());
+                user.getUpPosts().remove(upPost);
+                userRepo.save(user);
+                break;
+            }
+        }
         return post.getUpCountPost();
+    }
+
+    // postId를 받아서 post를 리턴하는 메서드
+    public Post returnPost(Long postId) {
+        return postRepo.findById(postId).orElseThrow(()
+                -> new RuntimeException("Error can't find post -> "+postId));
+    }
+
+    // userId를 받아서 user를 리턴하는 메서드
+    public User returnUser(Long userId){
+        return userRepo.findById(userId).orElseThrow(()
+                -> new RuntimeException("Error can't find user -> "+userId));
     }
 
     public List<PostReadDTO> sortByUpCountPost(List<PostReadDTO> postReadDTOS){
@@ -191,11 +221,9 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public List<PostReadDTO> findByLocal(Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(() ->
-                new RuntimeException("Can't find user-> "+userId));
-
-        List<Post> posts = postRepo.findByPostLocal(user.getLocal());
+    // 유저 아이디에 있는 지역 번호에 따라서 해당 지역을 나오게함
+    public List<PostReadDTO> findByLocal(Integer localPageId) {
+        List<Post> posts = postRepo.findByPostLocal(localPageId);
         return posts.stream()
                 .map(post -> new PostReadDTO(post,
                         post.getS3Attachments().stream()
@@ -204,15 +232,24 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    // 게시물 최신순으로 정렬하는 메서드
     public List<PostReadDTO> sortByRecentPost(List<PostReadDTO> postReadDTOS){
         return postReadDTOS.stream()
                 .sorted(Comparator.comparing(PostReadDTO::getPostTime).reversed())
                 .collect(Collectors.toList());
     }
 
+    // 게시물 채택수별로 정렬하는 메서드
     public List<PostReadDTO> findByUpCountPost(){
         List<PostReadDTO> postReadDTOS = readAllPosts();
         return sortByUpCountPost(postReadDTOS);
+    }
+
+    // 이미지 저장 메서드
+    public void saveImage(PostCreateDTO postCreateDTO, Post post) {
+        for(ImageCreateDTO imageCreateDTO : postCreateDTO.getImageCreateDTOS()) {
+            imageService.saveImage(imageCreateDTO,post);
+        }
     }
 
 }

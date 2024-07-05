@@ -69,27 +69,27 @@ public class PostController {
 
     @PostMapping("/increaeUpCount")
     @Operation(summary = "게시물 채택")
-    public Integer increaeUpCount(@RequestParam("postId") Long postId) {
-        return postService.IncreaseUpCountPost(postId);
+    public Integer increaeUpCount(@RequestParam("postId") Long postId, @RequestParam("userId") Long userId) {
+        return postService.IncreaseUpCountPost(postId,userId);
     }
 
     @PostMapping("/decreaseUpCount")
     @Operation(summary = "게시물 채택 취소")
-    public Integer decreaseUpCount(@RequestParam("postId") Long postId) {
-        return postService.decreaseUpCountPost(postId);
+    public Integer decreaseUpCount(@RequestParam("postId") Long postId, @RequestParam("userId") Long userId) {
+        return postService.decreaseUpCountPost(postId,userId);
     }
 
     @GetMapping("/read/by-local/by-up-count")
     @Operation(summary = "선택된 지역 게시물중 추천순으로 나열합니다.")
-    public List<PostReadDTO> findByUpCount(Long userId) {
-        List<PostReadDTO> postReadDTOS = postService.findByLocal(userId);
+    public List<PostReadDTO> findByUpCount(Integer localPageId) {
+        List<PostReadDTO> postReadDTOS = postService.findByLocal(localPageId);
         return postService.sortByUpCountPost(postReadDTOS);
     }
 
     @GetMapping("read/by-local")
     @Operation(summary = "선택된 지역 게시물중 최신순으로 나열합니다.")
-    public List<PostReadDTO> findByRecent(Long userId) {
-        List<PostReadDTO> postReadDTOS = postService.findByLocal(userId);
+    public List<PostReadDTO> findByRecent(Integer localPageId) {
+        List<PostReadDTO> postReadDTOS = postService.findByLocal(localPageId);
         return postService.sortByRecentPost(postReadDTOS);
     }
 
