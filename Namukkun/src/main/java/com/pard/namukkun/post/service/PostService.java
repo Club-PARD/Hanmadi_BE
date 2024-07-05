@@ -119,9 +119,11 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    //post 업데이트 메서드
-    public PostReadDTO updatePost(Long postId, PostCreateDTO postCreateDTO) {
-        Post post = postRepo.findById(postId).get(); //postId로 post find
+    //post 업데이트 메서드  
+    public PostReadDTO updatePost(Long postId, PostCreateDTO postCreateDTO){
+        Post post = postRepo.findById(postId).orElseThrow(); //postId로 post find
+
+
 
         // 내용 넣어주기
         // 이거 한번에 뭉쳐놓기

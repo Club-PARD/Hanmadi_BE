@@ -1,11 +1,13 @@
 package com.pard.namukkun.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.user.dto.UserCreateDTO;
 import com.pard.namukkun.user.dto.UserReadDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -35,9 +37,12 @@ public class User {
     @OneToOne
     private Post tempPost;
 
-    public void setTempPost(Post tempPost) {
-        this.tempPost = tempPost;
-    }
+
+    @ElementCollection
+    @CollectionTable(name = "user_up_comment_ids", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "up_comment_id")
+    private List<Long> upList;
+
 
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()
@@ -58,11 +63,21 @@ public class User {
                 .build();
     }
 
+
+    //----------------------------------------------
+
+    public void setTempPost(Post tempPost) {
+        this.tempPost = tempPost;
+    }
+
     public void updateNickName(String nickName) {
         this.nickName = nickName;
     }
 
     public void updateLocal(Integer local) {
         this.local = local;
+    }
+    public void updateUpList(List<Long> list) {
+        this.upList = list;
     }
 }
