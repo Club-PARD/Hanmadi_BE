@@ -40,8 +40,10 @@ public class Post {
 
 
     //--------------------------------------------------------
-    @JoinColumn(nullable = false, name = "comments_Id")
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+//    @JoinColumn(nullable = false, name = "comments_Id")
+//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+//    private List<Comment> comments;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
     //--------------------------------------------------------
 

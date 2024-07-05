@@ -21,11 +21,11 @@ public class CommentController {
 
 
     // 덧글 생성
-    @PostMapping("/comment")
+    @PostMapping("")
     @Operation(summary = "덧글 생성", description = "포스트 아이디와 유저아이디(세션)로 덧글을 생성합니다." + "유저 아이디는 디버그용입니다.")
     public ResponseEntity<?> createComment(
-            @RequestParam("postId") Long postId,
-            @RequestParam(value = "userId", required = true /* 이후 체크 해야함 */) Long userId, // debug
+            @RequestParam("postid") Long postId,
+            @RequestParam(value = "userid", required = true /* 이후 체크 해야함 */) Long userId, // debug
             @RequestBody() CommentCreateDTO dto
     ) {
         // 권한 확인
@@ -37,21 +37,24 @@ public class CommentController {
 
     // 덧글 수정 없음
 
-    @GetMapping("/comment")
+    // 덧글 읽기
+    @GetMapping("")
     @Operation(summary = "덧글 읽기", description = "포스트에 있는 덧글을 읽어옵니다.")
-    public List<CommentReadDTO> readAllComment(@RequestParam("postId") Long postId) {
+    public List<CommentReadDTO> readAllComment(@RequestParam("postid") Long postId) {
         return commentService.readALlComment(postId);
     }
 
     // 덧글 삭제
-    @DeleteMapping("/comment")
+    @DeleteMapping("")
     @Operation(summary = "덧글 삭제", description = "덧글아이디로 덧글을 삭제합니다" + "유저의 아이디와 작성자의 아이디가 다르다면 삭제되지 않습니다")
     public ResponseEntity<?> deleteComment(
             @RequestParam(value = "userid", required = false) Long userId, // debug
-            @RequestParam(value = "commentId") Long commentId
+            @RequestParam(value = "commentid") Long commentId
     ) {
         // 권한 확인
         Long commentWriterId = commentService.getCommentWriterId(commentId);
+        log.info("userId = {}",userId);
+        log.info("commentId = {}", commentId);
         if (userId == null || !userId.equals(commentWriterId))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -60,16 +63,32 @@ public class CommentController {
     }
 
     // 덧글 좋아요
-    @PatchMapping("/comment/up")
-    @Operation(summary = "덧글 좋아요", description = "좋아요가 증가됩니다." + "만약 유저가 이미 눌렀다면 좋아요가 취소 됩니다(감소됩니다)")
+    @PatchMapping("/up")
+    @Operation(summary = "덧글 좋아요", description = "좋아요가 증가됩니다." +
+            "만약 유저가 이미 눌렀다면 좋아요가 취소 됩니다(감소됩니다)")
     public ResponseEntity<?> upButton(
-            @RequestParam("commentId") Long commentId,
-            @RequestParam("userId") Long userId// debug
+            @RequestParam("commentid") Long commentId,
+            @RequestParam("userid") Long userId// debug
     ) {
         // 로그인 되어있는지 확인
         if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        
+
         commentService.upButton(commentId, userId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 덧글 채택
+    @PatchMapping("/take")
+    @Operation(summary = "덧글 채택", description = "덧글을 채택합니다")
+    public ResponseEntity<?> takeComment(
+            @RequestParam("userid") Long userId, // debug
+            @RequestParam("commentid") Long commentId,
+            @RequestParam("take") Boolean take
+    ) {
+        // 로그인 되어있는지 확인
+        if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        commentService.takeComment(commentId, take);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

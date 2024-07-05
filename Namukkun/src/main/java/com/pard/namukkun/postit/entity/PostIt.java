@@ -43,6 +43,11 @@ public class PostIt {
     private Float y;
     private Float z;
 
+
+    @OneToOne(mappedBy = "postIt", orphanRemoval = false)
+    private Comment comment;
+
+
     public static PostIt toEntity(PostItCreateDTO dto, User user) {
 
         return new PostIt().builder()

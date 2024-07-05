@@ -11,7 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CommentCreateDTO {
     private Long userId;
-    private String commentTime;
     private String content;
 
 }

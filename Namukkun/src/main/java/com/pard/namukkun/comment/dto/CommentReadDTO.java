@@ -16,15 +16,14 @@ public class CommentReadDTO {
     private Integer upCounter;  // 좋아요 수
     private String commentTime; // timetable
     private String content;     // 내용
-
-
-
+    private Boolean isTaken;     // 채택됨
 
     public CommentReadDTO(Comment comment){
         this.id = comment.getId();
-        this.userId = comment.getUserId();
+        this.userId = comment.getUser().getUserId();
         this.upCounter = comment.getUpCounter();
         this.commentTime = comment.getCommentTime();
         this.content = comment.getContent();
+        this.isTaken = comment.getIsTaken();
     }
 }

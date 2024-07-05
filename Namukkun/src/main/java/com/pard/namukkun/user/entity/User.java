@@ -1,7 +1,9 @@
 package com.pard.namukkun.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.post.entity.Post;
+import com.pard.namukkun.postit.entity.PostIt;
 import com.pard.namukkun.user.dto.UserCreateDTO;
 import com.pard.namukkun.user.dto.UserReadDTO;
 import jakarta.persistence.*;
@@ -31,11 +33,17 @@ public class User {
 
     private String profileImage; // kakao profile image
 
+    @OneToOne
+    private Post tempPost;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
-    @OneToOne
-    private Post tempPost;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostIt> postIts;
 
 
     @ElementCollection
