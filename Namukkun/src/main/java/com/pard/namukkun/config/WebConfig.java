@@ -14,6 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://localhost:3001",
                         "http://localhost:3003",
                         "http://localhost:8080",
+                        "https://hanmadi-test.web.app",
                         "https://hanmadi.site")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                 .allowedHeaders("*")

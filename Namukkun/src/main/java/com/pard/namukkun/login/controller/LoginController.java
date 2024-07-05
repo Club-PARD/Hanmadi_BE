@@ -38,21 +38,21 @@ public class LoginController {
     private final SessionService sessionService;
     private final LoginCookieService loginCookieService;
 
-
-    @PostMapping("/test")
-    public void testpost(HttpServletRequest request, @RequestParam("code") String code) {
-        HttpSession session = request.getSession(true); // 없으면 새로 만들어요
-        session.setAttribute("test", code);
-        log.info("post들어옴");
-//        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @GetMapping("/test")
-    public void testget(@SessionAttribute(value = "test",required = false) String str) {
-        log.info("get들어옴");
-        log.info(str);
-//        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//
+//    @GetMapping("/test/send")
+//    public void testpost(HttpServletRequest request, @RequestParam("code") String code) {
+//        HttpSession session = request.getSession(true); // 없으면 새로 만들어요
+//        session.setAttribute("test", code);
+//        log.info("post들어옴");
+////        return new ResponseEntity<>(HttpStatus.OK);
+//    }
+//
+//    @GetMapping("/test")
+//    public void testget(@SessionAttribute(value = "test",required = false) String str) {
+//        log.info("get들어옴");
+//        log.info(str);
+////        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
 
     @PostMapping("")
