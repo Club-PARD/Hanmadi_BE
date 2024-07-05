@@ -2,6 +2,7 @@ package com.pard.namukkun.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pard.namukkun.comment.entity.Comment;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.postit.entity.PostIt;
 import com.pard.namukkun.user.dto.UserCreateDTO;

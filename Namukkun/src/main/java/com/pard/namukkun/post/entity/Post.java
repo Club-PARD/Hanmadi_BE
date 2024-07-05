@@ -25,8 +25,9 @@ public class Post {
     private Long postId;
 
     private String title; // 제목
-    private Integer postRegion; // 지역
+    private Integer postLocal; // 지역
     private Integer upCountPost; // 추천수
+    private Integer postitCount; // 포스트잇 갯수
     private String proBackground; // 제안배경
     private String solution; // 해결방
     private String benefit; // 기대효과
@@ -60,16 +61,16 @@ public class Post {
             this.s3Attachments = new ArrayList<>();
         }
         S3Attachment s3Attachment = new S3Attachment();
-        s3Attachment.setFileUrl(fileUrl);
-        s3Attachment.setPost(this);
+        s3Attachment.setFileUrl(fileUrl,this);
         this.s3Attachments.add(s3Attachment);
     }
 
     public static Post toEntity(PostCreateDTO postCreateDTO, User user) {
         Post post = Post.builder()
                 .title(postCreateDTO.getTitle())
-                .postRegion(postCreateDTO.getPostRegion())
+                .postLocal(postCreateDTO.getPostLocal())
                 .upCountPost(postCreateDTO.getUpCountPost())
+                .postitCount(postCreateDTO.getPostitCount())
                 .proBackground(postCreateDTO.getProBackground())
                 .solution(postCreateDTO.getSolution())
                 .benefit(postCreateDTO.getBenefit())
@@ -84,13 +85,22 @@ public class Post {
         this.isReturn = isReturn;
     }
 
-    public void updatePost(String title, Integer postRegion, Integer upCountPost, String proBackground, String solution, String benefit) {
+    public void updatePost(String title, Integer postLocal, Integer upCountPost,Integer postitCount, String proBackground, String solution, String benefit) {
         this.title = title;
-        this.postRegion = postRegion;
+        this.postLocal = postLocal;
         this.upCountPost = upCountPost;
+        this.postitCount = postitCount;
         this.proBackground = proBackground;
         this.solution = solution;
         this.benefit = benefit;
+    }
+
+    public void increaseUpCountPost() {
+        this.upCountPost++;
+    }
+
+    public void decreaseUpCountPost() {
+        this.upCountPost--;
     }
 
 }
