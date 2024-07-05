@@ -9,16 +9,12 @@ import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.post.dto.PostUpdateDTO;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
-import com.pard.namukkun.user.entity.UpPost;
 import com.pard.namukkun.user.entity.User;
-import com.pard.namukkun.user.repo.UpPostRepo;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,7 +38,6 @@ public class PostService {
     private final PostRepo postRepo;
     private final UserRepo userRepo;
     private final S3AttachmentService s3AttachmentService;
-    private final UpPostRepo upPostRepo;
 
 
     /*// PostCreateDTO 받아서 postDTO 생성
@@ -250,12 +245,6 @@ public class PostService {
         post.increaseUpCountPost();
         postRepo.save(post);
 
-        UpPost upPost = new UpPost();
-        upPost.setPostId(postId);
-        user.addUpPost(upPost);
-
-        upPostRepo.save(upPost);
-
         return post.getUpCountPost();
     }
 
@@ -266,16 +255,6 @@ public class PostService {
         post.decreaseUpCountPost();
         postRepo.save(post);
 
-        User user = returnUser(userId);
-        List<UpPost> upPosts = user.getUpPosts();
-        for(UpPost upPost : upPosts) {
-            if(upPost.getPostId().equals(postId)) {
-                upPostRepo.deleteById(upPost.getUpPostId());
-                user.getUpPosts().remove(upPost);
-                userRepo.save(user);
-                break;
-            }
-        }
         return post.getUpCountPost();
     }
 
