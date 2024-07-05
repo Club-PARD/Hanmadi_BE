@@ -37,11 +37,10 @@ public class PostItService {
     // 포스트잇 이동
     public void movePostIt(PostItMoveDTO dto) {
         User user = userRepo.findById(dto.getUserId()).orElseThrow();
-
-
-        PostIt postIt = PostIt.toEntity(dto, user);
-        postItRepo.save(postIt);
-        postItRepo.save()
+//        PostIt postIt = PostIt.toEntity(dto, user);
+//        postItRepo.save(postIt);
+//        postItRepo.save();
 
     }
+
 }

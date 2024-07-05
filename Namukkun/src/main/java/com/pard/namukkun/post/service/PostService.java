@@ -46,7 +46,7 @@ public class PostService {
         // post 정보 저장할 때 User의 모든 정보 받을 필요 없이 User Id만 받고
         // UserId로 User 찾아서 저장한 뒤에 Post 생성후 save함.
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
-                -> new RuntimeException("Error creating post -> "+postCreateDTO.getUserId()));
+                -> new RuntimeException("Error creating post -> " + postCreateDTO.getUserId()));
 
         // s3attachment에 url 저장하기 위해서 filename을 받음
         List<String> fileNames = postCreateDTO.getFileName();
@@ -55,7 +55,7 @@ public class PostService {
         post.setIsReturn(true);
 
         // 파일 저장
-        for(String fileName : fileNames) {
+        for (String fileName : fileNames) {
             String S3FileUrl = s3AttachmentService.getUrlWithFileName(fileName);
             post.addS3Attachment(S3FileUrl);
         }
@@ -63,8 +63,8 @@ public class PostService {
         postRepo.save(post);
 
         // 이미지 저장
-        for(ImageCreateDTO imageCreateDTO : postCreateDTO.getImageCreateDTOS()) {
-            imageService.saveImage(imageCreateDTO,post);
+        for (ImageCreateDTO imageCreateDTO : postCreateDTO.getImageCreateDTOS()) {
+            imageService.saveImage(imageCreateDTO, post);
         }
         return "Post created";
     }
@@ -74,15 +74,15 @@ public class PostService {
     public String saveTempPost(PostCreateDTO postCreateDTO) {
         // User 불러옴
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
-                -> new RuntimeException("Error saving temp post -> "+postCreateDTO.getUserId()));
+                -> new RuntimeException("Error saving temp post -> " + postCreateDTO.getUserId()));
 
         // 만약 원래 temp post가 있다면 삭제
-        if(user.getTempPost() != null) {
+        if (user.getTempPost() != null) {
             Post exsitedPost = user.getTempPost();
             List<S3Attachment> exsitedS3Attachments = exsitedPost.getS3Attachments();
 
             // S3파일 삭제
-            for(S3Attachment exsitedS3Attachment : exsitedS3Attachments) {
+            for (S3Attachment exsitedS3Attachment : exsitedS3Attachments) {
                 s3AttachmentService.delete(exsitedS3Attachment.getFileUrl());
             }
 
@@ -95,7 +95,7 @@ public class PostService {
         Post tempPost = Post.toEntity(postCreateDTO, user);
         tempPost.setIsReturn(false);
         List<String> fileNames = postCreateDTO.getFileName();
-        for(String fileName : fileNames) {
+        for (String fileName : fileNames) {
             String S3FileUrl = s3AttachmentService.getUrlWithFileName(fileName);
             tempPost.addS3Attachment(S3FileUrl);
         }
@@ -120,23 +120,23 @@ public class PostService {
     }
 
     //post 업데이트 메서드
-    public PostReadDTO updatePost(Long postId, PostCreateDTO postCreateDTO){
+    public PostReadDTO updatePost(Long postId, PostCreateDTO postCreateDTO) {
         Post post = postRepo.findById(postId).get(); //postId로 post find
 
         // 내용 넣어주기
         // 이거 한번에 뭉쳐놓기
-        post.updatePost(postCreateDTO.getTitle(),postCreateDTO.getPostRegion(),postCreateDTO.getUpCountPost()
-        ,postCreateDTO.getProBackground(),postCreateDTO.getSolution(),postCreateDTO.getBenefit());
+        post.updatePost(postCreateDTO.getTitle(), postCreateDTO.getPostRegion(), postCreateDTO.getUpCountPost()
+                , postCreateDTO.getProBackground(), postCreateDTO.getSolution(), postCreateDTO.getBenefit());
 
         // 기존에 있던 S3 파일 삭제
         List<S3Attachment> existS3Attachments = post.getS3Attachments();
-        for(S3Attachment s3Attachments : existS3Attachments) {
+        for (S3Attachment s3Attachments : existS3Attachments) {
             s3AttachmentService.delete(s3Attachments.getFileUrl());
         }
 
         List<String> fileNames = postCreateDTO.getFileName();
         post.getS3Attachments().clear(); // 기존에 있던 url제거
-        for(String fileName : fileNames) {
+        for (String fileName : fileNames) {
             String S3FileUrl = s3AttachmentService.getUrlWithFileName(fileName);
             post.addS3Attachment(S3FileUrl);
         }
@@ -174,4 +174,9 @@ public class PostService {
         return fileUrls;
     }
 
+    //-----------------------------------------
+    public Long getWriterUserId(Long postId) {
+        return postRepo.findById(postId).orElseThrow().getUser().getUserId();
+    }
+    //-----------------------------------------
 }

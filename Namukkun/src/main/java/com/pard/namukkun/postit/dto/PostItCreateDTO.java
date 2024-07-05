@@ -12,15 +12,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostItCreateDTO {
-
     // 유저
     private Long userId;
 
     // 연결된 덧글
     private Long commentId;
 
-    // 포스트잇 내용
-    private String context;
+    // 디자인 옵션
+    private Integer design;
+
+    // 왼쪽 오른쪽
+    private String section;
 
     // 위치
     private Float x;

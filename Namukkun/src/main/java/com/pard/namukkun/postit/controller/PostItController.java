@@ -1,6 +1,7 @@
 package com.pard.namukkun.postit.controller;
 
 
+import com.pard.namukkun.post.service.PostService;
 import com.pard.namukkun.postit.dto.PostItCreateDTO;
 import com.pard.namukkun.postit.dto.PostItMoveDTO;
 import com.pard.namukkun.postit.service.PostItService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PostItController {
     private final PostItService postItService;
+    private final PostService postService;
 
     // 덧글 선택하여 포스트잇으로 만들기
     @GetMapping("/create")
@@ -30,6 +32,32 @@ public class PostItController {
 
 
     // 포스트잇 수정 없음
+
+
+    @PatchMapping("/sectionmove")
+    public ResponseEntity<?> moveSectionPostIt(
+            @RequestParam("userId") Long userId, // debug
+//            @RequestParam("postId") Long postId, // 글 작성자인지 확인
+            @RequestParam("postItId") Long postItId,
+            @RequestParam("section") String section) {
+        // 로그인 안됨
+        if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        // 권한 없음
+//        if (!userId.equals(postService.getWriterUserId(postItService.getPostId(postidId))))
+//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//
+//        // 보안 대처
+//        if(!postId.equals(postItService.getPostId(postitid))){
+//
+//        }
+
+
+
+//        postItService.moveSection(postItId, section);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 
     // 포스트잇 이동

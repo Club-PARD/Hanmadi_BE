@@ -30,7 +30,9 @@ public class PostIt {
 //    @JoinColumn(nullable = false, name = "commentId")
 //    @OneToOne
 //    private Comment comment;
-    private Long commentId;
+    private Long commentId; // 연결된 덧글 아이디
+
+    private Long postId; // 연결된 포스트 아이디
 
 
     // 포스트잇 내용
@@ -46,7 +48,7 @@ public class PostIt {
         return new PostIt().builder()
                 .user(user)
                 .commentId(dto.getCommentId())
-                .context(dto.getContext())
+//                .context(dto.getContext())
                 .x(dto.getX())
                 .y(dto.getY())
                 .z(dto.getZ()).
