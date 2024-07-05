@@ -1,10 +1,13 @@
 package com.pard.namukkun.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pard.namukkun.user.entity.UpPost;
 import com.pard.namukkun.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,6 +20,7 @@ public class UserReadDTO {
     private String nickName;
     private String email;
     private String profileImage;
+    private List<UpPost> upPosts;
 
     public UserReadDTO(User user) {
         this.userId = user.getUserId();
@@ -24,5 +28,6 @@ public class UserReadDTO {
         this.profileImage = user.getProfileImage();
         this.email = user.getEmail();
         this.local = user.getLocal();
+        this.upPosts = user.getUpPosts();
     }
     }
