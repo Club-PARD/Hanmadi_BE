@@ -8,9 +8,11 @@ import java.util.List;
 @Getter
 @Setter
 
-public class PostCreateDTO {
+public class PostUpdateDTO {
     private String title; // 제목
     private Integer postLocal; // 지역
+    private Integer upCountPost; // 추천수
+    private Integer postitCount; // 포스트잇 갯수
     private String proBackground; // 제안배경
     private String solution; //해결방법
     private String benefit; // 기대효과
