@@ -2,6 +2,7 @@ package com.pard.namukkun.post.entity;
 
 import com.pard.namukkun.Data;
 import com.pard.namukkun.attachment.entity.S3Attachment;
+import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.image.entity.Image;
 import com.pard.namukkun.post.dto.PostCreateDTO;
 import com.pard.namukkun.user.entity.User;
@@ -37,6 +38,16 @@ public class Post {
     @JoinColumn(nullable = false, name = "user_Id")
     @ManyToOne
     private User user;
+
+
+    //--------------------------------------------------------
+//    @JoinColumn(nullable = false, name = "comments_Id")
+//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+//    private List<Comment> comments;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+    //--------------------------------------------------------
+
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<S3Attachment> s3Attachments = new ArrayList<>();
