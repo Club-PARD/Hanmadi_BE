@@ -1,10 +1,16 @@
 package com.pard.namukkun.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.pard.namukkun.comment.entity.Comment;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.pard.namukkun.post.entity.Post;
+import com.pard.namukkun.postit.entity.PostIt;
 import com.pard.namukkun.user.dto.UserCreateDTO;
+import com.pard.namukkun.user.dto.UserReadDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,15 +34,24 @@ public class User {
 
     private String profileImage; // kakao profile image
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
-
     @OneToOne
     private Post tempPost;
 
-    public void setTempPost(Post tempPost) {
-        this.tempPost = tempPost;
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostIt> postIts;
+
+
+    @ElementCollection
+    @CollectionTable(name = "user_up_comment_ids", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "up_comment_id")
+    private List<Long> upList;
+
 
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()
@@ -47,6 +62,22 @@ public class User {
                 .local(userCreateDTO.getLocal())
                 .build();
     }
+    public static User toEntity(UserReadDTO dto) {
+        return User.builder()
+                .userId(dto.getUserId())
+                .nickName(dto.getNickName())
+                .profileImage(dto.getProfileImage())
+                .email(dto.getEmail())
+                .local(dto.getLocal())
+                .build();
+    }
+
+
+    //----------------------------------------------
+
+    public void setTempPost(Post tempPost) {
+        this.tempPost = tempPost;
+    }
 
     public void updateNickName(String nickName) {
         this.nickName = nickName;
@@ -54,5 +85,8 @@ public class User {
 
     public void updateLocal(Integer local) {
         this.local = local;
+    }
+    public void updateUpList(List<Long> list) {
+        this.upList = list;
     }
 }

@@ -29,11 +29,8 @@ public class S3Attachment {
         this.post = post;
     }
 
-    public void setFileUrl(String fileUrl) {
+    public void setFileUrl(String fileUrl, Post post) {
         this.fileUrl = fileUrl;
-    }
-
-    public void setPost(Post post) {
         this.post = post;
     }
 }
