@@ -6,6 +6,7 @@ import com.pard.namukkun.attachment.entity.S3Attachment;
 import com.pard.namukkun.attachment.service.S3AttachmentService;
 import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.post.dto.PostCreateDTO;
+import com.pard.namukkun.postit.entity.PostIt;
 import com.pard.namukkun.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,20 +46,23 @@ public class Post {
     private String postTime; // 작성된 날짜 및 시간
 
     @JoinColumn(nullable = false, name = "user_Id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     //--------------------------------------------------------
-//    @JoinColumn(nullable = false, name = "comments_Id")
-//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-//    private List<Comment> comments;
+    // 댓글
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    // 포스트잇
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostIt> postIts = new ArrayList<>();
     //--------------------------------------------------------
 
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<S3Attachment> s3Attachments = new ArrayList<>();
+
 
     public static Post toEntity(PostCreateDTO postCreateDTO,String proBackgroundText,
                                 String solutionText, String benefitText, User user) {
@@ -81,8 +85,15 @@ public class Post {
         this.isReturn = isReturn;
         this.deadLine = deadLine.toString();
     }
+
     //----------------------------------
-    public void setIsDone(boolean isDone) { this.isDone = isDone; }
+    public void setIsDone(boolean isDone) {
+        this.isDone = isDone;
+    }
+
+    public void setPostitCount(Integer postitCount) {
+        this.postitCount = postitCount;
+    }
     //----------------------------------
 
     public void updatePost(String title, Integer postLocal, String proBackground, String solution, String benefit) {

@@ -186,7 +186,7 @@ public class PostService {
 
     //post 업데이트 메서드
 
-    public PostReadDTO updatePost(Long postId, PostUpdateDTO postUpdateDTO){
+    public PostReadDTO updatePost(Long postId, PostUpdateDTO postUpdateDTO) {
         Post post = postRepo.findById(postId).get(); //postId로 post find
 
         post.updatePost(postUpdateDTO.getTitle(),postUpdateDTO.getPostLocal(),postUpdateDTO.getProBackground(),
@@ -268,13 +268,14 @@ public class PostService {
     //-----------------------------------
 
     // 포스트의 시간과 현재 시간을 비교하여
-    public void postCheck(String presentTime) {
+    public Integer postCheck(String presentTime) {
+        Integer counter = 0;
 
         // isDone 이 false 인 post 가져오기
         List<Post> posts = postRepo.findByIsDoneFalse();
 
         // 포메터 생성
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // 서버타임 설정
         LocalDate serverTime = LocalDate.parse(presentTime, formatter);
@@ -282,11 +283,19 @@ public class PostService {
         for (Post post : posts) {
             // 포스트의 시간 가져오기
             LocalDate postTime = LocalDate.parse(post.getPostTime(), formatter);
+
             // 포스트 시간에 7일을 더한 것이 서버 시간보다 이전이라면 = 7일이 지났다면
-            if (serverTime.isBefore(postTime.plusDays(7))) post.setIsDone(true); // isdone -> true
+            if (serverTime.isAfter(postTime.plusDays(7))) {
+                post.setIsDone(true); // isdone -> true
+                counter = counter + 1;
+                postRepo.save(post);
+            }
         }
+        return counter;
     }
 
+
+    //-----------------------------------------
     public Long getWriterUserId(Long postId) {
         return postRepo.findById(postId).orElseThrow().getUser().getUserId();
     }
@@ -297,7 +306,12 @@ public class PostService {
     @Transactional
     public Integer IncreaseUpCountPost(Long postId, Long userId) {
         User user = returnUser(userId);
-
+        //--------------------------------------
+        List<Long> list = user.getUpPostList();
+        list.add(postId);
+        user.updateUpPostList(list);
+        userRepo.save(user);
+        //--------------------------------------
         Post post = returnPost(postId);
         post.increaseUpCountPost();
         postRepo.save(post);
@@ -308,6 +322,13 @@ public class PostService {
     // 채택 취소하는 메서드
     @Transactional
     public Integer decreaseUpCountPost(Long postId, Long userId) {
+        User user = returnUser(userId);
+        //--------------------------------------
+        List<Long> list = user.getUpPostList();
+        list.remove(postId);
+        user.updateUpPostList(list);
+        userRepo.save(user);
+        //--------------------------------------
         Post post = returnPost(postId);
         post.decreaseUpCountPost();
         postRepo.save(post);
@@ -318,16 +339,16 @@ public class PostService {
     // postId를 받아서 post를 리턴하는 메서드
     public Post returnPost(Long postId) {
         return postRepo.findById(postId).orElseThrow(()
-                -> new RuntimeException("Error can't find post -> "+postId));
+                -> new RuntimeException("Error can't find post -> " + postId));
     }
 
     // userId를 받아서 user를 리턴하는 메서드
-    public User returnUser(Long userId){
+    public User returnUser(Long userId) {
         return userRepo.findById(userId).orElseThrow(()
-                -> new RuntimeException("Error can't find user -> "+userId));
+                -> new RuntimeException("Error can't find user -> " + userId));
     }
 
-    public List<PostReadDTO> sortByUpCountPost(List<PostReadDTO> postReadDTOS){
+    public List<PostReadDTO> sortByUpCountPost(List<PostReadDTO> postReadDTOS) {
         return postReadDTOS.stream()
                 .sorted(Comparator.comparingInt(PostReadDTO::getUpCountPost).reversed())
                 .collect(Collectors.toList());
@@ -345,22 +366,21 @@ public class PostService {
     }
 
     // 게시물 최신순으로 정렬하는 메서드
-    public List<PostReadDTO> sortByRecentPost(List<PostReadDTO> postReadDTOS){
+    public List<PostReadDTO> sortByRecentPost(List<PostReadDTO> postReadDTOS) {
         return postReadDTOS.stream()
                 .sorted(Comparator.comparing(PostReadDTO::getPostTime).reversed())
                 .collect(Collectors.toList());
     }
 
     // 게시물 채택수별로 정렬하는 메서드
-    public List<PostReadDTO> findByUpCountPost(){
+    public List<PostReadDTO> findByUpCountPost() {
         List<PostReadDTO> postReadDTOS = readAllPosts();
         return sortByUpCountPost(postReadDTOS);
     }
-
     public PostReadDTO findPostById(Long postId) {
         Post post = postRepo.findById(postId).orElseThrow(()
         -> new RuntimeException("Error can't find post -> "+postId));
-        List<S3Attachment> s3Attachments = post.getS3Attachments();
+        List<S3Attachment> s3Attachments = post.getS3Attachments()
 
         List<S3AttachmentReadDTO> s3AttachmentReadDTOS = s3Attachments.stream()
                 .map(s3Attachment -> new S3AttachmentReadDTO(s3Attachment))

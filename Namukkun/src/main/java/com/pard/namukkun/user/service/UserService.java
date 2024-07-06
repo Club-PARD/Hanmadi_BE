@@ -7,53 +7,32 @@ import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 
 public class UserService {
     private final UserRepo userRepo;
 
+    // 유저 생성
     public void createUser(UserCreateDTO dto) {
         userRepo.save(User.toEntity(dto));
     }
 
-//    public void findby
-
-    public List<UserReadDTO> findAllUser() {
-        return userRepo.findAll()
-                .stream()
-                .map(UserReadDTO::new)
-                .collect(Collectors.toList());
-    }
-
+    // kakao oauth 아이디로 user 정보 가져오기
     public UserReadDTO findUserByOauth(Long id) {
         return new UserReadDTO(userRepo.findByOauthID(id));
     }
 
-
-    public void updateUserNickname(UserUpdateDTO dto) throws Exception {
-        Long id = dto.getId();
-        User user = userRepo.findById(dto.getId())
-                .orElseThrow(() -> new Exception("User not found"));
-        user.updateNickName(dto.getNickName());
+    // userinfo 수정
+    public void updateUser(UserUpdateDTO dto) {
+        User user = userRepo.findById(dto.getId()).orElseThrow();
+        user.updateUserinfo(dto.getNickName(), dto.getLocal(), dto.getProfileImage());
         userRepo.save(user);
     }
 
-
-
-    public void updateUserLocal(UserUpdateDTO dto) {
-        Long userId = dto.getId();
-        User user = userRepo.findById(userId).get();
-        user.updateLocal(dto.getLocal());
-        userRepo.save(user);
-    }
-
-
-    public void deleteUser(UserDeleteDTO dto) {
-        userRepo.deleteById(dto.getId());
+    // 유저 삭제
+    public void deleteUser(Long userId) {
+        userRepo.deleteById(userId);
     }
 
     // 가입 한적 있는지 검사
@@ -61,18 +40,21 @@ public class UserService {
         return userRepo.existsByOauthID(oauthID);
     }
 
-    public UserPostDTO getUserPosts(Long id) throws Exception {
-        User user = userRepo.findById(id).orElseThrow();
-        UserPostDTO dto = new UserPostDTO();
-        dto.setId(id);
-        if (user.getPosts().isEmpty()) dto.setPosts(null);
-        else dto.setPosts(user.getPosts().stream().map(PostReadDTO::new).toList());
+    // 유저 정보 전달
+    public UserInfoDTO getUserInfo(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow();
+        return new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
+    }
 
-        if (user.getTempPost() == null) dto.setTempPost(null);
-        else dto.setTempPost(new PostReadDTO(user.getTempPost()));
-
-
-        return dto;
-
+    // 유저 상세 정보 전달
+    public UserReadDTO getUserInfoAll(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow();
+        return new UserReadDTO(
+                user.getUserId(),
+                new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage()),
+                user.getEmail(),
+                new PostReadDTO(user.getTempPost()),
+                user.getPosts().stream().map(PostReadDTO::new).toList()
+        );
     }
 }
