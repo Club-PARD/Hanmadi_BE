@@ -62,7 +62,8 @@ public class CommentService {
     }
 
     // 좋아요 버튼
-    public void upButton(Long commentId, Long userId) {
+    public void upButton(Long commentId, Long userId, Boolean up) {
+
         // 좋아요할 유저
         User user = userRepo.findById(userId).orElseThrow();
 
@@ -72,20 +73,16 @@ public class CommentService {
         // 유저의 좋아요 리스트 가져오기
         List<Long> upList = user.getUpCommentList();
 
-        log.info(String.valueOf(upList.contains(commentId)));
-        // 이미 좋아요를 눌렀다면
-        if (upList.contains(comment.getId())) {
+        Boolean isContaining = upList.contains(commentId);
+
+        // 좋아요 클릭
+        if (up && !isContaining) {
             comment.minUpCounter();
             upList.remove(comment.getId());
-
-            // 좋아요 누루기
-        } else {
+        } else if (!up && isContaining) {
             comment.addUpCounter();
             upList.add(comment.getId());
         }
-//        log.info("{}", comment.getUpCounter());
-//        log.info("{}", user.getUpList().toArray().length);
-        //유저 리스트 업데이트
         user.updateUpCommentList(upList);
         userRepo.save(user);
     }
@@ -98,7 +95,14 @@ public class CommentService {
     }
 
     public UserUpListDTO getUserUpList(Long postId, Long userId) {
+
         User user = userRepo.findById(userId).orElseThrow();
-        return new UserUpListDTO(user.getUpList());
+        List<Long> list = new ArrayList<>();
+
+        for (Long commentid : user.getUpCommentList()) {
+            Long id = commentRepo.findById(commentid).orElseThrow().getId();
+            if (id.equals(postId)) list.add(id);
+        }
+        return new UserUpListDTO(list);
     }
 }
