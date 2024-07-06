@@ -54,12 +54,6 @@ public class User {
     @Column(name = "up_comment_id")
     private List<Long> upCommentList;
 
-
-
-    public void setTempPost(Post tempPost) {
-        this.tempPost = tempPost;
-    }
-
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()
                 .oauthID(userCreateDTO.getOauthID())
