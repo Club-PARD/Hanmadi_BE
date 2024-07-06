@@ -6,12 +6,14 @@ import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.comment.repo.CommentRepo;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
+import com.pard.namukkun.user.dto.UserUpListDTO;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,12 +57,13 @@ public class CommentService {
     // 덧글 작성자 아이디 가져오기
     public Long getCommentWriterId(Long commentId) {
         Long commentWriterId = commentRepo.findById(commentId).orElseThrow().getUser().getUserId();
-        log.info(String.valueOf(commentWriterId));
+//        log.info(String.valueOf(commentWriterId));
         return commentWriterId;
     }
 
     // 좋아요 버튼
-    public void upButton(Long commentId, Long userId) {
+    public void upButton(Long commentId, Long userId, Boolean up) {
+
         // 좋아요할 유저
         User user = userRepo.findById(userId).orElseThrow();
 
@@ -68,25 +71,38 @@ public class CommentService {
         Comment comment = commentRepo.findById(commentId).orElseThrow();
 
         // 유저의 좋아요 리스트 가져오기
-        List<Long> upList = user.getUpList();
+        List<Long> upList = user.getUpCommentList();
 
-        // 이미 좋아요를 눌렀다면
-        if (upList.contains(commentId)) {
+        Boolean isContaining = upList.contains(commentId);
+
+        // 좋아요 클릭
+        if (up && !isContaining) {
             comment.minUpCounter();
-            upList.remove(commentId);
-
-            // 좋아요 누루기
-        } else {
+            upList.remove(comment.getId());
+        } else if (!up && isContaining) {
             comment.addUpCounter();
-            upList.add(commentId);
+            upList.add(comment.getId());
         }
-
-        //유저 리스트 업데이트
-        user.updateUpList(upList);
+        user.updateUpCommentList(upList);
+        userRepo.save(user);
     }
 
     public void takeComment(Long commentId, Boolean take) {
         Comment comment = commentRepo.findById(commentId).orElseThrow();
         comment.setIsTaken(take);
+        commentRepo.save(comment);
+        log.info("{}", comment.getIsTaken());
+    }
+
+    public UserUpListDTO getUserUpList(Long postId, Long userId) {
+
+        User user = userRepo.findById(userId).orElseThrow();
+        List<Long> list = new ArrayList<>();
+
+        for (Long commentid : user.getUpCommentList()) {
+            Long id = commentRepo.findById(commentid).orElseThrow().getId();
+            if (id.equals(postId)) list.add(id);
+        }
+        return new UserUpListDTO(list);
     }
 }
