@@ -169,7 +169,7 @@ public class PostService {
             tempPost.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
         postRepo.save(tempPost);
-        
+
         // 임시게시물 저장
         user.setTempPost(tempPost);
         postRepo.save(tempPost);
@@ -385,7 +385,7 @@ public class PostService {
     public PostReadDTO findPostById(Long postId) {
         Post post = postRepo.findById(postId).orElseThrow(()
         -> new RuntimeException("Error can't find post -> "+postId));
-        List<S3Attachment> s3Attachments = post.getS3Attachments()
+        List<S3Attachment> s3Attachments = post.getS3Attachments();
 
         List<S3AttachmentReadDTO> s3AttachmentReadDTOS = s3Attachments.stream()
                 .map(s3Attachment -> new S3AttachmentReadDTO(s3Attachment))
