@@ -12,7 +12,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PostItMoveDTO {
     private Long id;
+    private Long postId;
+    private Long commentId; // null 일 수 있음
     private Long userId;
+
 
     private Float x;
     private Float y;

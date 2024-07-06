@@ -19,6 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
                         "https://hanmadi.site")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                 .allowedHeaders("*")
+                .exposedHeaders("Access-Control-Allow-Private-Network")
                 .allowCredentials(true);
+
+
     }
 }

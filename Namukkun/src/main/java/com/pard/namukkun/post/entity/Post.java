@@ -4,6 +4,7 @@ import com.pard.namukkun.Data;
 import com.pard.namukkun.attachment.entity.S3Attachment;
 import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.post.dto.PostCreateDTO;
+import com.pard.namukkun.postit.entity.PostIt;
 import com.pard.namukkun.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,8 +45,13 @@ public class Post {
 //    @JoinColumn(nullable = false, name = "comments_Id")
 //    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
 //    private List<Comment> comments;
+    // 댓글
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    // 포스트잇
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostIt> postIts;
     //--------------------------------------------------------
 
 
@@ -86,6 +92,7 @@ public class Post {
     }
     //----------------------------------
     public void setIsDone(boolean isDone) { this.isDone = isDone; }
+    public void setPostitCount(Integer postitCount) { this.postitCount = postitCount; }
     //----------------------------------
 
     public void updatePost(String title, Integer postLocal, Integer upCountPost,Integer postitCount, String proBackground, String solution, String benefit) {

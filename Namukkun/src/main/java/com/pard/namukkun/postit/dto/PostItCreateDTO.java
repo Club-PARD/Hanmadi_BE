@@ -15,8 +15,11 @@ public class PostItCreateDTO {
     // 유저
     private Long userId;
 
+
     // 연결된 덧글
     private Long commentId;
+
+    private Long PostId;
 
     // 디자인 옵션
     private Integer design;
