@@ -1,6 +1,7 @@
 package com.pard.namukkun.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,11 +21,19 @@ public class UserReadDTO {
     private String email;
     private String profileImage;
 
+    private PostReadDTO tempPost;
+    private List<PostReadDTO> posts;
+
+
     public UserReadDTO(User user) {
         this.userId = user.getUserId();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
         this.email = user.getEmail();
         this.local = user.getLocal();
+
+        this.tempPost = new PostReadDTO(user.getTempPost());
+        this.posts = user.getPosts().stream().map(PostReadDTO::new).toList();
+
     }
-    }
+}

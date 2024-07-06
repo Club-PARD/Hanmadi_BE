@@ -7,6 +7,9 @@ import com.pard.namukkun.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,43 +21,54 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-//    @PostMapping("")
-//    @Operation(summary = "유저등록", description = "이름,이메일,authId를 통해 유저를 생성합니다.")
-//    public String createUser(@RequestBody UserCreateDTO dto) {
-//        userService.createUser(dto);
-//        return "User created";
+    @GetMapping("/info")
+    @Operation(summary = "유저 정보 전달", description = "로그인했을때 로컬에 저장하고, 로그아웃 하면 로컬에서 지우세요." + "기본적인 유저 정보를 전달합니다")
+    public UserInfoDTO getUserInfo(
+            @RequestParam("userid") Long userId // debug
+    ) {
+        if (userId == null) return null;
+        return userService.getUserInfo(userId);
+    }
+    @GetMapping("/info/all")
+    @Operation(summary = "유저 주요 정보", description = "마이페이지에서 사용될 유저 정보를 전달합니다")
+    public UserReadDTO getUserInfoAll(
+            @RequestParam("userid") Long userId // debug
+    ) {
+        if (userId == null) return null;
+        return userService.getUserInfoAll(userId);
+    }
+
+    @PatchMapping("/update")
+    @Operation(summary = "유저 지역, 닉네임 변경", description = "유저의 아이디값, 변경할 닉네임, 지역정보를 통해 유저를 수정합니다.")
+    public ResponseEntity<?> updateUser(
+            @RequestParam("userid") Long userid, // debug
+            @RequestBody UserUpdateDTO dto) {
+
+        // 권한 확인
+        if (!userid.equals(dto.getId())) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        userService.updateUser(dto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+//
+//    @GetMapping("/posts")
+//    @Operation(summary = "유저 닉네임 변경", description = "유저의 아이디값,변경할 닉네임을 통해 유저를 수정합니다.")
+//    public UserPostDTO getUserPosts(@RequestParam("id") Long id) { // debug 용
+//        return userService.getUserPosts(id);
+//
 //    }
 
-    @PatchMapping("/update/nickname")
-    @Operation(summary = "유저 닉네임 변경", description = "유저의 아이디값,변경할 닉네임을 통해 유저를 수정합니다.")
-    public String updateUser(@RequestBody UserUpdateDTO dto) {
-        try {
-            userService.updateUserNickname(dto);
-            return "success";
-        } catch (Exception e) {
-            return "error";
-        }
-    }
-
-    @GetMapping("/posts")
-    public UserPostDTO getUserPosts(@RequestParam("id") Long id) { // debug 용
-        try {
-            return userService.getUserPosts(id);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            log.info("유저 없음");
-            return null;
-        }
-    }
-
+    // TODO : 보안 관리 해야함
     @DeleteMapping("/delete")
-    public String deleteUser(@RequestBody UserDeleteDTO dto) {
-        userService.deleteUser(dto);
-        return "success";
+    @Operation(summary = "유저 삭제", description = "유저를 삭제합니다")
+    public ResponseEntity<?> deleteUser(@RequestParam("userid") Long userId) {
+        userService.deleteUser(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("")
-    public List<UserReadDTO> findAllUser() {
-        return userService.findAllUser();
-    }
+//    @GetMapping("")
+//    public List<UserReadDTO> findAllUser() {
+//        return userService.findAllUser();
+//    }
 }
