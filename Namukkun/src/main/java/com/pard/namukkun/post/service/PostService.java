@@ -133,14 +133,14 @@ public class PostService {
 
     //post 업데이트 메서드
 
-    public PostReadDTO updatePost(Long postId, PostUpdateDTO postUpdateDTO){
+    public PostReadDTO updatePost(Long postId, PostUpdateDTO postUpdateDTO) {
         Post post = postRepo.findById(postId).get(); //postId로 post find
 
         // 내용 넣어주기
         // 이거 한번에 뭉쳐놓기
 
-        post.updatePost(postUpdateDTO.getTitle(),postUpdateDTO.getPostLocal(),postUpdateDTO.getUpCountPost()
-        ,postUpdateDTO.getPostitCount(),postUpdateDTO.getProBackground(),postUpdateDTO.getSolution(),postUpdateDTO.getBenefit());
+        post.updatePost(postUpdateDTO.getTitle(), postUpdateDTO.getPostLocal(), postUpdateDTO.getUpCountPost()
+                , postUpdateDTO.getPostitCount(), postUpdateDTO.getProBackground(), postUpdateDTO.getSolution(), postUpdateDTO.getBenefit());
 
         // 기존에 있던 S3 파일 삭제
         List<S3Attachment> existS3Attachments = post.getS3Attachments();
@@ -192,13 +192,14 @@ public class PostService {
     //-----------------------------------
 
     // 포스트의 시간과 현재 시간을 비교하여
-    public void postCheck(String presentTime) {
+    public Integer postCheck(String presentTime) {
+        Integer counter = 0;
 
         // isDone 이 false 인 post 가져오기
         List<Post> posts = postRepo.findByIsDoneFalse();
 
         // 포메터 생성
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // 서버타임 설정
         LocalDate serverTime = LocalDate.parse(presentTime, formatter);
@@ -206,9 +207,15 @@ public class PostService {
         for (Post post : posts) {
             // 포스트의 시간 가져오기
             LocalDate postTime = LocalDate.parse(post.getPostTime(), formatter);
+
             // 포스트 시간에 7일을 더한 것이 서버 시간보다 이전이라면 = 7일이 지났다면
-            if (serverTime.isBefore(postTime.plusDays(7))) post.setIsDone(true); // isdone -> true
+            if (serverTime.isAfter(postTime.plusDays(7))) {
+                post.setIsDone(true); // isdone -> true
+                counter = counter + 1;
+                postRepo.save(post);
+            }
         }
+        return counter;
     }
     //-----------------------------------
 
@@ -216,15 +223,14 @@ public class PostService {
     // 이미지 업로드
     public List<String> uploadImge(List<MultipartFile> files) {
         List<String> fileUrls = new ArrayList<>();
-        try{
+        try {
             for (MultipartFile file : files) {
                 String uuid = UUID.randomUUID().toString();
                 String fileName = uuid + "_" + file.getOriginalFilename();
                 s3AttachmentService.upload(file, fileName);
                 fileUrls.add(s3AttachmentService.getUrlWithFileName(fileName));
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return fileUrls;
@@ -273,16 +279,16 @@ public class PostService {
     // postId를 받아서 post를 리턴하는 메서드
     public Post returnPost(Long postId) {
         return postRepo.findById(postId).orElseThrow(()
-                -> new RuntimeException("Error can't find post -> "+postId));
+                -> new RuntimeException("Error can't find post -> " + postId));
     }
 
     // userId를 받아서 user를 리턴하는 메서드
-    public User returnUser(Long userId){
+    public User returnUser(Long userId) {
         return userRepo.findById(userId).orElseThrow(()
-                -> new RuntimeException("Error can't find user -> "+userId));
+                -> new RuntimeException("Error can't find user -> " + userId));
     }
 
-    public List<PostReadDTO> sortByUpCountPost(List<PostReadDTO> postReadDTOS){
+    public List<PostReadDTO> sortByUpCountPost(List<PostReadDTO> postReadDTOS) {
         return postReadDTOS.stream()
                 .sorted(Comparator.comparingInt(PostReadDTO::getUpCountPost).reversed())
                 .collect(Collectors.toList());
@@ -300,14 +306,14 @@ public class PostService {
     }
 
     // 게시물 최신순으로 정렬하는 메서드
-    public List<PostReadDTO> sortByRecentPost(List<PostReadDTO> postReadDTOS){
+    public List<PostReadDTO> sortByRecentPost(List<PostReadDTO> postReadDTOS) {
         return postReadDTOS.stream()
                 .sorted(Comparator.comparing(PostReadDTO::getPostTime).reversed())
                 .collect(Collectors.toList());
     }
 
     // 게시물 채택수별로 정렬하는 메서드
-    public List<PostReadDTO> findByUpCountPost(){
+    public List<PostReadDTO> findByUpCountPost() {
         List<PostReadDTO> postReadDTOS = readAllPosts();
         return sortByUpCountPost(postReadDTOS);
     }
@@ -315,7 +321,7 @@ public class PostService {
     public ResponseEntity<?> createPost(PostCreateDTO postCreateDTO) {
         log.info("서비스 들어옴");
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
-                -> new RuntimeException("Error creating post -> "+postCreateDTO.getUserId()));
+                -> new RuntimeException("Error creating post -> " + postCreateDTO.getUserId()));
         try {
             // HTML 파싱
             String proBackgroundHtml = postCreateDTO.getProBackground();
@@ -334,7 +340,7 @@ public class PostService {
             // s3attachment에 url 저장하기 위해서 filename을 받음
             List<String> fileNames = postCreateDTO.getFileName();
 
-            Post post = Post.toEntity(postCreateDTO,probackgroundText,solutionText,benefitText, user);
+            Post post = Post.toEntity(postCreateDTO, probackgroundText, solutionText, benefitText, user);
             post.setInitial(true, Data.getDeadLine(post.getPostTime()));
 
             // 파일 저장
