@@ -2,6 +2,7 @@ package com.pard.namukkun.post.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -10,12 +11,12 @@ import java.util.List;
 
 public class PostCreateDTO {
     private String title; // 제목
-    private Integer postLocal; // 지역
+    private int postLocal; // 지역
     private String proBackground; // 제안배경
     private String solution; //해결방법
     private String benefit; // 기대효과
 
-    private List<String> fileName; // 첨부파일 url
+    private List<String> fileNames; // 첨부파일 url
 
     private boolean isReturn; // 게시물 업로드 확인
 
