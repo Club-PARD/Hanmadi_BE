@@ -240,7 +240,12 @@ public class PostService {
     // 채택하는 메서드
     public Integer IncreaseUpCountPost(Long postId, Long userId) {
         User user = returnUser(userId);
-
+        //--------------------------------------
+        List<Long> list = user.getUpPostList();
+        list.add(postId);
+        user.updateUpPostList(list);
+        userRepo.save(user);
+        //--------------------------------------
         Post post = returnPost(postId);
         post.increaseUpCountPost();
         postRepo.save(post);
@@ -251,6 +256,13 @@ public class PostService {
     // 채택 취소하는 메서드
     @Transactional
     public Integer decreaseUpCountPost(Long postId, Long userId) {
+        User user = returnUser(userId);
+        //--------------------------------------
+        List<Long> list = user.getUpPostList();
+        list.remove(postId);
+        user.updateUpPostList(list);
+        userRepo.save(user);
+        //--------------------------------------
         Post post = returnPost(postId);
         post.decreaseUpCountPost();
         postRepo.save(post);
