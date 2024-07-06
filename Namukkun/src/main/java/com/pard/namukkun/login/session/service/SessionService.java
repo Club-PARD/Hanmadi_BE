@@ -15,14 +15,14 @@ import java.util.UUID;
 @Slf4j
 @AllArgsConstructor
 public class SessionService {
-
-    public Boolean sessionCheck(HttpServletRequest request, String sessionId) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            return session.getAttribute(sessionId) != null;
-        }
-        return false;
-    }
+//
+//    public Boolean sessionCheck(HttpServletRequest request, String sessionId) {
+//        HttpSession session = request.getSession(false);
+//        if (session != null) {
+//            return session.getAttribute(sessionId) != null;
+//        }
+//        return false;
+//    }
 
     public void addSessionData(HttpServletRequest request, UserSessionDTO dto) {
         HttpSession session = request.getSession(true); // 없으면 새로 만들어요

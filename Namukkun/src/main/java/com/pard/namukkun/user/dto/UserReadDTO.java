@@ -16,24 +16,20 @@ import java.util.List;
 
 public class UserReadDTO {
     private Long userId;
-    private Integer local;
-    private String nickName;
+    private UserInfoDTO userInfoDTO;
     private String email;
-    private String profileImage;
 
     private PostReadDTO tempPost;
     private List<PostReadDTO> posts;
 
 
     public UserReadDTO(User user) {
+
         this.userId = user.getUserId();
-        this.nickName = user.getNickName();
-        this.profileImage = user.getProfileImage();
+        this.userInfoDTO = new UserInfoDTO(user.getNickName(), user.getLocal(), user.getNickName());
         this.email = user.getEmail();
-        this.local = user.getLocal();
 
         this.tempPost = new PostReadDTO(user.getTempPost());
         this.posts = user.getPosts().stream().map(PostReadDTO::new).toList();
-
     }
 }

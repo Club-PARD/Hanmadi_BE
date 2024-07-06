@@ -3,6 +3,7 @@ package com.pard.namukkun.comment.controller;
 import com.pard.namukkun.comment.dto.CommentCreateDTO;
 import com.pard.namukkun.comment.dto.CommentReadDTO;
 import com.pard.namukkun.comment.service.CommentService;
+import com.pard.namukkun.user.dto.UserUpListDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,17 @@ public class CommentController {
         return commentService.readALlComment(postId);
     }
 
+    // TODO 포스트쪽에서 가져갈 수 있도록 포스트쪽에서도 만들것
+    // 게시글에서 유저가 좋아요 한 아이디 리스트를 가져옵니다
+    @GetMapping("/user/comment-uplist")
+    @Operation(summary = "유저 좋아요 리스트", description = "포스트에 있는 덧글중 유저가 좋아요를 누를 리스트를 읽어옵니다.")
+    public UserUpListDTO readUserCommentUpList(
+            @RequestParam(value = "userid", required = false) Long userId,
+            @RequestParam("postid") Long postId
+    ) {
+        return commentService.getUserUpList(postId, userId);
+    }
+
     // 덧글 삭제
     @DeleteMapping("")
     @Operation(summary = "덧글 삭제", description = "덧글아이디로 덧글을 삭제합니다" + "유저의 아이디와 작성자의 아이디가 다르다면 삭제되지 않습니다")
@@ -53,8 +65,6 @@ public class CommentController {
     ) {
         // 권한 확인
         Long commentWriterId = commentService.getCommentWriterId(commentId);
-//        log.info("userId = {}",userId);
-//        log.info("commentId = {}", commentId);
         if (userId == null || !userId.equals(commentWriterId))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -67,13 +77,14 @@ public class CommentController {
     @Operation(summary = "덧글 좋아요", description = "좋아요가 증가됩니다." +
             "만약 유저가 이미 눌렀다면 좋아요가 취소 됩니다(감소됩니다)")
     public ResponseEntity<?> upButton(
+            @RequestParam("userid") Long userId, // debug
             @RequestParam("commentid") Long commentId,
-            @RequestParam("userid") Long userId// debug
+            @RequestParam("up") Boolean up
     ) {
         // 로그인 되어있는지 확인
         if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        commentService.upButton(commentId, userId);
+        commentService.upButton(commentId, userId, up);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

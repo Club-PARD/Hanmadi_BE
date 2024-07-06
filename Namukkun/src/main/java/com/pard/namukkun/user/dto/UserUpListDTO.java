@@ -5,13 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
+import java.util.List;
+
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-// 간단한 정보만 보내주는 DTO
-public class UserInfoDTO {
-    private String nickName;
-    private Integer local;
-    private String profileImage;
+public class UserUpListDTO {
+    private List<Long> UpList;
 }
