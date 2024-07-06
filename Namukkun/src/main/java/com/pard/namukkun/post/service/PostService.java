@@ -131,8 +131,8 @@ public class PostService {
         String benefitHtml = postCreateDTO.getBenefit();
         String benefitText = parseHtml(benefitHtml);
 
-        if(version.equals("create")) Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user,true);
-        else if(version.equals("temp")) Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user,false);
+        if(version.equals("create")) return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user,true);
+        else if(version.equals("temp")) return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user,false);
         return null;
     }
 
@@ -245,7 +245,6 @@ public class PostService {
         if(file.isEmpty()) {
             return ResponseEntity.badRequest().body("No file");
         }
-
         try{
             // 임시 저장소에 저장될 키값, 저장될 이미지 이름
             String fileId = UUID.randomUUID()+"_"+file.getOriginalFilename();
