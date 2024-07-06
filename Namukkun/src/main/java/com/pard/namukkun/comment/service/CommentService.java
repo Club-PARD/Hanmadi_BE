@@ -55,7 +55,7 @@ public class CommentService {
     // 덧글 작성자 아이디 가져오기
     public Long getCommentWriterId(Long commentId) {
         Long commentWriterId = commentRepo.findById(commentId).orElseThrow().getUser().getUserId();
-        log.info(String.valueOf(commentWriterId));
+//        log.info(String.valueOf(commentWriterId));
         return commentWriterId;
     }
 
@@ -70,23 +70,28 @@ public class CommentService {
         // 유저의 좋아요 리스트 가져오기
         List<Long> upList = user.getUpList();
 
+        log.info(String.valueOf(upList.contains(commentId)));
         // 이미 좋아요를 눌렀다면
-        if (upList.contains(commentId)) {
+        if (upList.contains(comment.getId())) {
             comment.minUpCounter();
-            upList.remove(commentId);
+            upList.remove(comment.getId());
 
             // 좋아요 누루기
         } else {
             comment.addUpCounter();
-            upList.add(commentId);
+            upList.add(comment.getId());
         }
-
+//        log.info("{}", comment.getUpCounter());
+//        log.info("{}", user.getUpList().toArray().length);
         //유저 리스트 업데이트
         user.updateUpList(upList);
+        userRepo.save(user);
     }
 
     public void takeComment(Long commentId, Boolean take) {
         Comment comment = commentRepo.findById(commentId).orElseThrow();
         comment.setIsTaken(take);
+        commentRepo.save(comment);
+        log.info("{}",comment.getIsTaken());
     }
 }

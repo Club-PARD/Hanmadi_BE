@@ -50,3 +50,4 @@ out/
 *.yml
 *.gradle
 
+/src/main/resources/bootsecurity.p12
