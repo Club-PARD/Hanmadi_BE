@@ -68,7 +68,7 @@ public class CommentService {
         Comment comment = commentRepo.findById(commentId).orElseThrow();
 
         // 유저의 좋아요 리스트 가져오기
-        List<Long> upList = user.getUpList();
+        List<Long> upList = user.getUpCommentList();
 
         // 이미 좋아요를 눌렀다면
         if (upList.contains(commentId)) {
@@ -82,7 +82,7 @@ public class CommentService {
         }
 
         //유저 리스트 업데이트
-        user.updateUpList(upList);
+        user.updateUpCommentList(upList);
     }
 
     public void takeComment(Long commentId, Boolean take) {
