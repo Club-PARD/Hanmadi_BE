@@ -15,7 +15,6 @@ public class PostItCreateDTO {
     // 유저
     private Long userId;
 
-
     // 연결된 덧글
     private Long commentId;
 

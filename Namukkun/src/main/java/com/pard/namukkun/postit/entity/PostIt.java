@@ -38,6 +38,9 @@ public class PostIt {
     // 포스트잇 섹션
     private String section;
 
+    // 디자인
+    private Integer design;
+
     // 위치
     private Float x;
     private Float y;
@@ -47,9 +50,9 @@ public class PostIt {
     @OneToOne(mappedBy = "postIt", orphanRemoval = false)
     private Comment comment;
 
-    @JoinColumn(nullable = false)
     @ManyToOne
-    private Post post;        // 작성자
+    @JoinColumn(name = "post_Id", nullable = false)
+    private Post post;
 
     public void updatePosition(Float x, Float y, Float z) {
         this.x = x;
@@ -57,32 +60,16 @@ public class PostIt {
         this.z = z;
     }
 
-    public static PostIt toEntity(PostItCreateDTO dto, User user,Comment comment, String context) {
-        return new PostIt().builder()
-                .user(user)
-                .comment(comment)
-                .context(context)
-                .x(dto.getX())
-                .y(dto.getY())
-                .z(dto.getZ()).
-                build();
+    public PostIt(PostItCreateDTO dto, User user, Comment comment,Post post, String context) {
+        this.user = user;
+        this.context = context;
+        this.section = dto.getSection();
+        this.design = dto.getDesign();
+        this.post = post;
+        this.x = dto.getX();
+        this.y = dto.getY();
+        this.z = dto.getZ();
     }
-
-
-//
-//    public static PostIt toEntity(PostItMoveDTO dto, User user, String context ) {
-//
-//        return new PostIt().builder()
-//                .user(user)
-//                .commentId(())
-//                .context(context)
-////                .context(dto.getContext())
-//                .x(dto.getX())
-//                .y(dto.getY())
-//                .z(dto.getZ())
-//                .build();
-//    }
-
 
     public void updateSection(String section) {
         this.section = section;

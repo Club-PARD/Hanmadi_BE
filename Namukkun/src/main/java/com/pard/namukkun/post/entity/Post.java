@@ -37,21 +37,18 @@ public class Post {
     private String postTime; // 작성된 날짜 및 시간
 
     @JoinColumn(nullable = false, name = "user_Id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
 
     //--------------------------------------------------------
-//    @JoinColumn(nullable = false, name = "comments_Id")
-//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-//    private List<Comment> comments;
     // 댓글
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
     // 포스트잇
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostIt> postIts;
+    private List<PostIt> postIts = new ArrayList<>();
     //--------------------------------------------------------
 
 
@@ -67,11 +64,11 @@ public class Post {
             this.s3Attachments = new ArrayList<>();
         }
         S3Attachment s3Attachment = new S3Attachment();
-        s3Attachment.setFileUrl(fileUrl,this);
+        s3Attachment.setFileUrl(fileUrl, this);
         this.s3Attachments.add(s3Attachment);
     }
 
-    public static Post toEntity(PostCreateDTO postCreateDTO,String proBackgroundText,
+    public static Post toEntity(PostCreateDTO postCreateDTO, String proBackgroundText,
                                 String solutionText, String benefitText, User user) {
         Post post = Post.builder()
                 .title(postCreateDTO.getTitle())
@@ -90,12 +87,18 @@ public class Post {
         this.isReturn = isReturn;
         this.deadLine = deadLine.toString();
     }
+
     //----------------------------------
-    public void setIsDone(boolean isDone) { this.isDone = isDone; }
-    public void setPostitCount(Integer postitCount) { this.postitCount = postitCount; }
+    public void setIsDone(boolean isDone) {
+        this.isDone = isDone;
+    }
+
+    public void setPostitCount(Integer postitCount) {
+        this.postitCount = postitCount;
+    }
     //----------------------------------
 
-    public void updatePost(String title, Integer postLocal, Integer upCountPost,Integer postitCount, String proBackground, String solution, String benefit) {
+    public void updatePost(String title, Integer postLocal, Integer upCountPost, Integer postitCount, String proBackground, String solution, String benefit) {
         this.title = title;
         this.postLocal = postLocal;
         this.upCountPost = upCountPost;

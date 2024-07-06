@@ -4,6 +4,7 @@ package com.pard.namukkun.postit.controller;
 import com.pard.namukkun.post.service.PostService;
 import com.pard.namukkun.postit.dto.PostItCreateDTO;
 import com.pard.namukkun.postit.dto.PostItMoveDTO;
+import com.pard.namukkun.postit.dto.PostItReadDTO;
 import com.pard.namukkun.postit.service.PostItService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -18,10 +20,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PostItController {
     private final PostItService postItService;
-    private final PostService postService;
 
     // 덧글 선택하여 포스트잇으로 만들기
-    @GetMapping("/create")
+    @PostMapping("/create")
     @Operation(summary = "포스트잇 생성", description = "덧글의 내용을 포스트잇으로 생성합니다.")
     public ResponseEntity<?> selectCommentToPostIt(
             @RequestParam("userid") Long userid,
@@ -31,14 +32,28 @@ public class PostItController {
         if (!postItService.getWriterIdByPostIdIt(dto.getPostId()).equals(userid))
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
+        System.out.println("----------------------1");
         // 최대갯수 확인
         if (10 <= postItService.getPostPostItCounter(dto.getPostId()))
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE); // 생성 안됨
+            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS); // 생성 안됨
+        System.out.println("----------------------2");
 
         // 생성
         postItService.createPostIt(dto);
         return new ResponseEntity<>(HttpStatus.CREATED); // 생성됨
     }
+
+    // 포스트잇 읽기
+    @GetMapping("/read")
+    @Operation(summary = "포스트잇 읽기", description = "포스트에 있는 모든 포스트잇의 내용을 읽어옵니다")
+    public List<PostItReadDTO> readPostIts(
+        @RequestParam(value = "userid", required = false)Long userId, // debug
+        @RequestParam("postid")Long postId
+    ){
+
+        return postItService.readAllByPostId(postId);
+    }
+
 
 
     // 포스트잇 수정 없음
@@ -66,7 +81,7 @@ public class PostItController {
 
 
     // 포스트잇 이동
-    @PostMapping("/move")
+    @PatchMapping("/move")
     @Operation(summary = "포스트잇 이동", description = "포스트잇의 위치를 이동시킵니다")
     public ResponseEntity<?> movePostIt(
             @RequestParam("userid") Long userId,
@@ -85,13 +100,12 @@ public class PostItController {
     @Operation(summary = "포스트잇 제거", description = "포스트잇을 지웁니다")
     public ResponseEntity<?> deletePostIt(
             @RequestParam("userid") Long userId,
-            @RequestParam("id") Long postItId
+            @RequestParam("postitid") Long postItId
     ) {
         // 권한 없음
         if (!Objects.equals(userId, postItService.getWriterIdByPostIdIt(postItId)))
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
-        // TODO post count --
         postItService.deletePostIt(postItId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

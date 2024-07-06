@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostItMoveDTO {
-    private Long id;
+    private Long postItId;
     private Long postId;
     private Long commentId; // null 일 수 있음
     private Long userId;
