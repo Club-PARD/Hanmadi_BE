@@ -179,7 +179,6 @@ public class KakaoUserInfoResponseDto {
 
         }
     }
-
     @Getter
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)

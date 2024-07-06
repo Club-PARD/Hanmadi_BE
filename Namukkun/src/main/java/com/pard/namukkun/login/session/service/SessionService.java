@@ -15,9 +15,6 @@ import java.util.UUID;
 @Slf4j
 @AllArgsConstructor
 public class SessionService {
-    public String createSessionId() {
-        return UUID.randomUUID().toString();
-    }
 
     public Boolean sessionCheck(HttpServletRequest request, String sessionId) {
         HttpSession session = request.getSession(false);
