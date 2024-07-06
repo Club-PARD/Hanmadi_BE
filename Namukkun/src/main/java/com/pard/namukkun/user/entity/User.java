@@ -56,6 +56,10 @@ public class User {
 
 
 
+    public void setTempPost(Post tempPost) {
+        this.tempPost = tempPost;
+    }
+
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()
                 .oauthID(userCreateDTO.getOauthID())
