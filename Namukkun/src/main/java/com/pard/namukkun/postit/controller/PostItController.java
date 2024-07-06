@@ -32,11 +32,9 @@ public class PostItController {
         if (!postItService.getWriterIdByPostIdIt(dto.getPostId()).equals(userid))
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
-        System.out.println("----------------------1");
         // 최대갯수 확인
         if (10 <= postItService.getPostPostItCounter(dto.getPostId()))
             return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS); // 생성 안됨
-        System.out.println("----------------------2");
 
         // 생성
         postItService.createPostIt(dto);
