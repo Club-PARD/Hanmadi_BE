@@ -1,6 +1,7 @@
 package com.pard.namukkun.comment.controller;
 
 import com.pard.namukkun.comment.dto.CommentCreateDTO;
+import com.pard.namukkun.comment.dto.CommentCreateInfoDTO;
 import com.pard.namukkun.comment.dto.CommentReadDTO;
 import com.pard.namukkun.comment.service.CommentService;
 import com.pard.namukkun.user.dto.UserUpListDTO;
@@ -24,16 +25,16 @@ public class CommentController {
     // 덧글 생성
     @PostMapping("")
     @Operation(summary = "덧글 생성", description = "포스트 아이디와 유저아이디(세션)로 덧글을 생성합니다." + "유저 아이디는 디버그용입니다.")
-    public ResponseEntity<?> createComment(
+    public CommentCreateInfoDTO createComment(
             @RequestParam("postid") Long postId,
             @RequestParam(value = "userid", required = true /* 이후 체크 해야함 */) Long userId, // debug
             @RequestBody() CommentCreateDTO dto
     ) {
         // 권한 확인
-        if (userId == null || !userId.equals(dto.getUserId())) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        if (userId == null || !userId.equals(dto.getUserId())) return null;
 
-        commentService.createComment(postId, userId, dto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Long id = commentService.createComment(postId, userId, dto);
+        return new CommentCreateInfoDTO(id);
     }
 
     // 덧글 수정 없음

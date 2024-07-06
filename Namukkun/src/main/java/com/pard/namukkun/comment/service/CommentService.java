@@ -26,7 +26,7 @@ public class CommentService {
     private final UserRepo userRepo;
 
     // 덧글 생성
-    public Boolean createComment(Long postId, Long userId, CommentCreateDTO dto) {
+    public Long createComment(Long postId, Long userId, CommentCreateDTO dto) {
         // dto 에 user id 세팅
         dto.setUserId(userId);
 
@@ -34,10 +34,11 @@ public class CommentService {
         if (postRepo.findById(postId).isPresent()) {
             User user = userRepo.findById(userId).orElseThrow();
             Post post = postRepo.findById(postId).orElseThrow();
-            commentRepo.save(Comment.toEntity(dto, user, post));
+            Comment comment = Comment.toEntity(dto, user, post);
+            commentRepo.save(comment);
             // 생성됨
-            return true;
-        } else return false; // 포스트가 존재하지 않으면 false
+            return comment.getId();
+        } else return null;
     }
 
     // 포스트의 덧글 모두 가져오기
