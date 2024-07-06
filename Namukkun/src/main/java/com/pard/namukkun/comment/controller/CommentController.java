@@ -3,6 +3,7 @@ package com.pard.namukkun.comment.controller;
 import com.pard.namukkun.comment.dto.CommentCreateDTO;
 import com.pard.namukkun.comment.dto.CommentReadDTO;
 import com.pard.namukkun.comment.service.CommentService;
+import com.pard.namukkun.user.dto.UserUpListDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,18 @@ public class CommentController {
     public List<CommentReadDTO> readAllComment(@RequestParam("postid") Long postId) {
         return commentService.readALlComment(postId);
     }
+
+    // 게시글에서 유저가 좋아요 한 아이디 리스트를 가져옵니다
+    @GetMapping("/user/uplist")
+    @Operation(summary = "유저 좋아요 리스트", description = "포스트에 있는 덧글중 유저가 좋아요를 누를 리스트를 읽어옵니다.")
+    public UserUpListDTO readUserUpList(
+            @RequestParam(value = "userid", required = false) Long userId,
+            @RequestParam("postid") Long postId
+
+    ) {
+        return commentService.getUserUpList(postId, userId);
+    }
+
 
     // 덧글 삭제
     @DeleteMapping("")

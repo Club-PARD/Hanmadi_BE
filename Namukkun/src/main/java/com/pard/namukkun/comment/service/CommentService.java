@@ -6,12 +6,14 @@ import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.comment.repo.CommentRepo;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
+import com.pard.namukkun.user.dto.UserUpListDTO;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,6 +94,11 @@ public class CommentService {
         Comment comment = commentRepo.findById(commentId).orElseThrow();
         comment.setIsTaken(take);
         commentRepo.save(comment);
-        log.info("{}",comment.getIsTaken());
+        log.info("{}", comment.getIsTaken());
+    }
+
+    public UserUpListDTO getUserUpList(Long postId, Long userId) {
+        User user = userRepo.findById(userId).orElseThrow();
+        return new UserUpListDTO(user.getUpList());
     }
 }
