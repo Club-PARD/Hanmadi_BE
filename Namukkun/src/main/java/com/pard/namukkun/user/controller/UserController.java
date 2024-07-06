@@ -59,7 +59,7 @@ public class UserController {
 //
 //    }
 
-    // TODO : 보안 관리 해야함
+    // 일단 없는 기능...?
     @DeleteMapping("/delete")
     @Operation(summary = "유저 삭제", description = "유저를 삭제합니다")
     public ResponseEntity<?> deleteUser(@RequestParam("userid") Long userId) {

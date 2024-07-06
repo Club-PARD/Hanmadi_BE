@@ -18,15 +18,6 @@ public class UserService {
         userRepo.save(User.toEntity(dto));
     }
 
-//    public void findby
-//
-//    public List<UserReadDTO> findAllUser() {
-//        return userRepo.findAll()
-//                .stream()
-//                .map(UserReadDTO::new)
-//                .collect(Collectors.toList());
-//    }
-
     // kakao oauth 아이디로 user 정보 가져오기
     public UserReadDTO findUserByOauth(Long id) {
         return new UserReadDTO(userRepo.findByOauthID(id));
@@ -48,24 +39,11 @@ public class UserService {
     public Boolean checkSigned(Long oauthID) {
         return userRepo.existsByOauthID(oauthID);
     }
-//
-//    public UserPostDTO getUserPosts(Long id) {
-//        User user = userRepo.findById(id).orElseThrow();
-//        UserPostDTO dto = new UserPostDTO();
-//        dto.setId(id);
-//        if (user.getPosts().isEmpty()) dto.setPosts(null);
-//        else dto.setPosts(user.getPosts().stream().map(PostReadDTO::new).toList());
-//
-//        if (user.getTempPost() == null) dto.setTempPost(null);
-//        else dto.setTempPost(new PostReadDTO(user.getTempPost()));
-//
-//        return dto;
-//    }
 
     // 유저 정보 전달
     public UserInfoDTO getUserInfo(Long userId) {
         User user = userRepo.findById(userId).orElseThrow();
-        return new UserInfoDTO(user.getUserId(), user.getNickName(), user.getLocal(), user.getProfileImage());
+        return new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
     }
 
     // 유저 상세 정보 전달
@@ -73,10 +51,8 @@ public class UserService {
         User user = userRepo.findById(userId).orElseThrow();
         return new UserReadDTO(
                 user.getUserId(),
-                user.getLocal(),
-                user.getNickName(),
+                new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage()),
                 user.getEmail(),
-                user.getProfileImage(),
                 new PostReadDTO(user.getTempPost()),
                 user.getPosts().stream().map(PostReadDTO::new).toList()
         );

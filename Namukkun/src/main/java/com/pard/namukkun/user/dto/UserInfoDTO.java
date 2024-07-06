@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 // 간단한 정보만 보내주는 DTO
 public class UserInfoDTO {
-    private Long userId;
     private String nickName;
     private Integer local;
     private String profileImage;
