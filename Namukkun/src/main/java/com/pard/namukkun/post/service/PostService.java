@@ -51,27 +51,12 @@ public class PostService {
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
                 -> new RuntimeException("Error creating post -> "+postCreateDTO.getUserId()));
         try{
-
-            // proBackground 파싱
-            String proBackgroundHtml = postCreateDTO.getProBackground();
-            String proBackgroundText = parseHtml(proBackgroundHtml);
-
-            // solution 파싱
-            String solutionHtml = postCreateDTO.getSolution();
-            String solutionText = parseHtml(solutionHtml);
-
-            // benefit 파싱
-            String benefitHtml = postCreateDTO.getBenefit();
-            String benefitText = parseHtml(benefitHtml);
-
-            Post post = Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user);
-
+            Post post = makePost(postCreateDTO,user,"create");
             List<String> fileNames = postCreateDTO.getFileNames();
             post.setInitial(true,Data.getDeadLine(post.getPostTime()));
 
-            for (String fileName : fileNames) {
+            for (String fileName : fileNames)
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
-            }
 
             postRepo.save(post);
         } catch (Exception e) {
@@ -132,11 +117,30 @@ public class PostService {
         }
     }
 
+    // HTML 파싱하는 메서드
+    public Post makePost(PostCreateDTO postCreateDTO, User user, String version) {
+        // proBackground 파싱
+        String proBackgroundHtml = postCreateDTO.getProBackground();
+        String proBackgroundText = parseHtml(proBackgroundHtml);
+
+        // solution 파싱
+        String solutionHtml = postCreateDTO.getSolution();
+        String solutionText = parseHtml(solutionHtml);
+
+        // benefit 파싱
+        String benefitHtml = postCreateDTO.getBenefit();
+        String benefitText = parseHtml(benefitHtml);
+
+        if(version.equals("create")) Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user,true);
+        else if(version.equals("temp")) Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user,false);
+        return null;
+    }
+
 
     @Transactional
     // 게시물 임시저장
     public ResponseEntity<?> saveTempPost(PostCreateDTO postCreateDTO) {
-        /*// User 불러옴
+        // User 불러옴
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
                 -> new RuntimeException("Error saving temp post -> " + postCreateDTO.getUserId()));
 
@@ -147,7 +151,7 @@ public class PostService {
 
             // S3파일 삭제
             for (S3Attachment exsitedS3Attachment : exsitedS3Attachments) {
-                s3AttachmentService.delete(exsitedS3Attachment.getFileUrl());
+                s3AttachmentService.deleteByUrl(exsitedS3Attachment.getFileUrl());
             }
 
             // 원래 있던 임시 게시물 삭제
@@ -156,19 +160,20 @@ public class PostService {
         }
 
         // 임시 게시물 생성
-        Post tempPost = Post.toEntity(postCreateDTO, user);
-        tempPost.setInitial(true, Data.getDeadLine(tempPost.getPostTime()));
-        List<String> fileNames = postCreateDTO.getFileName();
-        for (String fileName : fileNames) {
-            String S3FileUrl = s3AttachmentService.getUrlWithFileName(fileName);
-            tempPost.addS3Attachment(S3FileUrl);
-        }
+        Post tempPost = makePost(postCreateDTO,user,"temp");
 
+        List<String> fileNames = postCreateDTO.getFileNames();
+        tempPost.setInitial(true,Data.getDeadLine(tempPost.getPostTime()));
 
+        for (String fileName : fileNames)
+            tempPost.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
+
+        postRepo.save(tempPost);
+        
         // 임시게시물 저장
         user.setTempPost(tempPost);
         postRepo.save(tempPost);
-        userRepo.save(user);*/
+        userRepo.save(user);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

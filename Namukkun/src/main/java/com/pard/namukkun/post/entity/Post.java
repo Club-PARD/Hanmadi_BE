@@ -65,7 +65,7 @@ public class Post {
 
 
     public static Post toEntity(PostCreateDTO postCreateDTO,String proBackgroundText,
-                                String solutionText, String benefitText, User user) {
+                                String solutionText, String benefitText, User user, Boolean isReturn) {
         Post post = Post.builder()
                 .title(postCreateDTO.getTitle())
                 .postLocal(postCreateDTO.getPostLocal())
@@ -76,6 +76,7 @@ public class Post {
                 .upCountPost(0)
                 .postitCount(0)
                 .isDone(false)
+                .isReturn(isReturn)
                 .user(user)
                 .build();
         return post;
