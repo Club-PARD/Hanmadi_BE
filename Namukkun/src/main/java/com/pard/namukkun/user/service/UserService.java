@@ -43,7 +43,7 @@ public class UserService {
     // 유저 정보 전달
     public UserInfoDTO getUserInfo(Long userId) {
         User user = userRepo.findById(userId).orElseThrow();
-        return new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
+        return new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage(), user.getUpPostList(), user.getUpCommentList());
     }
 
     // 유저 상세 정보 전달

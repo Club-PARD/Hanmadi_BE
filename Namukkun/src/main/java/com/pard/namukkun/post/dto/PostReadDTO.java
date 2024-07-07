@@ -2,6 +2,7 @@ package com.pard.namukkun.post.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pard.namukkun.attachment.dto.S3AttachmentReadDTO;
+import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.post.entity.Post;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 public class PostReadDTO {
     private Long postId;
     private String title; // 제목
-    private Integer postLocal; // 지역
+    private int postLocal; // 지역
     private Integer upCountPost; // 추천수
     private Integer postitCount; // 포스트잇 갯수
     private String proBackground; // 제안배경
@@ -26,13 +27,12 @@ public class PostReadDTO {
     private String postTime; // 작성된 시간
     private String deadLine; // 마감기한까지 남은 날짜
 
-    private List<String> fileName; // 첨부파일 url
-
     private boolean isDone; // 작성 후 7일이 지난거
     private boolean isReturn; // 게시물 업로드 확인
     private String userName;
 
-    private List<S3AttachmentReadDTO> s3Attachments;
+    private List<S3AttachmentReadDTO> s3Attachments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     public PostReadDTO(Post post) {
         this.postId = post.getPostId();
@@ -63,8 +63,6 @@ public class PostReadDTO {
         this.userName = post.getUser().getNickName();
         this.s3Attachments = s3Attachments;
         this.deadLine = post.getDeadLine();
-
+        this.comments = post.getComments();
     }
-
-
 }
