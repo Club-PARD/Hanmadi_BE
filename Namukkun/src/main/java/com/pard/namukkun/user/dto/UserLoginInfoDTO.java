@@ -1,5 +1,8 @@
 package com.pard.namukkun.user.dto;
 
+
+// 유저가 로그인 하면 넘겨주는 DTO
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,9 +14,10 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-// 간단한 정보만 보내주는 DTO
-public class UserInfoDTO {
+public class UserLoginInfoDTO {
     private String nickName;
     private Integer local;
     private String profileImage;
+    private List<Long> postUpList;
+    private List<Long> commentUpList;
 }
