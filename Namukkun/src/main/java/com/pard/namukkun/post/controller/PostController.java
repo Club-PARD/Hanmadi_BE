@@ -116,14 +116,14 @@ public class PostController {
 
 
     @PostMapping("/increase/UpCount")
-    @Operation(summary = "게시물 채택")
-    public UpCountInfoDTO increaeUpCount(@RequestParam("postId") Long postId, @RequestParam("userId") Long userId) {
+    @Operation(summary = "게시물 채택" , description = "postid : 채택한 게시물 id, state 추천 상태 true : 채택 / false : 미채택")
+    public List<UpCountInfoDTO> increaeUpCount(@RequestParam("postId") Long postId, @RequestParam("userId") Long userId) {
         return postService.IncreaseUpCountPost(postId,userId);
     }
 
     @PostMapping("/decrease/UpCount")
-    @Operation(summary = "게시물 채택 취소")
-    public UpCountInfoDTO decreaseUpCount(@RequestParam("postId") Long postId, @RequestParam("userId") Long userId) {
+    @Operation(summary = "게시물 채택 취소", description = "postid : 채택한 게시물 id, state 추천 상태 true : 채택 / false : 미채택")
+    public List<UpCountInfoDTO> decreaseUpCount(@RequestParam("postId") Long postId, @RequestParam("userId") Long userId) {
         return postService.decreaseUpCountPost(postId,userId);
     }
 
