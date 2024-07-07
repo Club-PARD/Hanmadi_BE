@@ -3,13 +3,16 @@ package com.pard.namukkun.postit.controller;
 
 import com.pard.namukkun.post.service.PostService;
 import com.pard.namukkun.postit.dto.PostItCreateDTO;
+import com.pard.namukkun.postit.dto.PostItCreateInfoDTO;
 import com.pard.namukkun.postit.dto.PostItMoveDTO;
 import com.pard.namukkun.postit.dto.PostItReadDTO;
 import com.pard.namukkun.postit.service.PostItService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,40 +21,48 @@ import java.util.Objects;
 @RestController
 @RequestMapping("post/postit")
 @RequiredArgsConstructor
+@Slf4j
 public class PostItController {
     private final PostItService postItService;
 
     // 덧글 선택하여 포스트잇으로 만들기
     @PostMapping("/create")
     @Operation(summary = "포스트잇 생성", description = "덧글의 내용을 포스트잇으로 생성합니다.")
-    public ResponseEntity<?> selectCommentToPostIt(
-            @RequestParam("userid") Long userid,
-            PostItCreateDTO dto
+    public PostItCreateInfoDTO selectCommentToPostIt(
+            @RequestParam(value = "userid", required = false, defaultValue = "1L") Long userid,
+            @RequestBody PostItCreateDTO dto
     ) {
         // 권한 없음
-        if (!postItService.getWriterIdByPostIdIt(dto.getPostId()).equals(userid))
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+
+
+//        log.info("userId {}", userid);
+//        log.info("dto {}", dto.getPostId());
+//        log.info("dto {}", dto.getCommentId());
+//        log.info("dto {}", dto.getDesign());
+//        log.info("dto {}", dto.get());
+//        log.info(String.valueOf(postItService.getWriterIdByPostId(dto.getPostId())));
+
+        if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userid))
+            return null;
 
         // 최대갯수 확인
         if (10 <= postItService.getPostPostItCounter(dto.getPostId()))
-            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS); // 생성 안됨
+            return null;
 
         // 생성
-        postItService.createPostIt(dto);
-        return new ResponseEntity<>(HttpStatus.CREATED); // 생성됨
+        Long postId = postItService.createPostIt(dto);
+        return new PostItCreateInfoDTO(postId);
     }
 
     // 포스트잇 읽기
     @GetMapping("/read")
     @Operation(summary = "포스트잇 읽기", description = "포스트에 있는 모든 포스트잇의 내용을 읽어옵니다")
     public List<PostItReadDTO> readPostIts(
-        @RequestParam(value = "userid", required = false)Long userId, // debug
-        @RequestParam("postid")Long postId
-    ){
-
+            @RequestParam(value = "userid", required = false) Long userId, // debug
+            @RequestParam("postid") Long postId
+    ) {
         return postItService.readAllByPostId(postId);
     }
-
 
 
     // 포스트잇 수정 없음
@@ -60,13 +71,13 @@ public class PostItController {
     @PatchMapping("/sectionmove")
     @Operation(summary = "포스트잇 섹션 이동", description = "덧글의 섹션을 이동합니다." + "left, right 아니면 값을 받지 않습니다")
     public ResponseEntity<?> moveSectionPostIt(
-            @RequestParam("userId") Long userId, // debug
-            @RequestParam("postItId") Long postItId,
+            @RequestParam("userid") Long userId, // debug
+            @RequestParam("postitid") Long postItId,
             @RequestParam("section") String section) {
         // 로그인 안됨
         if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        if (!userId.equals(postItService.getWriterIdByPostIdIt(postItId)))
+        if (!userId.equals(postItService.getWriterIdByPostItId(postItId)))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         // 잘못된 입력
@@ -86,7 +97,7 @@ public class PostItController {
             @RequestBody() PostItMoveDTO dto
     ) {
         // 권한 없음
-        if (!postItService.getWriterIdByPostIdIt(dto.getPostId()).equals(userId))
+        if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userId))
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
         postItService.movePostIt(dto);
@@ -101,7 +112,7 @@ public class PostItController {
             @RequestParam("postitid") Long postItId
     ) {
         // 권한 없음
-        if (!Objects.equals(userId, postItService.getWriterIdByPostIdIt(postItId)))
+        if (!Objects.equals(userId, postItService.getWriterIdByPostItId(postItId)))
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
         postItService.deletePostIt(postItId);

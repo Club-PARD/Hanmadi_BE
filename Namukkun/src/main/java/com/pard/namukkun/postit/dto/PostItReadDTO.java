@@ -13,12 +13,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostItReadDTO {
+    private Long postItId;
     // 유저
     private Long userId;
 
     private UserInfoDTO userInfoDTO;
+
     // 디자인 옵션
     private Integer design;
+
+    // 포스트잇 내용
+    private String content;
 
     // 왼쪽 오른쪽
     private String section;
@@ -30,10 +35,12 @@ public class PostItReadDTO {
 
     public PostItReadDTO(PostIt postIt) {
         User user = postIt.getUser();
-        this.userId = postIt.getId();
+        this.postItId = postIt.getId();
+        this.userId = postIt.getUser().getUserId();
         this.userInfoDTO = new UserInfoDTO(user.getNickName(),user.getLocal(),user.getProfileImage());
         this.design = postIt.getDesign();
         this.section = postIt.getSection();
+        this.content = postIt.getContext();
         this.x = postIt.getX();
         this.y = postIt.getY();
         this.z = postIt.getZ();
