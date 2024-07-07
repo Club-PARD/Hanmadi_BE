@@ -23,7 +23,7 @@ public class UserController {
 
     @GetMapping("/info")
     @Operation(summary = "유저 정보 전달", description = "로그인했을때 로컬에 저장하고, 로그아웃 하면 로컬에서 지우세요." + "기본적인 유저 정보를 전달합니다")
-    public UserInfoDTO getUserInfo(
+    public UserLoginInfoDTO getUserInfo(
             @RequestParam("userid") Long userId // debug
     ) {
         if (userId == null) return null;
