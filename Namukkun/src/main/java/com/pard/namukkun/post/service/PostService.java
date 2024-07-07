@@ -24,8 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -42,7 +46,7 @@ public class PostService {
     private final S3AttachmentService s3AttachmentService;
 
     private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
-    private Map<String, File> tempStorage = new HashMap<>();
+    private Map<String, Path> tempStorage = new HashMap<>();
 
 
     // PostCreateDTO 받아서 postDTO 생성
@@ -77,8 +81,7 @@ public class PostService {
 
     private void catchNode(List<Node> nodes, StringBuilder sb) {
         for(Node node : nodes) {
-            log.info(String.valueOf(node));
-
+            log.info("node : "+node);
             if(node instanceof TextNode) {
                 sb.append(((TextNode) node).text());
                 log.info("택스트"+node);
@@ -89,32 +92,30 @@ public class PostService {
                 if(element.tagName().equals("img")) { // 이미지 일 때
                     try{
                         String fileName = element.attr("src"); // 파일 이름 저장 (tempStorage key값)
-                        File tempFile = tempStorage.get(fileName); // 해당 이름으로 저장된 이미지 불러옴
-                        if(tempFile != null && tempFile.exists()) { // 만약 저장소에 있으면
-                            log.info("img save : "+fileName);
-                            s3AttachmentService.upload((MultipartFile) tempFile,fileName); // s3에 저장
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                        String UUIDFileName = UUID.randomUUID()+"_"+fileName;
+                        log.info("fileName : " + fileName);
+                        if(tempStorage.containsKey(fileName)) {
 
-                    sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(element.attr("src"))).append("]");
+                            Path tempFilePath = tempStorage.get(fileName); // 해당 이름으로 저장된 이미지 불러옴
+
+                            if(tempFilePath != null) { // 만약 저장소에 있으면
+
+                                log.info("img save : "+fileName);
+                                s3AttachmentService.uploadFile(tempFilePath.toFile(),UUIDFileName); // s3에 저장
+                                sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(UUIDFileName)).append("]"); // stringbuilder에 추가
+
+                            }else log.warn("임시 파일이 null입니다: " + fileName);
+
+                        } else log.warn("임시 저장소에 파일이 존재하지 않습니다: " + fileName);
+
+                    } catch (Exception e) {
+                        log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
+                    }
                     tempStorage.clear();
                 } else {
                     catchNode(element.childNodes(), sb);
                 }
             }
-        }
-    }
-
-    // HTML에서 텍스트 추출하는 메서드
-    private String htmlToText(String html) {
-        try {
-            Document doc = Jsoup.parse(html);
-            return doc.body().text();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
         }
     }
 
@@ -243,34 +244,26 @@ public class PostService {
 
     // 이미지 업로드
     public ResponseEntity<?> uploadImg(MultipartFile file) {
-        if(file.isEmpty()) {
-            return ResponseEntity.badRequest().body("No file");
-        }
-        try{
+        // 임시 저장소에 파일 저장
+        try {
             // 임시 저장소에 저장될 키값, 저장될 이미지 이름
-            String fileId = UUID.randomUUID()+"_"+file.getOriginalFilename();
-            // 파일을 임시 디렉토리에 저장
-            File tempFile = new File(TEMP_DIR, file.getOriginalFilename());
-            file.transferTo(tempFile);
+            String fileId = file.getOriginalFilename();
+            Path tempFilePath = Paths.get(TEMP_DIR, fileId);
 
-            // 임시 저장소에 파일 저장
-            tempStorage.put(fileId,tempFile);
+            Files.copy(file.getInputStream(), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // 임시 저장된 이미지 이름 DTO에 저장
+            tempStorage.put(fileId, tempFilePath);
+            log.info("Temp storage contains: " + tempStorage.keySet());
+
             ImgDTO imgDTO = new ImgDTO(fileId);
+            log.info("Img 저장 : " + imgDTO.getImg());
 
-            // 로그 기록
-            log.info("Img 저장 : "+imgDTO.getImg());
-
-            // 임시 파일 경로 변환
-            return ResponseEntity.ok(imgDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(imgDTO);
         } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail upload");
+            log.error("Error storing temp image file: " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error storing temp image file");
         }
     }
-
-    //-----------------------------------
 
     // 포스트의 시간과 현재 시간을 비교하여
     public Integer postCheck(String presentTime) {
@@ -309,7 +302,7 @@ public class PostService {
 
     // 채택하는 메서드
     @Transactional
-    public Integer IncreaseUpCountPost(Long postId, Long userId) {
+    public UpCountInfoDTO IncreaseUpCountPost(Long postId, Long userId) {
         User user = returnUser(userId);
         //--------------------------------------
         List<Long> list = user.getUpPostList();
@@ -321,12 +314,12 @@ public class PostService {
         post.increaseUpCountPost();
         postRepo.save(post);
 
-        return post.getUpCountPost();
+        return new UpCountInfoDTO(user.getUpPostList(),post.getUpCountPost());
     }
 
     // 채택 취소하는 메서드
     @Transactional
-    public Integer decreaseUpCountPost(Long postId, Long userId) {
+    public UpCountInfoDTO decreaseUpCountPost(Long postId, Long userId) {
         User user = returnUser(userId);
         //--------------------------------------
         List<Long> list = user.getUpPostList();
@@ -338,7 +331,7 @@ public class PostService {
         post.decreaseUpCountPost();
         postRepo.save(post);
 
-        return post.getUpCountPost();
+        return new UpCountInfoDTO(user.getUpPostList(),post.getUpCountPost());
     }
 
     // postId를 받아서 post를 리턴하는 메서드
