@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,7 @@ public class UserInfoDTO {
     private String nickName;
     private Integer local;
     private String profileImage;
+
+    private List<Long> postUpList;
+    private List<Long> commentUpList;
 }
