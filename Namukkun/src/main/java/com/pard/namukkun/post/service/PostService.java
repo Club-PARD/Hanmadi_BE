@@ -91,6 +91,7 @@ public class PostService {
                         String fileName = element.attr("src"); // 파일 이름 저장 (tempStorage key값)
                         File tempFile = tempStorage.get(fileName); // 해당 이름으로 저장된 이미지 불러옴
                         if(tempFile != null && tempFile.exists()) { // 만약 저장소에 있으면
+                            log.info("img save : "+fileName);
                             s3AttachmentService.upload((MultipartFile) tempFile,fileName); // s3에 저장
                         }
                     } catch (Exception e) {
