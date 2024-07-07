@@ -26,6 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,6 +66,7 @@ public class PostService {
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
             postRepo.save(post);
+            tempStorage.clear();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
         }
@@ -91,7 +95,7 @@ public class PostService {
 
                 if(element.tagName().equals("img")) { // 이미지 일 때
                     try{
-                        String fileName = element.attr("src"); // 파일 이름 저장 (tempStorage key값)
+                        String fileName = URLDecoder.decode(element.attr("src"),StandardCharsets.UTF_8.toString()); // 파일 이름 저장 (tempStorage key값)
                         String UUIDFileName = UUID.randomUUID()+"_"+fileName;
                         log.info("fileName : " + fileName);
                         if(tempStorage.containsKey(fileName)) {
@@ -106,12 +110,11 @@ public class PostService {
 
                             }else log.warn("임시 파일이 null입니다: " + fileName);
 
-                        } else log.warn("임시 저장소에 파일이 존재하지 않습니다: " + fileName);
+                        } else log.warn("임시 저장소에 파일이 존재하지 않습니다:" + fileName);
 
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
                     }
-                    tempStorage.clear();
                 } else {
                     catchNode(element.childNodes(), sb);
                 }
@@ -247,7 +250,8 @@ public class PostService {
         // 임시 저장소에 파일 저장
         try {
             // 임시 저장소에 저장될 키값, 저장될 이미지 이름
-            String fileId = file.getOriginalFilename();
+            String originalFilename = file.getOriginalFilename();
+            String fileId = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8.toString());
             Path tempFilePath = Paths.get(TEMP_DIR, fileId);
 
             Files.copy(file.getInputStream(), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
@@ -255,7 +259,7 @@ public class PostService {
             tempStorage.put(fileId, tempFilePath);
             log.info("Temp storage contains: " + tempStorage.keySet());
 
-            ImgDTO imgDTO = new ImgDTO(fileId);
+            ImgDTO imgDTO = new ImgDTO(originalFilename);
             log.info("Img 저장 : " + imgDTO.getImg());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(imgDTO);
@@ -302,7 +306,7 @@ public class PostService {
 
     // 채택하는 메서드
     @Transactional
-    public UpCountInfoDTO IncreaseUpCountPost(Long postId, Long userId) {
+    public List<UpCountInfoDTO> IncreaseUpCountPost(Long postId, Long userId) {
         User user = returnUser(userId);
         //--------------------------------------
         List<Long> list = user.getUpPostList();
@@ -314,12 +318,12 @@ public class PostService {
         post.increaseUpCountPost();
         postRepo.save(post);
 
-        return new UpCountInfoDTO(user.getUpPostList(),post.getUpCountPost());
+        return makeUpCountInfoDTO(list);
     }
 
     // 채택 취소하는 메서드
     @Transactional
-    public UpCountInfoDTO decreaseUpCountPost(Long postId, Long userId) {
+    public List<UpCountInfoDTO> decreaseUpCountPost(Long postId, Long userId) {
         User user = returnUser(userId);
         //--------------------------------------
         List<Long> list = user.getUpPostList();
@@ -331,7 +335,20 @@ public class PostService {
         post.decreaseUpCountPost();
         postRepo.save(post);
 
-        return new UpCountInfoDTO(user.getUpPostList(),post.getUpCountPost());
+        return makeUpCountInfoDTO(list);
+    }
+
+    public List<UpCountInfoDTO> makeUpCountInfoDTO(List<Long> list){
+        // UpCountInfoDTO 객체 리스트 생성
+        List<UpCountInfoDTO> upCountInfoDTOList = new ArrayList<>();
+
+        // 각 사용자 upPostList 항목과 게시글의 upCount를 DTO에 추가
+        for (Long upPostId : list) {
+            Post upPost = postRepo.findById(upPostId).orElseThrow();
+            upCountInfoDTOList.add(new UpCountInfoDTO(upPostId,true,upPost.getUpCountPost()));
+        }
+
+        return upCountInfoDTOList;
     }
 
     // postId를 받아서 post를 리턴하는 메서드
