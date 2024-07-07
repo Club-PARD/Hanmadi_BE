@@ -1,18 +1,13 @@
 package com.pard.namukkun.postit.controller;
 
 
-import com.pard.namukkun.post.service.PostService;
-import com.pard.namukkun.postit.dto.PostItCreateDTO;
-import com.pard.namukkun.postit.dto.PostItCreateInfoDTO;
-import com.pard.namukkun.postit.dto.PostItMoveDTO;
-import com.pard.namukkun.postit.dto.PostItReadDTO;
+import com.pard.namukkun.postit.dto.*;
 import com.pard.namukkun.postit.service.PostItService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,15 +28,6 @@ public class PostItController {
             @RequestBody PostItCreateDTO dto
     ) {
         // 권한 없음
-
-
-//        log.info("userId {}", userid);
-//        log.info("dto {}", dto.getPostId());
-//        log.info("dto {}", dto.getCommentId());
-//        log.info("dto {}", dto.getDesign());
-//        log.info("dto {}", dto.get());
-//        log.info(String.valueOf(postItService.getWriterIdByPostId(dto.getPostId())));
-
         if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userid))
             return null;
 
@@ -64,10 +50,7 @@ public class PostItController {
         return postItService.readAllByPostId(postId);
     }
 
-
     // 포스트잇 수정 없음
-
-
     @PatchMapping("/sectionmove")
     @Operation(summary = "포스트잇 섹션 이동", description = "덧글의 섹션을 이동합니다." + "left, right 아니면 값을 받지 않습니다")
     public ResponseEntity<?> moveSectionPostIt(
@@ -96,6 +79,10 @@ public class PostItController {
             @RequestParam("userid") Long userId,
             @RequestBody() PostItMoveDTO dto
     ) {
+        log.info("{}", dto.getPostId());
+        log.info("{}", dto.getX());
+        log.info(String.valueOf(!postItService.getWriterIdByPostId(dto.getPostId()).equals(userId)));
+
         // 권한 없음
         if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userId))
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -107,15 +94,16 @@ public class PostItController {
     // 포스트잇 삭제
     @DeleteMapping("/delete")
     @Operation(summary = "포스트잇 제거", description = "포스트잇을 지웁니다")
-    public ResponseEntity<?> deletePostIt(
+    public PostItCommentDTO deletePostIt(
             @RequestParam("userid") Long userId,
             @RequestParam("postitid") Long postItId
     ) {
+
         // 권한 없음
         if (!Objects.equals(userId, postItService.getWriterIdByPostItId(postItId)))
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            return null;
 
-        postItService.deletePostIt(postItId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Long commentid = postItService.deletePostIt(postItId);
+        return new PostItCommentDTO(commentid);
     }
 }

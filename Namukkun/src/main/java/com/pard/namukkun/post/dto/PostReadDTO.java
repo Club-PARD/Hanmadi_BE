@@ -2,6 +2,7 @@ package com.pard.namukkun.post.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pard.namukkun.attachment.dto.S3AttachmentReadDTO;
+import com.pard.namukkun.comment.dto.CommentReadDTO;
 import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.post.entity.Post;
 import lombok.Getter;
@@ -32,21 +33,30 @@ public class PostReadDTO {
     private String userName;
 
     private List<S3AttachmentReadDTO> s3Attachments = new ArrayList<>();
-    private List<Comment> comments = new ArrayList<>();
+    //---------------------------------------------------
+    private List<CommentReadDTO> comments = new ArrayList<>();
+    //---------------------------------------------------
 
     public PostReadDTO(Post post) {
-        this.postId = post.getPostId();
-        this.title = post.getTitle();
-        this.postLocal = post.getPostLocal();
-        this.upCountPost = post.getUpCountPost();
-        this.postitCount = post.getPostitCount();
-        this.proBackground = post.getProBackground();
-        this.solution = post.getSolution();
-        this.benefit = post.getBenefit();
-        this.isDone = post.isDone();
-        this.postTime = post.getPostTime();
-        this.userName = post.getUser().getNickName();
-        this.deadLine = post.getDeadLine();
+        if (post != null) {
+            this.postId = post.getPostId();
+            this.title = post.getTitle();
+            this.postLocal = post.getPostLocal();
+            this.upCountPost = post.getUpCountPost();
+            this.postitCount = post.getPostitCount();
+            this.proBackground = post.getProBackground();
+            this.solution = post.getSolution();
+            this.benefit = post.getBenefit();
+            this.isDone = post.isDone();
+            this.postTime = post.getPostTime();
+            this.userName = post.getUser().getNickName();
+            this.deadLine = post.getDeadLine();
+            //----------------------------------
+            this.comments = post.getComments().stream()
+                    .map(CommentReadDTO::new)
+                    .collect(Collectors.toList());
+            //----------------------------------
+        }
     }
 
     public PostReadDTO(Post post, List<S3AttachmentReadDTO> s3Attachments) {
@@ -63,6 +73,10 @@ public class PostReadDTO {
         this.userName = post.getUser().getNickName();
         this.s3Attachments = s3Attachments;
         this.deadLine = post.getDeadLine();
-        this.comments = post.getComments();
+        //----------------------------------
+        this.comments = post.getComments().stream()
+                .map(CommentReadDTO::new)
+                .collect(Collectors.toList());
+        //----------------------------------
     }
 }

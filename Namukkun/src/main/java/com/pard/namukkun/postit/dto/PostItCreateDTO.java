@@ -18,6 +18,7 @@ public class PostItCreateDTO {
     // 연결된 덧글
     private Long commentId;
 
+    // 연결된 포스트
     private Long PostId;
 
     // 디자인 옵션
