@@ -1,10 +1,8 @@
 package com.pard.namukkun.postit.service;
 
 
-import com.pard.namukkun.comment.dto.CommentReadDTO;
 import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.comment.repo.CommentRepo;
-import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
 import com.pard.namukkun.postit.dto.PostItCreateDTO;
@@ -16,8 +14,6 @@ import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,7 +39,7 @@ public class PostItService {
     }
 
     // 포스트잇 생성
-    public void createPostIt(PostItCreateDTO dto) {
+    public Long createPostIt(PostItCreateDTO dto) {
         User user = userRepo.findById(dto.getUserId()).orElseThrow();
         Post post = postRepo.findById(dto.getPostId()).orElseThrow();
         Comment comment = commentRepo.findById(dto.getCommentId()).orElseThrow();
@@ -65,6 +61,7 @@ public class PostItService {
         postItRepo.save(postIt);
         post.setPostitCount(post.getPostitCount() + 1);
         postRepo.save(post);
+        return postIt.getId();
     }
 
     // 포스트잇 삭제
@@ -99,9 +96,14 @@ public class PostItService {
         postItRepo.save(postIt);
     }
 
-    // 포스트잇 글쓴이 아이디 가져오기
-    public Long getWriterIdByPostIdIt(Long postItId) {
-        return postRepo.findById(postItId).orElseThrow().getUser().getUserId();
+    public Long getWriterIdByPostItId(Long postItId){
+        return postItRepo.findById(postItId).orElseThrow()
+                .getPost().getUser().getUserId();
+    }
+
+    // 포스트아이디로 글쓴이 아이디 가져오기
+    public Long getWriterIdByPostId(Long postId) {
+        return postRepo.findById(postId).orElseThrow().getUser().getUserId();
     }
 
     // 포스트잇 읽기

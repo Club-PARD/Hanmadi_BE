@@ -52,12 +52,6 @@ public class Comment {
                 .build();
     }
 
-    public Comment(CommentCreateDTO dto, User user) {
-        this.user = user;
-        this.upCounter = 0;
-        this.commentTime = Data.getNowDate();
-        this.content = dto.getContent();
-    }
 
     //--------------------------------------
     public void addUpCounter() {
