@@ -46,16 +46,16 @@ public class CommentController {
         return commentService.readALlComment(postId);
     }
 
-    // TODO 포스트쪽에서 가져갈 수 있도록 포스트쪽에서도 만들것
-    // 게시글에서 유저가 좋아요 한 아이디 리스트를 가져옵니다
-    @GetMapping("/user/comment-uplist")
-    @Operation(summary = "유저 좋아요 리스트", description = "포스트에 있는 덧글중 유저가 좋아요를 누를 리스트를 읽어옵니다.")
-    public UserUpListDTO readUserCommentUpList(
-            @RequestParam(value = "userid", required = false) Long userId,
-            @RequestParam("postid") Long postId
-    ) {
-        return commentService.getUserUpList(postId, userId);
-    }
+//    // TODO 포스트쪽에서 가져갈 수 있도록 포스트쪽에서도 만들것
+//    // 게시글에서 유저가 좋아요 한 아이디 리스트를 가져옵니다
+//    @GetMapping("/user/comment-uplist")
+//    @Operation(summary = "유저 좋아요 리스트", description = "포스트에 있는 덧글중 유저가 좋아요를 누를 리스트를 읽어옵니다.")
+//    public UserUpListDTO readUserCommentUpList(
+//            @RequestParam(value = "userid", required = false) Long userId,
+//            @RequestParam("postid") Long postId
+//    ) {
+//        return commentService.getUserUpList(postId, userId);
+//    }
 
     // 덧글 삭제
     @DeleteMapping("")
@@ -66,6 +66,7 @@ public class CommentController {
     ) {
         // 권한 확인
         Long commentWriterId = commentService.getCommentWriterId(commentId);
+        log.info("weriterid {} userid {}", commentWriterId, userId);
         if (userId == null || !userId.equals(commentWriterId))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 

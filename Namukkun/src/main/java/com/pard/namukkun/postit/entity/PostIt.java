@@ -47,7 +47,11 @@ public class PostIt {
     private Float z;
 
 
-    @OneToOne(mappedBy = "postIt", orphanRemoval = false)
+    //    @OneToOne(mappedBy = "postIt", orphanRemoval = false)
+//    @JoinColumn(name = "comment_id")
+//    private Comment comment;
+    @OneToOne(optional = true, orphanRemoval = false)
+    @JoinColumn(name = "comment_id")
     private Comment comment;
 
     @ManyToOne
@@ -60,11 +64,12 @@ public class PostIt {
         this.z = z;
     }
 
-    public PostIt(PostItCreateDTO dto, User user, Comment comment,Post post, String context) {
+    public PostIt(PostItCreateDTO dto, User user, Comment comment, Post post, String context) {
         this.user = user;
         this.context = context;
         this.section = dto.getSection();
         this.design = dto.getDesign();
+        this.comment = comment;
         this.post = post;
         this.x = dto.getX();
         this.y = dto.getY();

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -43,6 +44,35 @@ public class S3AttachmentService {
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    public void uploadFile(File file, String fileName) {
+        try {
+            String contentType = getContentTypeByFileName(fileName);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(contentType); // 예시: 이미지 파일의 MIME 유형
+            metadata.setContentLength(file.length());
+            metadata.setHeader("Content-Disposition", "inline"); // 웹으로 표시되도록 변경
+
+            PutObjectRequest request = new PutObjectRequest(bucket, fileName, file)
+                    .withMetadata(metadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead); // 권한 설정
+
+            amazonS3Client.putObject(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 파일 확장자에 따라 MIME 유형을 결정하는 메서드
+    private String getContentTypeByFileName(String fileName) {
+        if (fileName.endsWith(".jpeg") || fileName.endsWith(".jpg")) {
+            return "image/jpeg";
+        } else if (fileName.endsWith(".png")) {
+            return "image/png";
+        } else {
+            return "application/octet-stream"; // 기본적으로 이진 파일로 설정
         }
     }
 

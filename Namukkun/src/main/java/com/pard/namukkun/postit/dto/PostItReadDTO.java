@@ -19,6 +19,8 @@ public class PostItReadDTO {
 
     private UserInfoDTO userInfoDTO;
 
+    private Long commentId;
+
     // 디자인 옵션
     private Integer design;
 
@@ -36,8 +38,12 @@ public class PostItReadDTO {
     public PostItReadDTO(PostIt postIt) {
         User user = postIt.getUser();
         this.postItId = postIt.getId();
+        try {
+            System.out.println(postIt.getComment());
+            this.commentId = postIt.getComment().getId();
+        } catch (Exception Ignore) {}
         this.userId = postIt.getUser().getUserId();
-        this.userInfoDTO = new UserInfoDTO(user.getNickName(),user.getLocal(),user.getProfileImage());
+        this.userInfoDTO = new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
         this.design = postIt.getDesign();
         this.section = postIt.getSection();
         this.content = postIt.getContext();

@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class PostItService {
-    //    private static final Logger log = LoggerFactory.getLogger(PostItService.class);
     private final CommentRepo commentRepo;
     private final PostItRepo postItRepo;
     private final UserRepo userRepo;
@@ -32,9 +31,7 @@ public class PostItService {
 
     // 포스트에 있는 포스트잇 개수 확인
     public Integer getPostPostItCounter(Long postId) {
-        System.out.println("----------------------1-1");
         Integer temp = postRepo.findById(postId).orElseThrow().getPostitCount();
-        System.out.println("----------------------1-2 : " + temp);
         return temp;
     }
 
@@ -44,33 +41,45 @@ public class PostItService {
         Post post = postRepo.findById(dto.getPostId()).orElseThrow();
         Comment comment = commentRepo.findById(dto.getCommentId()).orElseThrow();
 
-
         // 포스트잇 내용
         String context = comment.getContent();
 
-        log.info("user id {}", user.getUserId());
-        log.info("post id {}", post.getPostId());
-        log.info("comment id {}", comment.getId());
-        log.info("context {}", context);
-
         // 포스트잇 생성
         PostIt postIt = new PostIt(dto, user, comment, post, context);
-        // 포스트잇 개수 추가
+
+        comment.setPostIt(postIt);
+
 
         // 저장
         postItRepo.save(postIt);
+        commentRepo.save(comment);
+
+        // 포스트잇 개수 추가
         post.setPostitCount(post.getPostitCount() + 1);
+        System.out.println(postIt.getComment().getId());
         postRepo.save(post);
         return postIt.getId();
     }
 
     // 포스트잇 삭제
-    public void deletePostIt(Long postItId) {
+    public Long deletePostIt(Long postItId) {
         // 포스트잇 개수 감소
+
+        log.info("postitid : {}",postItId);
         PostIt postIt = postItRepo.findById(postItId).orElseThrow();
+        Comment comment = commentRepo.findById(postIt.getComment().getId()).orElseThrow();
+
+        log.info("comment id {}", comment.getId());
+
         Post post = postIt.getPost();
         post.setPostitCount(post.getPostitCount() - 1);
         postItRepo.deleteById(postItId);
+
+        try {
+            return postIt.getComment().getId();
+        } catch (Exception Ignore) {
+            return null;
+        }
     }
 
     // 포스트잇 이동
@@ -96,7 +105,7 @@ public class PostItService {
         postItRepo.save(postIt);
     }
 
-    public Long getWriterIdByPostItId(Long postItId){
+    public Long getWriterIdByPostItId(Long postItId) {
         return postItRepo.findById(postItId).orElseThrow()
                 .getPost().getUser().getUserId();
     }

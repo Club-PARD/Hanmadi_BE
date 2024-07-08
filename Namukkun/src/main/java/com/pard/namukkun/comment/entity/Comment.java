@@ -37,8 +37,10 @@ public class Comment {
     @ManyToOne
     private User user;        // 작성자
 
-    @OneToOne
-    @JoinColumn(name = "postIt_id")
+    //    @OneToOne
+//    @JoinColumn(name = "postIt_id")
+//    private PostIt postIt;
+    @OneToOne(mappedBy = "comment", orphanRemoval = false)
     private PostIt postIt;
 
     public static Comment toEntity(CommentCreateDTO dto, User user, Post post) {
@@ -66,4 +68,8 @@ public class Comment {
         this.isTaken = isTaken;
     }
 
+
+    public void setPostIt(PostIt postIt) {
+        this.postIt = postIt;
+    }
 }
