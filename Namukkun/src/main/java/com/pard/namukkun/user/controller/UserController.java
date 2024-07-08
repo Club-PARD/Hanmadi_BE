@@ -27,7 +27,7 @@ public class UserController {
             @RequestParam("userid") Long userId // debug
     ) {
         if (userId == null) return null;
-        return userService.getUserInfo(userId);
+        return userService.getUserLoginInfoDTO(userId);
     }
     @GetMapping("/info/all")
     @Operation(summary = "유저 주요 정보", description = "마이페이지에서 사용될 유저 정보를 전달합니다")

@@ -55,7 +55,7 @@ public class PostService {
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
                 -> new RuntimeException("Error creating post -> "+postCreateDTO.getUserId()));
         try{
-            Post post = makePost(postCreateDTO,user,"create");
+            Post post = makePost(postCreateDTO,user);
             List<String> fileNames = postCreateDTO.getFileNames();
             post.setInitial(true,Data.getDeadLine(post.getPostTime()));
 
@@ -119,8 +119,9 @@ public class PostService {
         }
     }
 
+
     // HTML 파싱하는 메서드
-    public Post makePost(PostCreateDTO postCreateDTO, User user, String version) {
+    public Post makePost(PostCreateDTO postCreateDTO, User user) {
         // proBackground 파싱
         String proBackgroundHtml = postCreateDTO.getProBackground();
         String proBackgroundText = parseHtml(proBackgroundHtml);
@@ -133,11 +134,15 @@ public class PostService {
         String benefitHtml = postCreateDTO.getBenefit();
         String benefitText = parseHtml(benefitHtml);
 
-        if(version.equals("create")) return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user,true);
-        else if(version.equals("temp")) return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user,false);
-        return null;
-    }
+        /*try{
+            for(String endcodedFileName : tempStorage.keySet()){
 
+            }
+        }*/
+        tempStorage.clear();
+        return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user);
+
+    }
 
     @Transactional
     // 게시물 임시저장
@@ -162,10 +167,10 @@ public class PostService {
         }
 
         // 임시 게시물 생성
-        Post tempPost = makePost(postCreateDTO,user,"temp");
+        Post tempPost = makePost(postCreateDTO,user);
 
         List<String> fileNames = postCreateDTO.getFileNames();
-        tempPost.setInitial(true,Data.getDeadLine(tempPost.getPostTime()));
+        tempPost.setInitial(false,Data.getDeadLine(tempPost.getPostTime()));
 
         for (String fileName : fileNames)
             tempPost.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
