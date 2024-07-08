@@ -6,12 +6,14 @@ import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.comment.repo.CommentRepo;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
+import com.pard.namukkun.user.dto.UserUpListDTO;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +26,7 @@ public class CommentService {
     private final UserRepo userRepo;
 
     // 덧글 생성
-    public Boolean createComment(Long postId, Long userId, CommentCreateDTO dto) {
+    public Long createComment(Long postId, Long userId, CommentCreateDTO dto) {
         // dto 에 user id 세팅
         dto.setUserId(userId);
 
@@ -32,10 +34,11 @@ public class CommentService {
         if (postRepo.findById(postId).isPresent()) {
             User user = userRepo.findById(userId).orElseThrow();
             Post post = postRepo.findById(postId).orElseThrow();
-            commentRepo.save(Comment.toEntity(dto, user, post));
+            Comment comment = Comment.toEntity(dto, user, post);
+            commentRepo.save(comment);
             // 생성됨
-            return true;
-        } else return false; // 포스트가 존재하지 않으면 false
+            return comment.getId();
+        } else return null;
     }
 
     // 포스트의 덧글 모두 가져오기
@@ -60,7 +63,8 @@ public class CommentService {
     }
 
     // 좋아요 버튼
-    public void upButton(Long commentId, Long userId) {
+    public void upButton(Long commentId, Long userId, Boolean up) {
+
         // 좋아요할 유저
         User user = userRepo.findById(userId).orElseThrow();
 
@@ -70,28 +74,53 @@ public class CommentService {
         // 유저의 좋아요 리스트 가져오기
         List<Long> upList = user.getUpCommentList();
 
-        log.info(String.valueOf(upList.contains(commentId)));
-        // 이미 좋아요를 눌렀다면
-        if (upList.contains(comment.getId())) {
-            comment.minUpCounter();
-            upList.remove(comment.getId());
+        Boolean isContaining = upList.contains(commentId);
 
-            // 좋아요 누루기
-        } else {
+        // 좋아요 클릭
+        if (up && !isContaining) {
             comment.addUpCounter();
             upList.add(comment.getId());
+        } else if (!up && isContaining) {
+            comment.minUpCounter();
+            upList.remove(comment.getId());
         }
-//        log.info("{}", comment.getUpCounter());
-//        log.info("{}", user.getUpList().toArray().length);
-        //유저 리스트 업데이트
         user.updateUpCommentList(upList);
         userRepo.save(user);
     }
 
+    // 채택
     public void takeComment(Long commentId, Boolean take) {
         Comment comment = commentRepo.findById(commentId).orElseThrow();
         comment.setIsTaken(take);
         commentRepo.save(comment);
-        log.info("{}",comment.getIsTaken());
+    }
+
+    // 해당 개시글에서 유저가 좋아한 댓글의 아이디만 모아서 리스트 return
+    public UserUpListDTO getUserUpList(Long postId, Long userId) {
+        // 유저 찾기
+        User user = userRepo.findById(userId).orElseThrow();
+
+        // 리턴할 리스트
+        List<Long> list = new ArrayList<>();
+
+        //유저가 가지고 있는 좋아요 리스트
+        List<Long> userList = user.getUpCommentList();
+
+        // 덧글이 작성된 포스트 아이디
+        Long commentPostId = 0L;
+
+        // 저장된 아이디로 하나하나 검사
+        for (Long commentId : userList) {
+            try { // 덧글이 지워진 경우 대응
+                Comment comment = commentRepo.findById(commentId).orElseThrow();
+                commentPostId = comment.getPost().getPostId();
+                if (postId.equals(commentPostId)) list.add(commentId);
+            } catch (Exception ignored) {
+                user.getUpCommentList().remove(commentId);
+                userRepo.save(user);
+            }
+        }
+
+        return new UserUpListDTO(list);
     }
 }

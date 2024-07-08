@@ -18,16 +18,13 @@ public class S3Attachment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long attachmentId;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String fileUrl;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
-
-    public S3Attachment(String fileUrl, Post post) {
-        this.fileUrl = fileUrl;
-        this.post = post;
-    }
 
     public void setFileUrl(String fileUrl, Post post) {
         this.fileUrl = fileUrl;

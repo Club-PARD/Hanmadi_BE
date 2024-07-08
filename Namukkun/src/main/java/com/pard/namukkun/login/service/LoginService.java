@@ -92,7 +92,7 @@ public class LoginService extends DefaultOAuth2UserService {
         User user = userRepo.findById(userId).orElseThrow();
 
         // 유저 지역 변경
-//        user.updateUserinfo(user.getNickName(), local, user.getProfileImage());
+        user.updateUserinfo(user.getNickName(), local, user.getProfileImage());
 
         // 유저 저장
         userRepo.save(user);

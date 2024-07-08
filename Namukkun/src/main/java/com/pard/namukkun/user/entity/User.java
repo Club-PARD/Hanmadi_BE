@@ -4,7 +4,6 @@ import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.postit.entity.PostIt;
 import com.pard.namukkun.user.dto.UserCreateDTO;
-import com.pard.namukkun.user.dto.UserReadDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +32,7 @@ public class User {
     @OneToOne
     private Post tempPost;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Post> posts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -54,12 +53,6 @@ public class User {
     @Column(name = "up_comment_id")
     private List<Long> upCommentList;
 
-
-
-    public void setTempPost(Post tempPost) {
-        this.tempPost = tempPost;
-    }
-
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()
                 .oauthID(userCreateDTO.getOauthID())
@@ -69,16 +62,6 @@ public class User {
                 .local(userCreateDTO.getLocal())
                 .build();
     }
-    public static User toEntity(UserReadDTO dto) {
-        return User.builder()
-                .userId(dto.getUserId())
-                .nickName(dto.getNickName())
-                .profileImage(dto.getProfileImage())
-                .email(dto.getEmail())
-                .local(dto.getLocal())
-                .build();
-    }
-
 
     //----------------------------------------------
     // setters
