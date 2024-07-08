@@ -1,18 +1,28 @@
 package com.pard.namukkun.user.service;
 
+
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.user.dto.*;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 
 public class UserService {
     private final UserRepo userRepo;
+
+    //---------------- 준현 수정-------------
+    private S3AttachmentService s3AttachmentService;
+    //---------------- 준현 수정-------------
 
     // 유저 생성
     public void createUser(UserCreateDTO dto) {
@@ -42,9 +52,14 @@ public class UserService {
     }
 
     // 유저 정보 전달
-    public UserLoginInfoDTO getUserInfo(Long userId) {
+    public UserLoginInfoDTO getUserLoginInfoDTO(Long userId) {
         User user = userRepo.findById(userId).orElseThrow();
         return new UserLoginInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage(), user.getUpPostList(), user.getUpCommentList());
+    }
+    // 유저 정보 전달
+    public UserInfoDTO getUserInfoDTO(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow();
+        return new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
     }
 
     // 유저 정보 전달
@@ -64,4 +79,16 @@ public class UserService {
                 user.getPosts().stream().map(PostReadDTO::new).toList()
         );
     }
+
+    // -------------- 준현 수정 ----------------
+    public ResponseEntity<?> updateUserProfile(String profileImage, Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(()
+        -> new RuntimeException("User not found: "+userId));
+
+        user.updateProfileImage(profileImage); // 유저정보 업데이트
+        userRepo.save(user); // 저장
+
+        return ResponseEntity.ok().build();
+    }
+    // -------------- 준현 수정 ----------------
 }

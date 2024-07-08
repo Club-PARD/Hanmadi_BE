@@ -37,20 +37,18 @@ public class Comment {
     @ManyToOne
     private User user;        // 작성자
 
-//    @OneToOne
+    //    @OneToOne
 //    @JoinColumn(name = "postIt_id")
 //    private PostIt postIt;
-
-    @OneToOne(mappedBy = "comment")
+    @OneToOne(mappedBy = "comment", orphanRemoval = false)
     private PostIt postIt;
-
 
     public static Comment toEntity(CommentCreateDTO dto, User user, Post post) {
         return Comment.builder()
                 .upCounter(0)
                 .user(user)
                 .isTaken(false)
-                .commentTime(Data.getNowDate())
+                .commentTime(Data.getNowDateYYYYMMdd())
                 .content(dto.getContent())
                 .post(post)
                 .build();
@@ -71,7 +69,7 @@ public class Comment {
     }
 
 
-    public void setPostIt(PostIt postIt){
+    public void setPostIt(PostIt postIt) {
         this.postIt = postIt;
     }
 }
