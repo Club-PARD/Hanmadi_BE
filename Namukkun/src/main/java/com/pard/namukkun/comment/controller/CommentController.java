@@ -66,6 +66,7 @@ public class CommentController {
     ) {
         // 권한 확인
         Long commentWriterId = commentService.getCommentWriterId(commentId);
+        log.info("weriterid {} userid {}", commentWriterId, userId);
         if (userId == null || !userId.equals(commentWriterId))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 

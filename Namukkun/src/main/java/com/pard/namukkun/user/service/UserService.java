@@ -41,9 +41,14 @@ public class UserService {
     }
 
     // 유저 정보 전달
-    public UserLoginInfoDTO getUserInfo(Long userId) {
+    public UserLoginInfoDTO getUserLoginInfoDTO(Long userId) {
         User user = userRepo.findById(userId).orElseThrow();
         return new UserLoginInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage(), user.getUpPostList(), user.getUpCommentList());
+    }
+    // 유저 정보 전달
+    public UserInfoDTO getUserInfoDTO(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow();
+        return new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
     }
 
     // 유저 상세 정보 전달

@@ -1,8 +1,10 @@
 package com.pard.namukkun.postit.controller;
 
 
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.pard.namukkun.postit.dto.*;
 import com.pard.namukkun.postit.service.PostItService;
+import com.pard.namukkun.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.util.Objects;
 @Slf4j
 public class PostItController {
     private final PostItService postItService;
+    private final UserService userService;
 
     // 덧글 선택하여 포스트잇으로 만들기
     @PostMapping("/create")
@@ -37,7 +40,8 @@ public class PostItController {
 
         // 생성
         Long postId = postItService.createPostIt(dto);
-        return new PostItCreateInfoDTO(postId);
+
+        return new PostItCreateInfoDTO(postId, userService.getUserInfoDTO(dto.getUserId()));
     }
 
     // 포스트잇 읽기
