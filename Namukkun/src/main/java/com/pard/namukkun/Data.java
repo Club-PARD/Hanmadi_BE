@@ -3,22 +3,24 @@ package com.pard.namukkun;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 public class Data {
     public static Integer cookieSessionTime = 60 * 60;
-
+    public static String timeFormatString = "yyyy-MM-dd";
 
     // 현재 시간 리턴하는 메서드
     public static String getNowDate() {
         LocalDate nowDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeFormatString);
         return nowDate.format(formatter);
     }
 
-    public static Long getDeadLine(String postTime){
+    public static Long getDeadLine(String postTime) {
         // postTime을 LocalDate로 변환시킴
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeFormatString);
         LocalDate date = LocalDate.parse(postTime, formatter);
 
         // 7일 더함
