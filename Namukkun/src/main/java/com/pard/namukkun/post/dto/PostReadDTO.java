@@ -25,7 +25,8 @@ public class PostReadDTO {
     private String proBackground; // 제안배경
     private String solution; //해결방법
     private String benefit; // 기대효과
-    private String postTime; // 작성된 시간
+    private String postTime; // 작성된 시간 (년-월-일)
+    private String sortTime; // 작성된 시간 (년-월-일-시-분-초)
     private String deadLine; // 마감기한까지 남은 날짜
 
     private boolean isDone; // 작성 후 7일이 지난거
@@ -47,6 +48,7 @@ public class PostReadDTO {
             this.proBackground = post.getProBackground();
             this.solution = post.getSolution();
             this.benefit = post.getBenefit();
+            this.isReturn = post.isReturn();
             this.isDone = post.isDone();
             this.postTime = post.getPostTime();
             this.userName = post.getUser().getNickName();
@@ -68,6 +70,7 @@ public class PostReadDTO {
         this.proBackground = post.getProBackground();
         this.solution = post.getSolution();
         this.benefit = post.getBenefit();
+        this.isReturn = post.isReturn();
         this.isDone = post.isDone();
         this.postTime = post.getPostTime();
         this.userName = post.getUser().getNickName();

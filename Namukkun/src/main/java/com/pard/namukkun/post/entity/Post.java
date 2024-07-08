@@ -6,6 +6,7 @@ import com.pard.namukkun.attachment.entity.S3Attachment;
 import com.pard.namukkun.attachment.service.S3AttachmentService;
 import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.post.dto.PostCreateDTO;
+import com.pard.namukkun.post.dto.PostUpdateDTO;
 import com.pard.namukkun.postit.entity.PostIt;
 import com.pard.namukkun.user.entity.User;
 import jakarta.persistence.*;
@@ -43,7 +44,8 @@ public class Post {
     private String deadLine; // 마감기한까지 남은 날짜
     private boolean isDone; // 작성 후 7일이 지난거
     private boolean isReturn; // 게시물 업로드 확인
-    private String postTime; // 작성된 날짜 및 시간
+    private String postTime; // 작성된 시간 (년-월-일)
+    private String sortTime; // 작성된 시간 (년-월-일-시-분-초)
 
     @JoinColumn(nullable = false, name = "user_Id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -72,7 +74,8 @@ public class Post {
                 .proBackground(proBackgroundText)
                 .solution(solutionText)
                 .benefit(benefitText)
-                .postTime(Data.getNowDate())
+                .postTime(Data.getNowDateYYYYMMdd())
+                .sortTime(Data.getNowDateYYYYMMddHHmmss())
                 .upCountPost(0)
                 .postitCount(0)
                 .isDone(false)
@@ -96,12 +99,12 @@ public class Post {
     }
     //----------------------------------
 
-    public void updatePost(String title, Integer postLocal, String proBackground, String solution, String benefit) {
-        this.title = title;
-        this.postLocal = postLocal;
-        this.proBackground = proBackground;
-        this.solution = solution;
-        this.benefit = benefit;
+    public void updatePost(PostUpdateDTO postUpdateDTO, String proBackgroundText, String solutionText, String benefitText) {
+        this.proBackground = proBackgroundText;
+        this.solution = solutionText;
+        this.benefit = benefitText;
+        this.title = postUpdateDTO.getTitle();
+        this.postLocal = postUpdateDTO.getPostLocal();
     }
 
     public void increaseUpCountPost() {
