@@ -47,13 +47,12 @@ public class PostIt {
     private Float z;
 
 
-//    @OneToOne(mappedBy = "postIt", orphanRemoval = false)
+    //    @OneToOne(mappedBy = "postIt", orphanRemoval = false)
 //    @JoinColumn(name = "comment_id")
 //    private Comment comment;
-    @OneToOne
+    @OneToOne(optional = true, orphanRemoval = false)
     @JoinColumn(name = "comment_id")
     private Comment comment;
-
 
     @ManyToOne
     @JoinColumn(name = "post_Id", nullable = false)

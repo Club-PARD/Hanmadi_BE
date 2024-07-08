@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 public class SnapShotScheduler {
     private final PostService postService;
 
-    @Scheduled(cron = "0 0 * * * *") // 00시 00분 마다 실행
+    @Scheduled(cron = "0 0 0 * * *") // 00시 00분 마다 실행
 //    @Scheduled(cron = "30 * * * * *") // 테스트용 -> 매 30초 마다
     public void run() {
         Integer changeNum = postService.postCheck(Data.getNowDateYYYYMMdd());
