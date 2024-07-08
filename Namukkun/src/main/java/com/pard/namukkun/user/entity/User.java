@@ -27,7 +27,11 @@ public class User {
 
     private Integer local = 0;
 
+    //-------------- 준현 수정 -----------
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String profileImage; // kakao profile image
+    //---------------------------------
 
     @OneToOne
     private Post tempPost;
@@ -82,4 +86,10 @@ public class User {
     public void updateUpCommentList(List<Long> list) {
         this.upCommentList = list;
     }
+
+    // ---------------- 준현 수정 -------------
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+    // ---------------- 준현 수정 -------------
 }
