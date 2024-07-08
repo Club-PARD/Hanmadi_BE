@@ -45,6 +45,6 @@ public class LoginController {
             @SessionAttribute(name = "userinfo", required = false) UserSessionData data
     ) {
 
-        return loginService.logOut(request);
+        return loginService.logOut(request, data);
     }
 }

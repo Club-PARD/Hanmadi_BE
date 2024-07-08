@@ -66,7 +66,7 @@ public class PostService {
             Post post = makePost(postCreateDTO,user);
 
             log.info("post created");
-          
+
             List<String> fileNames = postCreateDTO.getFileNames();
             post.setInitial(true,Data.getDeadLine(post.getPostTime()));
 
@@ -80,90 +80,20 @@ public class PostService {
         }
     }
 
-    // ----------------- 유저 테스트용 ------------------
-    // HTML 파싱하는 메서드
-    public Post makePost(PostCreateDTO postCreateDTO, User user) {
-        // proBackground 파싱
-        String proBackgroundHtml = postCreateDTO.getProBackground();
-        String proBackgroundText = parseHtml(proBackgroundHtml);
-
-        // solution 파싱
-        String solutionHtml = postCreateDTO.getSolution();
-        String solutionText = parseHtml(solutionHtml);
-
-        // benefit 파싱
-        String benefitHtml = postCreateDTO.getBenefit();
-        String benefitText = parseHtml(benefitHtml);
-
-        tempStorage.clear();
-        return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user);
-
-    }
-
-    // HTML에서 텍스트와 이미지를 골라서 파싱하는 메서드
-    private String parseHtml(String html) {
-        Document document = Jsoup.parse(html);
-        StringBuilder sb = new StringBuilder();
-
-        catchNode(document.body().childNodes(), sb);
-
-        return sb.toString();
-    }
-
-    private void catchNode(List<Node> nodes, StringBuilder sb) {
-        for(Node node : nodes) {
-            log.info("node : "+node);
-            if(node instanceof TextNode) {
-                sb.append(((TextNode) node).text());
-                log.info("택스트"+node);
-            } else if(node instanceof Element) {
-                Element element = (Element) node;
-                log.info("엘리먼트: " + element);
-
-                if(element.tagName().equals("img")) { // 이미지 일 때
-                    try{
-                        String fileName = element.attr("src"); // 파일 이름 저장 (tempStorage key값)
-                        String UUIDFileName = UUID.randomUUID()+"_"+fileName;
-                        log.info("fileName : " + fileName);
-                        if(tempStorage.containsKey(fileName)) {
-
-                            Path tempFilePath = tempStorage.get(fileName); // 해당 이름으로 저장된 이미지 불러옴
-
-                            if(tempFilePath != null) { // 만약 저장소에 있으면
-
-                                log.info("img save : "+fileName);
-                                s3AttachmentService.uploadFile(tempFilePath.toFile(),UUIDFileName); // s3에 저장
-                                sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(UUIDFileName)).append("]"); // stringbuilder에 추가
-
-                            }else log.warn("임시 파일이 null입니다: " + fileName);
-
-                        } else log.warn("임시 저장소에 파일이 존재하지 않습니다: " + fileName);
-
-                    } catch (Exception e) {
-                        log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
-                    }
-                    tempStorage.clear();
-                } else {
-                    catchNode(element.childNodes(), sb);
-                }
-            }
-        }
-    }
-    // ----------------- 유저 테스트용 ------------------
-
+//    // ----------------- 유저 테스트용 ------------------
 //    // HTML 파싱하는 메서드
 //    public Post makePost(PostCreateDTO postCreateDTO, User user) {
 //        // proBackground 파싱
 //        String proBackgroundHtml = postCreateDTO.getProBackground();
-//        String proBackgroundText = parseHtml(proBackgroundHtml,user);
+//        String proBackgroundText = parseHtml(proBackgroundHtml);
 //
 //        // solution 파싱
 //        String solutionHtml = postCreateDTO.getSolution();
-//        String solutionText = parseHtml(solutionHtml,user);
+//        String solutionText = parseHtml(solutionHtml);
 //
 //        // benefit 파싱
 //        String benefitHtml = postCreateDTO.getBenefit();
-//        String benefitText = parseHtml(benefitHtml,user);
+//        String benefitText = parseHtml(benefitHtml);
 //
 //        tempStorage.clear();
 //        return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user);
@@ -171,16 +101,16 @@ public class PostService {
 //    }
 //
 //    // HTML에서 텍스트와 이미지를 골라서 파싱하는 메서드
-//    private String parseHtml(String html, User user) {
+//    private String parseHtml(String html) {
 //        Document document = Jsoup.parse(html);
 //        StringBuilder sb = new StringBuilder();
 //
-//        catchNode(document.body().childNodes(), sb, user);
+//        catchNode(document.body().childNodes(), sb);
 //
 //        return sb.toString();
 //    }
 //
-//    private void catchNode(List<Node> nodes, StringBuilder sb, User user) {
+//    private void catchNode(List<Node> nodes, StringBuilder sb) {
 //        for(Node node : nodes) {
 //            log.info("node : "+node);
 //            if(node instanceof TextNode) {
@@ -191,38 +121,108 @@ public class PostService {
 //                log.info("엘리먼트: " + element);
 //
 //                if(element.tagName().equals("img")) { // 이미지 일 때
-//                    String postImgName = element.attr("src");
-//                    String postImgUrl = s3AttachmentService.getUrlWithFileName(postImgName);
 //                    try{
-//                        // 게시물에 첨부된 이미지가 Img에 있는지 확인
-//                        // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
-//                        Optional<Img> optionalImg = imgRepo.findById(user.getUserId());
-//                        if(optionalImg.isPresent()) {
-//                            Img img = optionalImg.get(); // 이미지 객체를 받아온다.
-//                            List<String> imgUrls = img.getImgUrls(); // 이미지 주소가 담긴 List를 받는다.
-//                            imgUrls.removeIf(imgUrl -> imgUrl.equals(postImgUrl)); // 리스트에 있는 이미지가 게시물에도 있으면 리스트에서 삭제
-//                            sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(postImgUrl)).append("]"); // stringbuilder에 추가
-//                            try {
-//                                // 리스트에 남은 이미지들은 S3에서 삭제한다.
-//                                for (String imgUrl : imgUrls) {
-//                                    s3AttachmentService.deleteByUrl(imgUrl);
-//                                    log.info("이미지 삭제 완료: " + imgUrl);
-//                                }
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                                log.error("S3에 이미지가 없습니다.");
-//                            }
-//                        }
+//                        String fileName = element.attr("src"); // 파일 이름 저장 (tempStorage key값)
+//                        String UUIDFileName = UUID.randomUUID()+"_"+fileName;
+//                        log.info("fileName : " + fileName);
+//                        if(tempStorage.containsKey(fileName)) {
+//
+//                            Path tempFilePath = tempStorage.get(fileName); // 해당 이름으로 저장된 이미지 불러옴
+//
+//                            if(tempFilePath != null) { // 만약 저장소에 있으면
+//
+//                                log.info("img save : "+fileName);
+//                                s3AttachmentService.uploadFile(tempFilePath.toFile(),UUIDFileName); // s3에 저장
+//                                sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(UUIDFileName)).append("]"); // stringbuilder에 추가
+//
+//                            }else log.warn("임시 파일이 null입니다: " + fileName);
+//
+//                        } else log.warn("임시 저장소에 파일이 존재하지 않습니다: " + fileName);
 //
 //                    } catch (Exception e) {
 //                        log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
 //                    }
+//                    tempStorage.clear();
 //                } else {
-//                    catchNode(element.childNodes(), sb,user);
+//                    catchNode(element.childNodes(), sb);
 //                }
 //            }
 //        }
 //    }
+//    // ----------------- 유저 테스트용 ------------------
+
+    // HTML 파싱하는 메서드
+    public Post makePost(PostCreateDTO postCreateDTO, User user) {
+        // proBackground 파싱
+        String proBackgroundHtml = postCreateDTO.getProBackground();
+        String proBackgroundText = parseHtml(proBackgroundHtml,user);
+
+        // solution 파싱
+        String solutionHtml = postCreateDTO.getSolution();
+        String solutionText = parseHtml(solutionHtml,user);
+
+        // benefit 파싱
+        String benefitHtml = postCreateDTO.getBenefit();
+        String benefitText = parseHtml(benefitHtml,user);
+
+        tempStorage.clear();
+        return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user);
+
+    }
+
+    // HTML에서 텍스트와 이미지를 골라서 파싱하는 메서드
+    private String parseHtml(String html, User user) {
+        Document document = Jsoup.parse(html);
+        StringBuilder sb = new StringBuilder();
+
+        catchNode(document.body().childNodes(), sb, user);
+
+        return sb.toString();
+    }
+
+    private void catchNode(List<Node> nodes, StringBuilder sb, User user) {
+        for(Node node : nodes) {
+            log.info("node : "+node);
+            if(node instanceof TextNode) {
+                sb.append(((TextNode) node).text());
+                log.info("택스트"+node);
+            } else if(node instanceof Element) {
+                Element element = (Element) node;
+                log.info("엘리먼트: " + element);
+
+                if(element.tagName().equals("img")) { // 이미지 일 때
+                    String postImgName = element.attr("src");
+                    String postImgUrl = s3AttachmentService.getUrlWithFileName(postImgName);
+                    try{
+                        // 게시물에 첨부된 이미지가 Img에 있는지 확인
+                        // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
+                        Optional<Img> optionalImg = imgRepo.findById(user.getUserId());
+                        if(optionalImg.isPresent()) {
+                            Img img = optionalImg.get(); // 이미지 객체를 받아온다.
+                            List<String> imgUrls = img.getImgUrls(); // 이미지 주소가 담긴 List를 받는다.
+                            imgUrls.removeIf(imgUrl -> imgUrl.equals(postImgUrl)); // 리스트에 있는 이미지가 게시물에도 있으면 리스트에서 삭제
+                            sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(postImgUrl)).append("]"); // stringbuilder에 추가
+                            try {
+                                // 리스트에 남은 이미지들은 S3에서 삭제한다.
+                                for (String imgUrl : imgUrls) {
+                                    s3AttachmentService.deleteByUrl(imgUrl);
+                                    log.info("이미지 삭제 완료: " + imgUrl);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                log.error("S3에 이미지가 없습니다.");
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
+                    }
+                } else {
+                    catchNode(element.childNodes(), sb,user);
+                }
+            }
+        }
+    }
 
 
     @Transactional
@@ -283,37 +283,37 @@ public class PostService {
     //post 수정 메서드
     public ResponseEntity<?> updatePost(Long postId, PostUpdateDTO postUpdateDTO) {
         Post post = postRepo.findById(postId).orElseThrow(()
-        -> new RuntimeException("Error can't find post: " + postId)); //postId로 post find
+                -> new RuntimeException("Error can't find post: " + postId)); //postId로 post find
 
         User user = userRepo.findById(post.getUser().getUserId()).orElseThrow(()
                 -> new RuntimeException("Error can't find user"));
         // 수정된 HTML 코드를 TEXT형태로 저장 및 수정된 이미지 확인해서 저장 및 삭제.
 
-        // ----------------- 유저 테스트용 --------------
-        // 제안배경 파싱
-        String proBackgroundHtml = postUpdateDTO.getProBackground();
-        String proBackgroundText = parseHtml(proBackgroundHtml);
-
-        // solution 파싱
-        String solutionHtml = postUpdateDTO.getSolution();
-        String solutionText = parseHtml(solutionHtml);
-
-        // benefit 파싱
-        String benefitHtml = postUpdateDTO.getBenefit();
-        String benefitText = parseHtml(benefitHtml);
-        // --------------------------------------------
-
+//        // ----------------- 유저 테스트용 --------------
 //        // 제안배경 파싱
 //        String proBackgroundHtml = postUpdateDTO.getProBackground();
-//        String proBackgroundText = parseHtml(proBackgroundHtml,user);
+//        String proBackgroundText = parseHtml(proBackgroundHtml);
 //
 //        // solution 파싱
 //        String solutionHtml = postUpdateDTO.getSolution();
-//        String solutionText = parseHtml(solutionHtml,user);
+//        String solutionText = parseHtml(solutionHtml);
 //
 //        // benefit 파싱
 //        String benefitHtml = postUpdateDTO.getBenefit();
-//        String benefitText = parseHtml(benefitHtml,user);
+//        String benefitText = parseHtml(benefitHtml);
+//        // --------------------------------------------
+
+        // 제안배경 파싱
+        String proBackgroundHtml = postUpdateDTO.getProBackground();
+        String proBackgroundText = parseHtml(proBackgroundHtml,user);
+
+        // solution 파싱
+        String solutionHtml = postUpdateDTO.getSolution();
+        String solutionText = parseHtml(solutionHtml,user);
+
+        // benefit 파싱
+        String benefitHtml = postUpdateDTO.getBenefit();
+        String benefitText = parseHtml(benefitHtml,user);
 
         try {
             post.updatePost(postUpdateDTO,proBackgroundText,solutionText,benefitText);
@@ -365,60 +365,60 @@ public class PostService {
         return new ReturnFileNameDTO(fileNames);
     }
 
-    // ---------------------- 유저 테스트용 ----------------------
-    // 이미지 업로드
-    public ResponseEntity<?> uploadImg(MultipartFile file) {
-        // 임시 저장소에 파일 저장
-        try {
-            // 임시 저장소에 저장될 키값, 저장될 이미지 이름
-            String originalFilename = file.getOriginalFilename();
-            String fileId = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8.toString());
-            Path tempFilePath = Paths.get(TEMP_DIR, fileId);
-
-            Files.copy(file.getInputStream(), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
-
-            tempStorage.put(fileId, tempFilePath);
-            log.info("Temp storage contains: " + tempStorage.keySet());
-
-            TempImgDTO tempImgDTO = new TempImgDTO(originalFilename);
-            log.info("Img 저장 : " + tempImgDTO.getImg());
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(tempImgDTO);
-        } catch (IOException e) {
-            log.error("Error storing temp image file: " + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error storing temp image file");
-        }
-    }
-    // -----------------------------------------------------------
-
+//    // ---------------------- 유저 테스트용 ----------------------
 //    // 이미지 업로드
-//    public ResponseEntity<?> uploadImg(MultipartFile file, UserSessionData data) {
-//        // S3에 이미지 저장
-//        String originalImgName = file.getOriginalFilename();
-//        String UUIDImgName = UUID.randomUUID()+"_"+originalImgName;
-//        s3AttachmentService.upload(file, UUIDImgName);
-//        String imgUrl = s3AttachmentService.getUrlWithFileName(UUIDImgName);
-//        log.info("Img에 저장될 이미지 주소: "+imgUrl);
+//    public ResponseEntity<?> uploadImg(MultipartFile file) {
+//        // 임시 저장소에 파일 저장
+//        try {
+//            // 임시 저장소에 저장될 키값, 저장될 이미지 이름
+//            String originalFilename = file.getOriginalFilename();
+//            String fileId = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8.toString());
+//            Path tempFilePath = Paths.get(TEMP_DIR, fileId);
 //
-//        // ImgDTO에 Url 저장
-//        try{
-//            Optional<Img> optionalImg = imgRepo.findById(data.getUserId());
-//            if(optionalImg.isPresent()) {
-//                Img img = optionalImg.get();
-//                img.setImgUrl(imgUrl);
-//                imgRepo.save(img);
-//            } else {
-//                List<String> imgUrls = new ArrayList<>();
-//                imgUrls.add(imgUrl);
-//                Img img = new Img(data.getUserId(),imgUrls);
-//                imgRepo.save(img);
-//            }
-//            return ResponseEntity.ok("S3 upload succeed.");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.badRequest().body("S3 upload failed.");
+//            Files.copy(file.getInputStream(), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
+//
+//            tempStorage.put(fileId, tempFilePath);
+//            log.info("Temp storage contains: " + tempStorage.keySet());
+//
+//            TempImgDTO tempImgDTO = new TempImgDTO(originalFilename);
+//            log.info("Img 저장 : " + tempImgDTO.getImg());
+//
+//            return ResponseEntity.status(HttpStatus.CREATED).body(tempImgDTO);
+//        } catch (IOException e) {
+//            log.error("Error storing temp image file: " + e.getMessage(), e);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error storing temp image file");
 //        }
 //    }
+//    // -----------------------------------------------------------
+
+    // 이미지 업로드
+    public ResponseEntity<?> uploadImg(MultipartFile file, UserSessionData data) {
+        // S3에 이미지 저장
+        String originalImgName = file.getOriginalFilename();
+        String UUIDImgName = UUID.randomUUID()+"_"+originalImgName;
+        s3AttachmentService.upload(file, UUIDImgName);
+        String imgUrl = s3AttachmentService.getUrlWithFileName(UUIDImgName);
+        log.info("Img에 저장될 이미지 주소: "+imgUrl);
+
+        // ImgDTO에 Url 저장
+        try{
+            Optional<Img> optionalImg = imgRepo.findById(data.getUserId());
+            if(optionalImg.isPresent()) {
+                Img img = optionalImg.get();
+                img.setImgUrl(imgUrl);
+                imgRepo.save(img);
+            } else {
+                List<String> imgUrls = new ArrayList<>();
+                imgUrls.add(imgUrl);
+                Img img = new Img(data.getUserId(),imgUrls);
+                imgRepo.save(img);
+            }
+            return ResponseEntity.ok("S3 upload succeed.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("S3 upload failed.");
+        }
+    }
 
     @Transactional
     // 포스트의 시간과 현재 시간을 비교하여
@@ -563,7 +563,7 @@ public class PostService {
     }
     public PostReadDTO findPostById(Long postId) {
         Post post = postRepo.findById(postId).orElseThrow(()
-        -> new RuntimeException("Error can't find post -> "+postId));
+                -> new RuntimeException("Error can't find post -> "+postId));
         List<S3Attachment> s3Attachments = post.getS3Attachments();
 
         List<S3AttachmentReadDTO> s3AttachmentReadDTOS = s3Attachments.stream()

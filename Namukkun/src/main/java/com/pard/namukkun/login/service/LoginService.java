@@ -99,7 +99,7 @@ public class LoginService extends DefaultOAuth2UserService {
         return new ResponseEntity<>(HttpStatus.OK); // 200
     }
 
-    public ResponseEntity<?> logOut(HttpServletRequest request) {
+    public ResponseEntity<?> logOut(HttpServletRequest request, UserSessionData data) {
         sessionService.removeSession(request);
         return new ResponseEntity<>(HttpStatus.OK); // 200
     }
