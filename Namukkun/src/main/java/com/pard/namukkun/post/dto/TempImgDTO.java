@@ -1,17 +1,15 @@
 package com.pard.namukkun.post.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
 
-public class ImgDTO {
+public class TempImgDTO {
     private String Img;
 
-    public ImgDTO(String img) {
+    public TempImgDTO(String img) {
         Img = img;
     }
 }

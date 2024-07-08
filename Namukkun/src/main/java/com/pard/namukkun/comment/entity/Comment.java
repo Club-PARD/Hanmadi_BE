@@ -50,7 +50,7 @@ public class Comment {
                 .upCounter(0)
                 .user(user)
                 .isTaken(false)
-                .commentTime(Data.getNowDate())
+                .commentTime(Data.getNowDateYYYYMMdd())
                 .content(dto.getContent())
                 .post(post)
                 .build();

@@ -2,6 +2,7 @@ package com.pard.namukkun.attachment.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import org.apache.commons.io.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -130,15 +133,29 @@ public class S3AttachmentService {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
+    // S3에 저장된 객체 URL에서 다른거 다 빼고 UUID_파일이름 만 추출하는 메서드
     public String extractObjectKey(String fileUrl) {
         int index = fileUrl.lastIndexOf("/"); // 마지막 / 의 인덱스를 찾음
         if(index != -1) {
             String objectKeyEncoded = fileUrl.substring(index + 1); // "/" 이거 다음부터 문자 추출
             return java.net.URLDecoder.decode(objectKeyEncoded, StandardCharsets.UTF_8);
         } else {
-            return ""; // 올바른 URL이 아니면 에러처리
+            // 잘못된 Url일경우 에러처리
+            throw new IllegalArgumentException("Invalid file URL: " + fileUrl);
         }
     }
+
+    // UUID_파일이름인 경우에 파일이름만 추출하는 메서드
+    public String extractFileName(String originalFileName) {
+        int index = originalFileName.indexOf("_");
+        if (index != -1 && index < originalFileName.length() - 1) {
+            return originalFileName.substring(index + 1);
+        } else {
+            // '_'가 없거나 마지막에 위치한 경우
+            return originalFileName;
+        }
+    }
+
 
     // 파일 이름 받아서 첨부파일 삭제
     public ResponseEntity<?> deleteByName(String fileName){
@@ -165,4 +182,40 @@ public class S3AttachmentService {
     public String getUrlWithFileName(String fileName) {
         return amazonS3Client.getUrl(bucket,fileName).toString();
     }
+
+
+    public File downloadFileFromS3(String objectUrl) throws IOException {
+        try {
+            // URL을 URI로 변환하여 객체 키 추출
+            URI uri = new URI(objectUrl);
+            String objectKey = extractObjectKey(uri.getPath());
+
+            // 파일 이름만 추출
+            String fileName = extractFileName(extractObjectKey(objectUrl));
+            fileName = URLEncoder.encode(fileName,StandardCharsets.UTF_8.toString());
+
+            // S3에서 객체 다운로드
+            S3Object s3Object = amazonS3Client.getObject(new GetObjectRequest(bucket, objectKey));
+            File tempFile = File.createTempFile(fileName,"");
+
+            // S3 객체를 임시 파일에 복사
+            FileUtils.copyInputStreamToFile(s3Object.getObjectContent(), tempFile);
+
+            // 다운로드된 임시 파일 반환
+            return tempFile;
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("잘못된 객체 URL", e);
+        }
+    }
+
+    // 객체 Url로 S3 버킷에 파일이 있는지 여부 확인하는 메서드
+    public boolean isObjectExist(String objectUrl) {
+        try{
+            ObjectMetadata objectMetadata = amazonS3Client.getObjectMetadata(bucket, objectUrl);
+            return objectMetadata != null;
+        } catch (AmazonS3Exception e) {
+            return false;
+        }
+    }
+
 }

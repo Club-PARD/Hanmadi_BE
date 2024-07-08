@@ -10,10 +10,17 @@ public class Data {
     public static Integer cookieSessionTime = 60 * 60;
 
 
-    // 현재 시간 리턴하는 메서드
-    public static String getNowDate() {
+    // 현재 시간 리턴하는 메서드 년-월-일
+    public static String getNowDateYYYYMMdd() {
         LocalDate nowDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return nowDate.format(formatter);
+    }
+
+    // 현재 시간 리턴하는 메서드 년-월-일-시-분-초
+    public static String getNowDateYYYYMMddHHmmss() {
+        LocalDateTime nowDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
         return nowDate.format(formatter);
     }
 
