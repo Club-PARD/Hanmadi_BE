@@ -3,6 +3,7 @@ package com.pard.namukkun;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 public class Data {
@@ -18,6 +19,7 @@ public class Data {
 
     public static Long getDeadLine(String postTime) {
         // postTime을 LocalDate로 변환시킴
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeFormatString);
         LocalDate date = LocalDate.parse(postTime, formatter);
 

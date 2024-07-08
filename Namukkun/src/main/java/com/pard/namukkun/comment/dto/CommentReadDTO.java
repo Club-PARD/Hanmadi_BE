@@ -17,6 +17,7 @@ public class CommentReadDTO {
     private Long id;                    // 덧글 아이디
     private UserInfoDTO userInfoDTO;    // 유저 정보
     private Long userId;                // 작성자
+    private Long postId;
     private Integer upCounter;          // 좋아요 수
     private String commentTime;         // timetable
     private String content;             // 내용
@@ -27,6 +28,7 @@ public class CommentReadDTO {
         this.id = comment.getId();
         this.userInfoDTO = new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
         this.userId = comment.getUser().getUserId();
+        this.postId = comment.getPost().getPostId();
         this.upCounter = comment.getUpCounter();
         this.commentTime = comment.getCommentTime();
         this.content = comment.getContent();
