@@ -24,6 +24,8 @@ public class User {
     private String nickName;
     private String email;
 
+    private String role; // 유저 권한 필드 추가
+
 
     private Integer local = 0;
 
