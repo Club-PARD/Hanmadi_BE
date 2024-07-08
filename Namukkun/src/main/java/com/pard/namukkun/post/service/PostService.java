@@ -278,7 +278,7 @@ public class PostService {
         List<Post> posts = postRepo.findByIsDoneFalse();
 
         // 포메터 생성
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Data.timeFormatString);
 
         // 서버타임 설정
         LocalDate serverTime = LocalDate.parse(presentTime, formatter);
@@ -287,12 +287,17 @@ public class PostService {
             // 포스트의 시간 가져오기
             LocalDate postTime = LocalDate.parse(post.getPostTime(), formatter);
 
-            // 포스트 시간에 7일을 더한 것이 서버 시간보다 이전이라면 = 7일이 지났다면
+            post.setInitial(post.isReturn(), Data.getDeadLine(post.getPostTime()));
+            if (Integer.parseInt(post.getDeadLine()) < 0) {
+                post.setInitial(post.isReturn(), Long.valueOf("0"));
+            }
+            // 7일이 지났다면
             if (serverTime.isAfter(postTime.plusDays(7))) {
                 post.setIsDone(true); // isdone -> true
                 counter = counter + 1;
-                postRepo.save(post);
             }
+
+            postRepo.save(post);
         }
         return counter;
     }
