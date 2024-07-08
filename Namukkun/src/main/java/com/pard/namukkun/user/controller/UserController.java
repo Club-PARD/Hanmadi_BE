@@ -11,6 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -50,6 +51,15 @@ public class UserController {
         userService.updateUser(dto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // -------------- 준현 수정 ----------------
+    @PatchMapping("/update/profile")
+    @Operation(summary = "유저 프로필 업데이트")
+    public ResponseEntity<?> updateProfile(@RequestParam String profileImage,
+                                           @RequestParam Long userId){
+        return userService.updateUserProfile(profileImage,userId);
+    }
+    // -------------- 준현 수정 ----------------
 
 //
 //    @GetMapping("/posts")
