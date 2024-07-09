@@ -497,7 +497,9 @@ public class PostService {
         try{
             Img img = new Img();
             img.setImgUrl(imgUrl,user);
+            log.info("Saving Img: {}", img);
             imgRepo.save(img);
+            log.info("Img saved successfully");
             user.addImg(img);
             userRepo.save(user);
             return ResponseEntity.ok("S3 upload succeed.");
