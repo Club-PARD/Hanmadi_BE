@@ -17,14 +17,15 @@ public class Img {
     @Id
     private Long imageId;
     @Lob
-    private List<String> imgUrls;
+    @Column(columnDefinition = "TEXT")
+    private String imgUrl;
 
-    public Img(Long imageId, List<String> imgUrl) {
+    public Img(Long imageId, String imgUrl) {
         this.imageId = imageId;
-        this.imgUrls = imgUrl;
+        this.imgUrl = imgUrl;
     }
 
     public void setImgUrl(String imgUrl){
-        this.imgUrls.add(imgUrl);
+        this.imgUrl = imgUrl;
     }
 }

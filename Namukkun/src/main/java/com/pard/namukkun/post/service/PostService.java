@@ -203,7 +203,11 @@ public class PostService {
         String benefitHtml = postCreateDTO.getBenefit();
         String benefitText = parseHtml(benefitHtml,user);
 
-        tempStorage.clear();
+        List<Img> imgs = user.getImgs();
+        for(Img img : imgs){
+            s3AttachmentService.deleteByUrl(img.getImgUrl());
+            log.info("이미지 삭제 완료: " + img.getImgUrl());
+        }
         return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user);
 
     }
@@ -219,49 +223,71 @@ public class PostService {
     }
 
     private void catchNode(List<Node> nodes, StringBuilder sb, User user) {
-        for(Node node : nodes) {
-            log.info("node : "+node);
-            if(node instanceof TextNode) {
+        for (int i = 0; i < nodes.size(); i++) {
+            Node node = nodes.get(i);
+            log.info("node : " + node);
+            if (node instanceof TextNode) {
                 sb.append(((TextNode) node).text());
-                log.info("택스트"+node);
-            } else if(node instanceof Element) {
+                log.info("텍스트: " + node);
+            } else if (node instanceof Element) {
                 Element element = (Element) node;
                 log.info("엘리먼트: " + element);
 
-                if(element.tagName().equals("img")) { // 이미지 일 때
+                if (element.tagName().equals("img")) {
                     String postImgName = element.attr("src");
                     String postImgUrl = s3AttachmentService.getUrlWithFileName(postImgName);
-                    try{
+                    try {
                         // 게시물에 첨부된 이미지가 Img에 있는지 확인
                         // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
-                        Optional<Img> optionalImg = imgRepo.findById(user.getUserId());
-                        if(optionalImg.isPresent()) {
-                            Img img = optionalImg.get(); // 이미지 객체를 받아온다.
-                            List<String> imgUrls = img.getImgUrls(); // 이미지 주소가 담긴 List를 받는다.
-                            imgUrls.removeIf(imgUrl -> imgUrl.equals(postImgUrl)); // 리스트에 있는 이미지가 게시물에도 있으면 리스트에서 삭제
-                            sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(postImgUrl)).append("]"); // stringbuilder에 추가
-                            try {
-                                // 리스트에 남은 이미지들은 S3에서 삭제한다.
-                                for (String imgUrl : imgUrls) {
-                                    s3AttachmentService.deleteByUrl(imgUrl);
-                                    log.info("이미지 삭제 완료: " + imgUrl);
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                log.error("S3에 이미지가 없습니다.");
-                            }
-                        }
-
+                        List<Img> imgs = user.getImgs(); // 이미지 리스트를 받아온다.
+                        imgs.removeIf(img -> element.equals(img.getImgUrl())); // 게시물에 제시되야하는건 리스트에서 제거
+                        sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(postImgUrl)).append("]"); // stringbuilder에 추가
+                            // 리스트에 남은 이미지들은 S3에서 삭제한다.
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
                     }
+                } else if (element.tagName().equals("br")) { // <br> 태그 처리
+                    sb.append("\n");
+                } else if (element.tagName().equals("p")) { // <p> 태그 처리
+                    if (i > 0 && nodes.get(i - 1) instanceof Element && ((Element) nodes.get(i - 1)).tagName().equals("/p")) {
+                        sb.append("\n"); // 이전 노드가 </p> 태그인 경우 개행 추가
+                    }
+                    catchNode(element.childNodes(), sb, user);
+                    sb.append("\n"); // <p> 태그가 끝날 때 개행 추가
                 } else {
-                    catchNode(element.childNodes(), sb,user);
+                    // 글씨체와 글씨 굵기 처리
+                    boolean isBold = element.tagName().equals("strong") || element.hasClass("ql-size-bold");
+                    String sizeClass = element.className().contains("ql-size-") ? element.className() : "";
+
+                    String sizeTag = "";
+                    if (sizeClass.contains("ql-size-small")) {
+                        sizeTag = "[small]";
+                    } else if (sizeClass.contains("ql-size-large")) {
+                        sizeTag = "[large]";
+                    } else if (sizeClass.contains("ql-size-huge")) {
+                        sizeTag = "[huge]";
+                    } else {
+                        sizeTag = "[normal]";
+                    }
+
+                    if (isBold) {
+                        sb.append("[bold]");
+                    }
+                    sb.append(sizeTag);
+
+                    catchNode(element.childNodes(), sb, user);
+
+                    // 태그 닫기
+                    if (!sizeTag.equals("[normal]")) {
+                        sb.append(sizeTag.replace("[", "[/"));
+                    }
+                    if (isBold) {
+                        sb.append("[/bold]");
+                    }
                 }
             }
         }
     }
-
 
     @Transactional
     // 게시물 임시저장
@@ -452,27 +478,31 @@ public class PostService {
 //    // -----------------------------------------------------------
 
     // 이미지 업로드
-    public ResponseEntity<?> uploadImg(MultipartFile file, UserSessionData data) {
+    public ResponseEntity<?> uploadImg(MultipartFile file, Long userId) {
         // S3에 이미지 저장
+        User user;
+        Optional<User> optionalUser = userRepo.findById(userId);
+        if(optionalUser.isPresent()) {
+            user = optionalUser.get();
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't find user");
+        }
         String originalImgName = file.getOriginalFilename();
-        String UUIDImgName = UUID.randomUUID()+"_"+originalImgName;
+        String incodedImgName = URLEncoder.encode(originalImgName, StandardCharsets.UTF_8);
+        String UUIDImgName = UUID.randomUUID()+"_"+incodedImgName;
         s3AttachmentService.upload(file, UUIDImgName);
         String imgUrl = s3AttachmentService.getUrlWithFileName(UUIDImgName);
-        log.info("Img에 저장될 이미지 주소: "+imgUrl);
+        log.info("Img에 저장될 이미지 주소: "+UUIDImgName);
+        log.info("originalImgName: "+originalImgName);
+        log.info("incodeImgName: "+incodedImgName);
+        log.info("imgUrl: "+imgUrl);
 
         // ImgDTO에 Url 저장
         try{
-            Optional<Img> optionalImg = imgRepo.findById(data.getUserId());
-            if(optionalImg.isPresent()) {
-                Img img = optionalImg.get();
-                img.setImgUrl(imgUrl);
-                imgRepo.save(img);
-            } else {
-                List<String> imgUrls = new ArrayList<>();
-                imgUrls.add(imgUrl);
-                Img img = new Img(data.getUserId(),imgUrls);
-                imgRepo.save(img);
-            }
+            Img img = new Img();
+            img.setImgUrl(imgUrl);
+            user.addImg(img);
+            userRepo.save(user);
             return ResponseEntity.ok("S3 upload succeed.");
         } catch (Exception e) {
             e.printStackTrace();

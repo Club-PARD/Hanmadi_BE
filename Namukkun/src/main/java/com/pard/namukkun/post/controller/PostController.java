@@ -25,21 +25,14 @@ public class PostController {
 
     @PostMapping("/upload/post")
     @Operation(summary = "게시물 등록", description = "게시물 내용을 입력해서 게시물을 등록합니다.")
-    public ResponseEntity<?> createPost(
-            @RequestBody() PostCreateDTO postCreateDTO,
-            @SessionAttribute(name = "userid", required = false) Long userId
-            ) {
-        // 권한 확인
-        if (userId == null || !userId.equals(postCreateDTO.getUserId()))
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
+    public ResponseEntity<?> createPost(@RequestBody() PostCreateDTO postCreateDTO) {
         // Post에서 첨부파일을 제외한 데이터는 CreateDTO형태로 받고, 첨부파일은 List형태로 따로 받음
         return postService.createPost(postCreateDTO);
     }
 
     //-----------------------------------
     @PostMapping("/test")
-    public ResponseEntity<?> test() {
+    public ResponseEntity<?> test(){
         log.info("test");
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -47,93 +40,58 @@ public class PostController {
 
     @PostMapping("/upload/temppost")
     @Operation(summary = "게시물 임시저장", description = "게시물을 임시저장합니다.")
-    public ResponseEntity<?> createTempPost(
-            @SessionAttribute(name = "userid", required = false) Long userId,
-            @RequestBody() PostCreateDTO postCreateDTO
-    ) {
-        // 권한 확인
-        if (userId == null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
+    public ResponseEntity<?> createTempPost(@RequestBody() PostCreateDTO postCreateDTO) {
         return postService.saveTempPost(postCreateDTO);
     }
 
     @PostMapping(value = "/upload/file", consumes = {"multipart/form-data"})
     @Operation(summary = "첨부파일 첨부", description = "첨부파일을 첨부합니다.")
-    public ResponseEntity<?> uploadFile(
-            @SessionAttribute(name = "userid", required = false) Long userId,
-            @RequestPart("files") List<MultipartFile> files
-    ) throws JsonProcessingException {
-        // 권한 확인
-        if (userId == null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        ReturnFileNameDTO dto = postService.uploadAttachment(files);
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+    public ReturnFileNameDTO uploadFile(@RequestPart("files") List<MultipartFile> files) {
+        return postService.uploadAttachment(files);
     }
 
 //    // ------------ 유저 테스트용 ---------------
 //    @PostMapping(value = "/upload/img", consumes = {"multipart/form-data"})
 //    @Operation(summary = "이미지 첨부", description = "이미지 이름을 받아서 UUID를 앞에 붙인 이름을 반환합니다.")
-//    public ResponseEntity<?> uploadImg(@RequestParam("img") MultipartFile img,
-//                                       @SessionAttribute(name = "userid", required = false) Long userId){
-//        return postService.uploadImg(img,userId);
+//    public ResponseEntity<?> uploadImg(@RequestParam("img") MultipartFile img){
+//        return postService.uploadImg(img);
 //    }
 //    // ------------ 유저 테스트용 ---------------
 
-    // TODO : 보류
     @PostMapping(value = "/upload/img", consumes = {"multipart/form-data"})
     @Operation(summary = "이미지 첨부", description = "이미지 이름을 받아서 UUID를 앞에 붙인 이름을 반환합니다.")
     public ResponseEntity<?> uploadImg(@RequestParam("img") MultipartFile img,
-                                       @SessionAttribute(name = "userinfo", required = false) UserSessionData data) {
-        return postService.uploadImg(img, data);
+                                       @SessionAttribute(name = "userid", required = false) Long userId){
+        return postService.uploadImg(img,userId);
     }
 
     @PostMapping("/delete/file")
     @Operation(summary = "첨부파일 삭제", description = "첨부파일 이름을 받아서 삭제합니다.")
-    public ResponseEntity<?> deleteFile(
-            @SessionAttribute(name = "userid", required = false) Long userId,
-            @RequestParam("fileName") String fileName
-    ) {
-        // 권한 확인
-        if (userId == null)
-            return new ResponseEntity<>(HttpStatus.OK);
-
+    public ResponseEntity<?> deleteFile(@RequestParam("fileName") String fileName) {
         return s3AttachmentService.deleteByName(fileName);
     }
 
     @GetMapping("/read/all")
     @Operation(summary = "모든 게시물을 읽습니다.")
     public List<PostReadDTO> findAllPost() {
-        // 모두 가능
         return postService.readAllPosts();
     }
 
     @GetMapping("/read/update")
     @Operation(summary = "수정할 게시물을 id를 통해서 읽습니다.")
-    public ResponseEntity<?> findPostById(
-            @SessionAttribute(name = "userid", required = false) Long userId,
-            @RequestParam("id") Long id
-    ) {
-        // 권한 확인
-        if (userId == null || !postService.getWriterUserId(id).equals(userId))
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        PostUpdateDTO dto = postService.findPostByIdUpdateVer(id);
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+    public PostUpdateDTO findPostById(@RequestParam("id") Long id) {
+        return postService.findPostByIdUpdateVer(id);
     }
 
     @GetMapping("/read")
     @Operation(summary = "게시물 id를 통해서 게시물을 읽습니다.")
     public PostReadDTO findById(@RequestParam("id") Long id) {
-        // 모두 가능
         return postService.findPostById(id);
     }
 
     @GetMapping("/read/by-local/by-up-count")
     @Operation(summary = "선택된 지역 게시물중 추천순으로 나열합니다.")
     public List<PostReadDTO> findByUpCount(Integer localPageId) {
-        // 모두 가능
         List<PostReadDTO> postReadDTOS = postService.findByLocal(localPageId);
         return postService.sortByUpCountPost(postReadDTOS);
     }
@@ -141,77 +99,40 @@ public class PostController {
     @GetMapping("/read/by-local")
     @Operation(summary = "선택된 지역 게시물중 최신순으로 나열합니다.")
     public List<PostReadDTO> findByRecent(Integer localPageId) {
-        // 모두 가능
         List<PostReadDTO> postReadDTOS = postService.findByLocal(localPageId);
         return postService.sortByRecentPost(postReadDTOS);
     }
 
     @GetMapping("/read/by-Upcount")
     @Operation(summary = "게시물을 추천 높은순으로 정렬해 나열합니다.")
-    public List<PostReadDTO> findByUpCount() {
-        // 모두 가능
+    public List<PostReadDTO> findByUpCount(){
         return postService.findByUpCountPost();
     }
 
     @PatchMapping("/update")
     @Operation(summary = "게시물을 수정합니다.", description = "이거 실행하기전에 /post/decreaseUpCount에 가서 파일 첨부먼저 하고 리턴값을" +
             "fileName에 넣어줘야합니다.")
-    public ResponseEntity<?> updatePost(
-            @RequestBody PostUpdateDTO postUpdateDTO,
-            @SessionAttribute(name = "userid", required = false) Long userId,
-            @RequestParam("postId") Long postId
-    ) {
-        // 권한 확인
-        if (userId == null || !postService.getWriterUserId(postId).equals(userId))
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        try {
-            postService.updatePost(postId, postUpdateDTO);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Error updating post", e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<?> updatePost(@RequestBody PostUpdateDTO postUpdateDTO, @RequestParam("postId") Long postId) {
+        return postService.updatePost(postId, postUpdateDTO);
     }
 
     @DeleteMapping("/delete")
     @Operation(summary = "게시물을 삭제합니다.")
-    public ResponseEntity<?> deletePost(
-            @RequestParam("postId") Long postId,
-            @SessionAttribute(name = "userid", required = false) Long userId
-    ) {
-        // 권한 확인
-        if (userId == null || !userId.equals(postService.getWriterUserId(postId)))
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
+    public ResponseEntity<?> deletePost(@RequestParam("postId") Long postId) {
         return postService.deletePost(postId);
     }
 
 
     @PostMapping("/increase/UpCount")
-    @Operation(summary = "게시물 채택", description = "postid : 채택한 게시물 id, state 추천 상태 true : 채택 / 미채택이면 그냥 없어짐")
-    public ResponseEntity<?> increaeUpCount(
-            @RequestParam("postId") Long postId,
-            @SessionAttribute(name = "userid", required = false) Long userId
-    ) {
-        // 권한 확인
-        if (userId == null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        return postService.IncreaseUpCountPost(postId, userId);
+    @Operation(summary = "게시물 채택" , description = "postid : 채택한 게시물 id, state 추천 상태 true : 채택 / 미채택이면 그냥 없어짐")
+    public ResponseEntity<?> increaeUpCount(@RequestParam("postId") Long postId, @RequestParam("userId") Long userId) {
+        return postService.IncreaseUpCountPost(postId,userId);
     }
 
     @PostMapping("/decrease/UpCount")
     @Operation(summary = "게시물 채택 취소", description = "postid : 채택한 게시물 id, state 추천 상태 true : 채택 / 미채택이면 그냥 없어짐")
-    public ResponseEntity<?> decreaseUpCount(
-            @RequestParam("postId") Long postId,
-            @SessionAttribute(name = "userid", required = false) Long userId
-    ) {
-        // 권한 확인
-        if (userId == null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        return postService.decreaseUpCountPost(postId, userId);
+    public ResponseEntity<?> decreaseUpCount(@RequestParam("postId") Long postId, @RequestParam("userId") Long userId) {
+        return postService.decreaseUpCountPost(postId,userId);
     }
 
 }
