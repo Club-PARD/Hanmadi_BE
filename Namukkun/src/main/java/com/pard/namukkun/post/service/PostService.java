@@ -241,11 +241,10 @@ public class PostService {
                     String postImgUrl = s3AttachmentService.getUrlWithFileName(postImgName);
                     try {
                         // 게시물에 첨부된 이미지가 Img에 있는지 확인
-                        if(!user.getImgs().isEmpty()) {
-                            List<Img> imgs = user.getImgs(); // 이미지 리스트를 받아온다.
-                            imgs.removeIf(img -> element.equals(img.getImgUrl())); // 게시물에 제시되야하는건 리스트에서 제거
-                            sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(postImgUrl)).append("]"); // stringbuilder에 추가
-                        }
+                        // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
+                        List<Img> imgs = user.getImgs(); // 이미지 Url이 담긴 리스트를 받아온다.
+                        imgs.removeIf(img -> (postImgUrl.equals(img.getImgUrl()))); // 게시물에 업로드 돼야하는건 리스트에서 제거
+                        sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(postImgUrl)).append("]"); // stringbuilder에 추가
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
                     }
@@ -491,13 +490,11 @@ public class PostService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't find user");
         }
         String originalImgName = file.getOriginalFilename();
-        String incodedImgName = URLEncoder.encode(originalImgName, StandardCharsets.UTF_8);
-        String UUIDImgName = UUID.randomUUID()+"_"+incodedImgName;
-        s3AttachmentService.upload(file, UUIDImgName);
-        String imgUrl = s3AttachmentService.getUrlWithFileName(UUIDImgName);
+        String UUIDImgName = UUID.randomUUID()+"_"+originalImgName;
+        s3AttachmentService.upload(file, originalImgName);
+        String imgUrl = s3AttachmentService.getUrlWithFileName(originalImgName);
         log.info("Img에 저장될 이미지 주소: "+UUIDImgName);
         log.info("originalImgName: "+originalImgName);
-        log.info("incodeImgName: "+incodedImgName);
         log.info("imgUrl: "+imgUrl);
 
         // ImgDTO에 Url 저장
