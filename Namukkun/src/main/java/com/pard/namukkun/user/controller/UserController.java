@@ -1,5 +1,6 @@
 package com.pard.namukkun.user.controller;
 
+import com.pard.namukkun.login.session.DTO.UserSessionData;
 import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.user.dto.*;
 import com.pard.namukkun.user.entity.User;
@@ -25,28 +26,35 @@ public class UserController {
     @GetMapping("/info")
     @Operation(summary = "유저 정보 전달", description = "로그인했을때 로컬에 저장하고, 로그아웃 하면 로컬에서 지우세요." + "기본적인 유저 정보를 전달합니다")
     public UserLoginInfoDTO getUserInfo(
-            @RequestParam("userid") Long userId // debug
+//            @SessionAttribute(name = "userinfo", required = false) UserSessionData data,
+            @SessionAttribute(name = "userid", required = false) Long userId
+//            @RequestParam("userid") Long userId // debug
     ) {
         if (userId == null) return null;
         return userService.getUserLoginInfoDTO(userId);
     }
+
     @GetMapping("/info/all")
     @Operation(summary = "유저 주요 정보", description = "마이페이지에서 사용될 유저 정보를 전달합니다")
-    public UserReadDTO getUserInfoAll(
-            @RequestParam("userid") Long userId // debug
+    public ResponseEntity<?> getUserInfoAll(
+            @SessionAttribute(name = "userid", required = false) Long userId
+//            @RequestParam("userid") Long userId // debug
     ) {
-        if (userId == null) return null;
-        return userService.getUserInfoAll(userId);
+        if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        UserReadDTO dto = userService.getUserInfoAll(userId);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @PatchMapping("/update")
     @Operation(summary = "유저 지역, 닉네임 변경", description = "유저의 아이디값, 변경할 닉네임, 지역정보를 통해 유저를 수정합니다.")
     public ResponseEntity<?> updateUser(
-            @RequestParam("userid") Long userid, // debug
-            @RequestBody UserUpdateDTO dto) {
+            @SessionAttribute(name = "userid", required = false) Long userId,
+//            @RequestParam("userid") Long userid, // debug
+            @RequestBody UserUpdateDTO dto
+    ) {
 
         // 권한 확인
-        if (!userid.equals(dto.getId())) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        if (!userId.equals(dto.getId())) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         userService.updateUser(dto);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -55,9 +63,10 @@ public class UserController {
     // -------------- 준현 수정 ----------------
     @PatchMapping("/update/profile")
     @Operation(summary = "유저 프로필 업데이트")
-    public ResponseEntity<?> updateProfile(@RequestParam String profileImage,
-                                           @RequestParam Long userId){
-        return userService.updateUserProfile(profileImage,userId);
+    public ResponseEntity<?> updateProfile(
+            @RequestParam String profileImage,
+            @RequestParam Long userId) {
+        return userService.updateUserProfile(profileImage, userId);
     }
     // -------------- 준현 수정 ----------------
 
