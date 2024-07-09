@@ -482,17 +482,15 @@ public class PostService {
     // 이미지 업로드
     public ResponseEntity<?> uploadImg(MultipartFile file, Long userId) {
         // S3에 이미지 저장
-        User user;
         Optional<User> optionalUser = userRepo.findById(userId);
-        if(optionalUser.isPresent()) {
-            user = optionalUser.get();
-        } else {
+        if(!optionalUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't find user");
         }
+        User user = optionalUser.get();
         String originalImgName = file.getOriginalFilename();
         String UUIDImgName = UUID.randomUUID()+"_"+originalImgName;
-        s3AttachmentService.upload(file, originalImgName);
-        String imgUrl = s3AttachmentService.getUrlWithFileName(originalImgName);
+        s3AttachmentService.upload(file, UUIDImgName);
+        String imgUrl = s3AttachmentService.getUrlWithFileName(UUIDImgName);
 
         // ImgDTO에 Url 저장
         try{
