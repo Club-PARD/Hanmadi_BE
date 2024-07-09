@@ -60,4 +60,12 @@ public class LoginController {
 
         return loginService.logOut(request, data);
     }
+
+    @PostMapping("/check")
+    public ResponseEntity<?> logInCheck(
+            @SessionAttribute(name = "userid", required = false) Long userId
+    ){
+        if (userId == null)  return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        else return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
