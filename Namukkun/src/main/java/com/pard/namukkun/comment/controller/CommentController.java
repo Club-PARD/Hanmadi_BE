@@ -4,7 +4,7 @@ import com.pard.namukkun.comment.dto.CommentCreateDTO;
 import com.pard.namukkun.comment.dto.CommentCreateInfoDTO;
 import com.pard.namukkun.comment.dto.CommentReadDTO;
 import com.pard.namukkun.comment.service.CommentService;
-import com.pard.namukkun.user.dto.UserUpListDTO;
+import com.pard.namukkun.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,31 +19,40 @@ import java.util.List;
 @RequestMapping("/post/comment")
 @RequiredArgsConstructor
 public class CommentController {
-    private final CommentService commentService;
 
+    private final CommentService commentService;
+    private final PostService postService;
 
     // 덧글 생성
     @PostMapping("")
     @Operation(summary = "덧글 생성", description = "포스트 아이디와 유저아이디(세션)로 덧글을 생성합니다." + "유저 아이디는 디버그용입니다.")
-    public CommentCreateInfoDTO createComment(
-            @RequestParam("postid") Long postId,
-            @RequestParam(value = "userid", required = true /* 이후 체크 해야함 */) Long userId, // debug
-            @RequestBody() CommentCreateDTO dto
+    public ResponseEntity<?> createComment(
+            @RequestParam(value = "postid") Long postId,
+            @RequestBody() CommentCreateDTO dto,
+            @SessionAttribute(name = "userid", required = false) Long userId
     ) {
         // 권한 확인
-        if (userId == null || !userId.equals(dto.getUserId())) return null;
+        if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         Long id = commentService.createComment(postId, userId, dto);
-        return new CommentCreateInfoDTO(id);
+        CommentCreateInfoDTO infoDTO = new CommentCreateInfoDTO(id);
+        return new ResponseEntity<>(infoDTO, HttpStatus.OK);
     }
 
     // 덧글 수정 없음
 
-    // 덧글 읽기
+    // 덧글 읽기 전체 허용
     @GetMapping("")
     @Operation(summary = "덧글 읽기", description = "포스트에 있는 덧글을 읽어옵니다.")
-    public List<CommentReadDTO> readAllComment(@RequestParam("postid") Long postId) {
-        return commentService.readALlComment(postId);
+    public List<CommentReadDTO> readAllComment(
+            @RequestParam("postid") Long postId
+    ) {
+        try {
+            return commentService.readALlComment(postId);
+        } catch (Exception Ignore) {
+            return null;
+        }
+
     }
 
 //    // TODO 포스트쪽에서 가져갈 수 있도록 포스트쪽에서도 만들것
@@ -61,14 +70,14 @@ public class CommentController {
     @DeleteMapping("")
     @Operation(summary = "덧글 삭제", description = "덧글아이디로 덧글을 삭제합니다" + "유저의 아이디와 작성자의 아이디가 다르다면 삭제되지 않습니다")
     public ResponseEntity<?> deleteComment(
-            @RequestParam(value = "userid", required = false) Long userId, // debug
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam(value = "commentid") Long commentId
     ) {
-        // 권한 확인
         Long commentWriterId = commentService.getCommentWriterId(commentId);
-        log.info("weriterid {} userid {}", commentWriterId, userId);
+
+        // 권한 확인
         if (userId == null || !userId.equals(commentWriterId))
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         commentService.deleteComment(commentId);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -79,12 +88,11 @@ public class CommentController {
     @Operation(summary = "덧글 좋아요", description = "좋아요가 증가됩니다." +
             "만약 유저가 이미 눌렀다면 좋아요가 취소 됩니다(감소됩니다)")
     public ResponseEntity<?> upButton(
-            @RequestParam("userid") Long userId, // debug
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("commentid") Long commentId,
             @RequestParam("up") Boolean up
     ) {
-        // 로그인 되어있는지 확인
-        if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         commentService.upButton(commentId, userId, up);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -94,12 +102,14 @@ public class CommentController {
     @PatchMapping("/take")
     @Operation(summary = "덧글 채택", description = "덧글을 채택합니다")
     public ResponseEntity<?> takeComment(
-            @RequestParam("userid") Long userId, // debug
+            @SessionAttribute(name = "userid", required = false) Long userId,
+            @RequestParam("postid") Long postId,
             @RequestParam("commentid") Long commentId,
             @RequestParam("take") Boolean take
     ) {
-        // 로그인 되어있는지 확인
-        if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        // 권한 확인
+        if (!postService.getWriterUserId(postId).equals(userId))
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         commentService.takeComment(commentId, take);
         return new ResponseEntity<>(HttpStatus.OK);

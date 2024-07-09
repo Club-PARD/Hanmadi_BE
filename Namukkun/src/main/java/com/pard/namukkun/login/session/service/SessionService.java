@@ -29,6 +29,17 @@ public class SessionService {
         UserSessionData data = new UserSessionData(dto); // dto -> data
 
         session.setAttribute("userinfo", data); // session save
+        session.setAttribute("userid", data.getUserId()); // session save
+        session.setMaxInactiveInterval(Data.cookieSessionTime); // time set
+
+
+        log.info("세션 생성 완료");
+    }
+
+    public void addSessionData(HttpServletRequest request) {
+        HttpSession session = request.getSession(true); // 없으면 새로 만들어요
+
+        session.setAttribute("userid", 1); // session save
         session.setMaxInactiveInterval(Data.cookieSessionTime); // time set
 
 
