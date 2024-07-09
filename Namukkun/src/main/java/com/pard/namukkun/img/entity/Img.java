@@ -26,7 +26,8 @@ public class Img {
         this.user = user;
     }
 
-    public void setImgUrl(String imgUrl){
+    public void setImgUrl(String imgUrl, User user){
         this.imgUrl = imgUrl;
+        this.user = user;
     }
 }

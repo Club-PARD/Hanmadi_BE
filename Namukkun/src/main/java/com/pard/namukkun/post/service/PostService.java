@@ -493,16 +493,13 @@ public class PostService {
         String UUIDImgName = UUID.randomUUID()+"_"+originalImgName;
         s3AttachmentService.upload(file, originalImgName);
         String imgUrl = s3AttachmentService.getUrlWithFileName(originalImgName);
-        log.info("Img에 저장될 이미지 주소: "+UUIDImgName);
-        log.info("originalImgName: "+originalImgName);
-        log.info("imgUrl: "+imgUrl);
 
         // ImgDTO에 Url 저장
         try{
             Img img = new Img();
-            img.setImgUrl(imgUrl);
-            user.addImg(img);
+            img.setImgUrl(imgUrl,user);
             imgRepo.save(img);
+            user.addImg(img);
             userRepo.save(user);
             return ResponseEntity.ok("S3 upload succeed.");
         } catch (Exception e) {
