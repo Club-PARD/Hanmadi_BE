@@ -2,18 +2,13 @@ package com.pard.namukkun.img.entity;
 
 import com.pard.namukkun.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor
-
 public class Img {
     @Id
     private Long imageId;
