@@ -28,6 +28,7 @@ public class SessionService {
         HttpSession session = request.getSession(true); // 없으면 새로 만들어요
         UserSessionData data = new UserSessionData(dto); // dto -> data
 
+        session.setAttribute("userid", dto.getUserId()); // session save
         session.setAttribute("userinfo", data); // session save
         session.setMaxInactiveInterval(Data.cookieSessionTime); // time set
 

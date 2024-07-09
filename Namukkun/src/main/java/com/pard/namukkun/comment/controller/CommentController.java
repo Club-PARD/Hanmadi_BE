@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
-    private final PostService postService;
+//    private final PostService postService;
 
 
     // 덧글 생성
@@ -30,16 +30,16 @@ public class CommentController {
     @Operation(summary = "덧글 생성", description = "포스트 아이디와 유저아이디(세션)로 덧글을 생성합니다." + "유저 아이디는 디버그용입니다.")
     public CommentCreateInfoDTO createComment(
             @RequestParam(value = "postid") Long postId,
-            @RequestParam(value = "userid") Long userId, // debug
             @RequestBody() CommentCreateDTO dto,
+            @SessionAttribute(name = "userid", required = false) Long userId, // debug
             @SessionAttribute(name = "userinfo", required = false) UserSessionData data
     ) {
         // 권한 확인
         //--------------------------------------
         //debug
-        // if (userId == null || !userId.equals(dto.getUserId())) return null;
+         if (userId == null || !userId.equals(dto.getUserId())) return null;
         //--------------------------------------
-        if (data == null ||!data.getUserId().equals(dto.getUserId())) return null;
+//        if (data == null ||!data.getUserId().equals(dto.getUserId())) return null;
 
         Long id = commentService.createComment(postId, userId, dto);
         return new CommentCreateInfoDTO(id);
@@ -70,20 +70,21 @@ public class CommentController {
     @DeleteMapping("")
     @Operation(summary = "덧글 삭제", description = "덧글아이디로 덧글을 삭제합니다" + "유저의 아이디와 작성자의 아이디가 다르다면 삭제되지 않습니다")
     public ResponseEntity<?> deleteComment(
-            @RequestParam(value = "userid", required = false) Long userId, // debug
-            @RequestParam(value = "commentid") Long commentId,
-            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
+//            @RequestParam(value = "userid", required = false) Long userId, // debug
+            @SessionAttribute(name = "userid", required = false) Long userId,
+            @RequestParam(value = "commentid") Long commentId//,
+//            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
     ) {
         // 권한 확인
         Long commentWriterId = commentService.getCommentWriterId(commentId);
 
         //------------------------------------------------------
         //debug
-        // if (userId == null || !userId.equals(commentWriterId))
-        //     return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+         if (userId == null || !userId.equals(commentWriterId))
+             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         //------------------------------------------------------
-        if (data == null || !data.getUserId().equals(commentWriterId))
-                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        if (data == null || !data.getUserId().equals(commentWriterId))
+//                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         commentService.deleteComment(commentId);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -94,17 +95,18 @@ public class CommentController {
     @Operation(summary = "덧글 좋아요", description = "좋아요가 증가됩니다." +
             "만약 유저가 이미 눌렀다면 좋아요가 취소 됩니다(감소됩니다)")
     public ResponseEntity<?> upButton(
-            @RequestParam(value = "userid", required = false) Long userId, // debug
+//            @RequestParam(value = "userid", required = false) Long userId, // debug
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("commentid") Long commentId,
-            @RequestParam("up") Boolean up,
-            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
+            @RequestParam("up") Boolean up//,
+//            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
     ) {
         // 로그인 되어있는지 확인
         //------------------------------------------------------
         // debug
-        // if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         //------------------------------------------------------
-        if (data == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        if (data == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
 
         commentService.upButton(commentId, userId, up);
@@ -115,19 +117,20 @@ public class CommentController {
     @PatchMapping("/take")
     @Operation(summary = "덧글 채택", description = "덧글을 채택합니다")
     public ResponseEntity<?> takeComment(
-            @RequestParam("userid") Long userId, // debug
+//            @RequestParam("userid") Long userId, // debug
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("commentid") Long commentId,
-            @RequestParam("take") Boolean take,
+            @RequestParam("take") Boolean take//,
 
-            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
+//            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
     ) {
         // 로그인 되어있는지 확인
 
         //------------------------------------------------------
         // debug
-        // if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         //------------------------------------------------------
-        if (data.getUserId() == null || data.getUserId().equals(postService.getWriterUserId())) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        if (data.getUserId() == null || data.getUserId().equals(postService.getWriterUserId())) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         commentService.takeComment(commentId, take);
         return new ResponseEntity<>(HttpStatus.OK);

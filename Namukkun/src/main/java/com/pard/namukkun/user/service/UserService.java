@@ -2,6 +2,7 @@ package com.pard.namukkun.user.service;
 
 
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
+import com.pard.namukkun.attachment.service.S3AttachmentService;
 import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.user.dto.*;
 import com.pard.namukkun.user.entity.User;
@@ -62,11 +63,6 @@ public class UserService {
         return new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
     }
 
-    // 유저 정보 전달
-    public UserInfoDTO getUserInfoDTO(Long userId) {
-        User user = userRepo.findById(userId).orElseThrow();
-        return new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
-    }
 
     // 유저 상세 정보 전달
     public UserReadDTO getUserInfoAll(Long userId) {

@@ -27,7 +27,8 @@ public class PostItController {
     @PostMapping("/create")
     @Operation(summary = "포스트잇 생성", description = "덧글의 내용을 포스트잇으로 생성합니다.")
     public PostItCreateInfoDTO selectCommentToPostIt(
-            @RequestParam(value = "userid", required = false, defaultValue = "1L") Long userid,
+//            @RequestParam(value = "userid", required = false, defaultValue = "1L") Long userid,
+            @SessionAttribute(name = "userid", required = false) Long userid,
             @RequestBody PostItCreateDTO dto
     ) {
         // 권한 없음
@@ -48,7 +49,8 @@ public class PostItController {
     @GetMapping("/read")
     @Operation(summary = "포스트잇 읽기", description = "포스트에 있는 모든 포스트잇의 내용을 읽어옵니다")
     public List<PostItReadDTO> readPostIts(
-            @RequestParam(value = "userid", required = false) Long userId, // debug
+//            @RequestParam(value = "userid", required = false) Long userId, // debug
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("postid") Long postId
     ) {
         return postItService.readAllByPostId(postId);
@@ -58,14 +60,15 @@ public class PostItController {
     @PatchMapping("/sectionmove")
     @Operation(summary = "포스트잇 섹션 이동", description = "덧글의 섹션을 이동합니다." + "left, right 아니면 값을 받지 않습니다")
     public ResponseEntity<?> moveSectionPostIt(
-            @RequestParam("userid") Long userId, // debug
+//            @RequestParam("userid") Long userId, // debug
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("postitid") Long postItId,
             @RequestParam("section") String section) {
         // 로그인 안됨
-        if (userId == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         if (!userId.equals(postItService.getWriterIdByPostItId(postItId)))
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         // 잘못된 입력
         if (!(section.equals("left") || section.equals("right")))
@@ -80,7 +83,8 @@ public class PostItController {
     @PatchMapping("/move")
     @Operation(summary = "포스트잇 이동", description = "포스트잇의 위치를 이동시킵니다")
     public ResponseEntity<?> movePostIt(
-            @RequestParam("userid") Long userId,
+//            @RequestParam("userid") Long userId,
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestBody() PostItMoveDTO dto
     ) {
         log.info("{}", dto.getPostId());
@@ -99,7 +103,9 @@ public class PostItController {
     @DeleteMapping("/delete")
     @Operation(summary = "포스트잇 제거", description = "포스트잇을 지웁니다")
     public PostItCommentDTO deletePostIt(
-            @RequestParam("userid") Long userId,
+//            @RequestParam("userid") Long userId,
+            @SessionAttribute(name = "userid", required = false) Long userId,
+
             @RequestParam("postitid") Long postItId
     ) {
 

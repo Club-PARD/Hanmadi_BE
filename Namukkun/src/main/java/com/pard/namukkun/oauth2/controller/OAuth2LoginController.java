@@ -1,18 +1,15 @@
-package com.pard.namukkun.oauth2;
+package com.pard.namukkun.oauth2.controller;
 import com.pard.namukkun.login.dto.KakaoUserInfoResponseDto;
 import com.pard.namukkun.login.service.KakaoService;
 import com.pard.namukkun.login.service.LoginService;
 import com.pard.namukkun.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +18,7 @@ public class OAuth2LoginController {
     private final KakaoService kakaoService;
     private final UserService userService;
 
-    @GetMapping("/auth/kakao/callback")
+    @GetMapping("/login/oauth2/code/kakao")
     public ResponseEntity<?> callback(
         HttpServletRequest request,
         @RequestParam("code") String code
@@ -49,8 +46,8 @@ public class OAuth2LoginController {
 //
     }
 
-    @GetMapping("/user")
-    public String user(@AuthenticationPrincipal OAuth2User principal) {
-        return principal.getAttributes().toString();
-    }
+//    @GetMapping("/user")
+//    public String user(@AuthenticationPrincipal OAuth2User principal) {
+//        return principal.getAttributes().toString();
+//    }
 }
