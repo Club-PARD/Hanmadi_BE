@@ -62,6 +62,7 @@ public class PostController {
     @Operation(summary = "이미지 첨부", description = "이미지 이름을 받아서 UUID를 앞에 붙인 이름을 반환합니다.")
     public ResponseEntity<?> uploadImg(@RequestParam("img") MultipartFile img,
                                        @SessionAttribute(name = "userid", required = false) Long userId){
+        log.info("{}\n{}", userId, img);
         return postService.uploadImg(img,userId);
     }
 

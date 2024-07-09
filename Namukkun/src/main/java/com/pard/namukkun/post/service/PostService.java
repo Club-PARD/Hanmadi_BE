@@ -243,7 +243,15 @@ public class PostService {
                         // 게시물에 첨부된 이미지가 Img에 있는지 확인
                         // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
                         List<Img> imgs = user.getImgs(); // 이미지 Url이 담긴 리스트를 받아온다.
-                        imgs.removeIf(img -> (postImgUrl.equals(img.getImgUrl()))); // 게시물에 업로드 돼야하는건 리스트에서 제거
+                        log.info("postImgUrl: "+postImgUrl);
+                        log.info("img.getImgUrl: "+imgs.get(0).getImgUrl());
+                        for(Img img : imgs){
+                            if(img.getImgUrl().equals(postImgUrl)){
+                                imgRepo.delete(img);
+                                log.info("deleted img: "+img.getImgUrl());
+                            }
+                        }
+                        //imgs.removeIf(img -> (postImgUrl.equals(img.getImgUrl()))); // 게시물에 업로드 돼야하는건 리스트에서 제거
                         sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(postImgUrl)).append("]"); // stringbuilder에 추가
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
@@ -496,9 +504,8 @@ public class PostService {
         // ImgDTO에 Url 저장
         try{
             Img img = Img.toEntity(user,imgUrl);
-            log.info("Saving Img: {}", img);
             imgRepo.save(img);
-            log.info("Img saved successfully");
+            log.info("Img saved successfully",img);
             user.addImg(img);
             userRepo.save(user);
             return ResponseEntity.ok("S3 upload succeed.");

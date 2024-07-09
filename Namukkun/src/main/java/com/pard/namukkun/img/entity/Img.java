@@ -27,11 +27,10 @@ public class Img {
     private User user;
 
     public static Img toEntity(User user, String imgUrl) {
-        Img img = Img.builder()
+        return Img.builder()
                 .user(user)
                 .imgUrl(imgUrl)
                 .build();
-        return img;
     }
 
     public void setUser(User user) {
