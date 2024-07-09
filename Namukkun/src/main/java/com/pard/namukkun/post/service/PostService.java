@@ -480,6 +480,7 @@ public class PostService {
 //    // -----------------------------------------------------------
 
     // 이미지 업로드
+    @Transactional
     public ResponseEntity<?> uploadImg(MultipartFile file, Long userId) {
         // S3에 이미지 저장
         Optional<User> optionalUser = userRepo.findById(userId);

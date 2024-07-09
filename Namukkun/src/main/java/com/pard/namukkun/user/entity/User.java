@@ -101,6 +101,7 @@ public class User {
     }
 
     public void addImg(Img img) {
+        img.setUser(this);
         this.imgs.add(img);
     }
     // ---------------- 준현 수정 -------------
