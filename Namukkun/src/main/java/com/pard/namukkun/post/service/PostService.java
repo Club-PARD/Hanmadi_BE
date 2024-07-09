@@ -552,7 +552,7 @@ public class PostService {
     // 게시물 최신순으로 정렬하는 메서드
     public List<PostReadDTO> sortByRecentPost(List<PostReadDTO> postReadDTOS) {
         return postReadDTOS.stream()
-                .sorted(Comparator.comparing(PostReadDTO::getSortTime).reversed())
+                .sorted(Comparator.comparing(PostReadDTO::getPostTime).reversed())
                 .collect(Collectors.toList());
     }
 

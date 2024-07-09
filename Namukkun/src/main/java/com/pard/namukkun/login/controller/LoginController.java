@@ -2,6 +2,7 @@ package com.pard.namukkun.login.controller;
 
 import com.pard.namukkun.login.service.LoginService;
 import com.pard.namukkun.login.session.DTO.UserSessionData;
+import com.pard.namukkun.login.session.service.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,18 +18,27 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
 
-//    private final  customOAuth2UserService;
+    //    private final  customOAuth2UserService;
     private final LoginService loginService;
+    private final SessionService sessionService;
 
-//    // 로그인 완료 했을떄 오는 경로
-//    @GetMapping("/oauth2/code/kakao")
-//    @Operation(summary = "로그인 완료 경로", description = "카카오 oauth 인가코드를 함꼐 전송하여 로그인, 회원가입합니다" + "로그인 이후 서버에 세션을 생성합니다")
-//    public ResponseEntity<?> callback(
-//            HttpServletRequest request,
-//            @RequestParam("code") String code) {
-//        return new ResponseEntity<>(HttpStatus.OK);
-////        return loginService.oauthLogin(request, code);
-//    }
+    // 로그인 완료 했을떄 오는 경로
+    @GetMapping("/oauth2/code/kakao")
+    @Operation(summary = "로그인 완료 경로", description = "카카오 oauth 인가코드를 함꼐 전송하여 로그인, 회원가입합니다" + "로그인 이후 서버에 세션을 생성합니다")
+    public ResponseEntity<?> callback(
+            HttpServletRequest request,
+            @RequestParam("code") String code) {
+
+        return loginService.oauthLogin(request, code);
+    }
+
+    @GetMapping("/test")
+    @Operation(summary = "로그인 테스트용", description = "테스트용 토큰을 발행합니다. 1")
+    public ResponseEntity<?> testLogIn(HttpServletRequest request) {
+        sessionService.addSessionData(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     // 회원가입 -> update local
     @GetMapping("/create/user")
