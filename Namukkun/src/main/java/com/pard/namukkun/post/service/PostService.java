@@ -502,6 +502,7 @@ public class PostService {
             Img img = new Img();
             img.setImgUrl(imgUrl);
             user.addImg(img);
+            imgRepo.save(img);
             userRepo.save(user);
             return ResponseEntity.ok("S3 upload succeed.");
         } catch (Exception e) {
