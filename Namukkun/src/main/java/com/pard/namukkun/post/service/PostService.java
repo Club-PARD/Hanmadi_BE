@@ -207,8 +207,10 @@ public class PostService {
         List<Img> imgs = user.getImgs();
         for(Img img : imgs){
             s3AttachmentService.deleteByUrl(img.getImgUrl());
+            imgRepo.delete(img);
             log.info("이미지 삭제 완료: " + img.getImgUrl());
         }
+        userRepo.save(user);
         return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user);
 
     }

@@ -1,5 +1,6 @@
 package com.pard.namukkun.img.entity;
 
+import com.pard.namukkun.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,9 +21,14 @@ public class Img {
     @Column(columnDefinition = "TEXT")
     private String imgUrl;
 
-    public Img(Long imageId, String imgUrl) {
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "userId")
+    private User user;
+
+    public Img(Long imageId, String imgUrl, User user) {
         this.imageId = imageId;
         this.imgUrl = imgUrl;
+        this.user = user;
     }
 
     public void setImgUrl(String imgUrl){
