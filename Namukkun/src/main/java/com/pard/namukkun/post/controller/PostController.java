@@ -61,8 +61,8 @@ public class PostController {
 //    @PostMapping(value = "/upload/img", consumes = {"multipart/form-data"})
 //    @Operation(summary = "이미지 첨부", description = "이미지 이름을 받아서 UUID를 앞에 붙인 이름을 반환합니다.")
 //    public ResponseEntity<?> uploadImg(@RequestParam("img") MultipartFile img,
-//                                       @SessionAttribute(name = "userinfo", required = false) UserSessionData data){
-//        return postService.uploadImg(img,data);
+//                                       @SessionAttribute(name = "userid", required = false) Long userId){
+//        return postService.uploadImg(img,userId);
 //    }
 
     @PostMapping("/delete/file")
@@ -113,13 +113,7 @@ public class PostController {
     @Operation(summary = "게시물을 수정합니다.", description = "이거 실행하기전에 /post/decreaseUpCount에 가서 파일 첨부먼저 하고 리턴값을" +
             "fileName에 넣어줘야합니다.")
     public ResponseEntity<?> updatePost(@RequestBody PostUpdateDTO postUpdateDTO, @RequestParam("postId") Long postId) {
-        try {
-            postService.updatePost(postId, postUpdateDTO);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Error updating post", e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return postService.updatePost(postId, postUpdateDTO);
     }
 
     @DeleteMapping("/delete")
