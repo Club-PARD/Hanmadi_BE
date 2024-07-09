@@ -26,6 +26,14 @@ public class Img {
     @JoinColumn(nullable = false, name = "userId")
     private User user;
 
+    public static Img toEntity(User user, String imgUrl) {
+        Img img = Img.builder()
+                .user(user)
+                .imgUrl(imgUrl)
+                .build();
+        return img;
+    }
+
     public void setUser(User user) {
         this.user = user;
     }

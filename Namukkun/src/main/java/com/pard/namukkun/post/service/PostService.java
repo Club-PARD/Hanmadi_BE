@@ -495,8 +495,7 @@ public class PostService {
 
         // ImgDTO에 Url 저장
         try{
-            Img img = new Img();
-            img.setImgUrl(imgUrl,user);
+            Img img = Img.toEntity(user,imgUrl);
             log.info("Saving Img: {}", img);
             imgRepo.save(img);
             log.info("Img saved successfully");
