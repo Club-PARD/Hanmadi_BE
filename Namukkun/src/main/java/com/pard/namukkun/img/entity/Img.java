@@ -7,11 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
 
 public class Img {
@@ -24,12 +23,6 @@ public class Img {
     @ManyToOne
     @JoinColumn(nullable = false, name = "userId")
     private User user;
-
-    public Img(Long imageId, String imgUrl, User user) {
-        this.imageId = imageId;
-        this.imgUrl = imgUrl;
-        this.user = user;
-    }
 
     public void setImgUrl(String imgUrl, User user){
         this.imgUrl = imgUrl;
