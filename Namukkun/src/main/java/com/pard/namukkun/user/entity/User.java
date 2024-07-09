@@ -1,12 +1,14 @@
 package com.pard.namukkun.user.entity;
 
 import com.pard.namukkun.comment.entity.Comment;
+import com.pard.namukkun.img.entity.Img;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.postit.entity.PostIt;
 import com.pard.namukkun.user.dto.UserCreateDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -59,6 +61,10 @@ public class User {
     @Column(name = "up_comment_id")
     private List<Long> upCommentList;
 
+    // 이미지
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Img> imgs = new ArrayList<>();
+
     public static User toEntity(UserCreateDTO userCreateDTO) {
         return User.builder()
                 .oauthID(userCreateDTO.getOauthID())
@@ -92,6 +98,10 @@ public class User {
     // ---------------- 준현 수정 -------------
     public void updateProfileImage(String profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public void addImg(Img img) {
+        this.imgs.add(img);
     }
     // ---------------- 준현 수정 -------------
 }
