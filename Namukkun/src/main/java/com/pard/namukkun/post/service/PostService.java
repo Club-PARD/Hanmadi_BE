@@ -207,7 +207,7 @@ public class PostService {
         List<Img> imgs = user.getImgs();
         for(Img img : imgs){
             s3AttachmentService.deleteByUrl(img.getImgUrl());
-            imgRepo.delete(img);
+            imgRepo.deleteById(img.getImageId());
             log.info("이미지 삭제 완료: " + img.getImgUrl());
         }
         userRepo.save(user);
@@ -252,7 +252,7 @@ public class PostService {
                             }
                         }
                         //imgs.removeIf(img -> (postImgUrl.equals(img.getImgUrl()))); // 게시물에 업로드 돼야하는건 리스트에서 제거
-                        sb.append("[이미지: ").append(s3AttachmentService.getUrlWithFileName(postImgUrl)).append("]"); // stringbuilder에 추가
+                        sb.append("[이미지: ").append(postImgUrl).append("]"); // stringbuilder에 추가
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
                     }
@@ -297,6 +297,7 @@ public class PostService {
                 }
             }
         }
+        userRepo.save(user);
     }
 
     @Transactional
