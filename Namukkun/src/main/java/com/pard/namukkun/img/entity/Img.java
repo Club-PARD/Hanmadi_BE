@@ -25,10 +25,10 @@ public class Img {
     @JoinColumn(nullable = false, name = "userId")
     private User user;
 
-
-    public Img(Long imageId, String imgUrl) {
+    public Img(Long imageId, String imgUrl, User user) {
         this.imageId = imageId;
         this.imgUrl = imgUrl;
+        this.user = user;
     }
 
     public void setImgUrl(String imgUrl){
