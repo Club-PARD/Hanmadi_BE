@@ -96,13 +96,13 @@ public class PostService {
         String benefitText = parseHtml(benefitHtml, user);
 
         // 리스트에 남은 이미지들은 S3에서 삭제한다.
-        List<Img> imgs = user.getImgs();
-        for (Img img : imgs) {
-            s3AttachmentService.deleteByUrl(img.getImgUrl());
-            user.deleteImg(img);
-            userRepo.save(user);
-            log.info("이미지 삭제 완료: " + img.getImgUrl());
-        }
+//        List<Img> imgs = user.getImgs();
+//        for (Img img : imgs) {
+//            s3AttachmentService.deleteByUrl(img.getImgUrl());
+//            user.deleteImg(img);
+//            userRepo.save(user);
+//            log.info("이미지 삭제 완료: " + img.getImgUrl());
+//        }
         log.info("background: " + proBackgroundText);
         log.info("solution: " + solutionText);
         log.info("benefit: " + benefitText);
@@ -148,7 +148,7 @@ public class PostService {
                             if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
                                 sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
                                 log.info("이미지: {}", img.getImgUrl());
-                            } tempimgs.remove(img);
+                            } //tempimgs.remove(img);
                         }
                         log.info("tempImgs length: {}", tempimgs.size());
                         user.setImgs(tempimgs);
