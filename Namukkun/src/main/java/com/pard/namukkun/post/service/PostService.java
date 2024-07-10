@@ -147,7 +147,8 @@ public class PostService {
                             if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
                                 sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
                                 log.info("이미지: {}", img.getImgUrl());
-                                tempimgs.remove(img);
+                                if(tempimgs.remove(img));
+                                log.info("tempImgs length: {}", tempimgs.size());
                             }
                         }
                         user.setImgs(tempimgs);
