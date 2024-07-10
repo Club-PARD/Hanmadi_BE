@@ -246,8 +246,8 @@ public class PostService {
                         // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
                         List<Img> imgs = user.getImgs(); // 이미지 Url이 담긴 리스트를 받아온다.
                         log.info("postImgUrl: "+postImgUrl);
-                        log.info("img.getImgUrl: "+imgs.get(0).getImgUrl());
                         for(Img img : imgs){
+                            log.info("img.getImgUrl: "+img.getImgUrl());
                             if(img.getImgUrl().contains(postImgUrl)){
                                 // S3에 저장하고 받은 주소랑 프론트에서 받은 파일이름 인코딩된 형태랑 비교해서 포함하는지 확인
                                 imgRepo.deleteById(img.getImageId());
