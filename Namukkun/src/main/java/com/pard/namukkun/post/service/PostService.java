@@ -252,12 +252,8 @@ public class PostService {
                             log.info("img.getImgUrl: " + img.getImgUrl());
                             log.warn("img.getImgUrl : {}, postImgUrl : {}", URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8), postImgName);
                             if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
-                                user.deleteImg(img);
-                                // S3에 저장하고 받은 주소랑 프론트에서 받은 파일이름 인코딩된 형태랑 비교해서 포함하는지 확인
-//                                imgRepo.deleteById(img.getImageId());
-//                                userRepo.save(user);
-
                                 sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
+                                user.deleteImg(img);
                                 log.info("deleted img: " + img.getImgUrl());
                             }
                         }
