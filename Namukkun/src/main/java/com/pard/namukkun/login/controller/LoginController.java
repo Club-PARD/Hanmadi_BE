@@ -32,12 +32,12 @@ public class LoginController {
         return loginService.oauthLogin(request, code);
     }
 
-    @GetMapping("/test")
-    @Operation(summary = "로그인 테스트용", description = "테스트용 토큰을 발행합니다. 1")
-    public ResponseEntity<?> testLogIn(HttpServletRequest request) {
-        sessionService.addSessionData(request);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @GetMapping("/test")
+//    @Operation(summary = "로그인 테스트용", description = "테스트용 토큰을 발행합니다. 1")
+//    public ResponseEntity<?> testLogIn(HttpServletRequest request) {
+//        sessionService.addSessionData(request);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
 
     // 회원가입 -> update local
@@ -54,11 +54,11 @@ public class LoginController {
     @PostMapping("/logout")
     @Operation(summary = "로그아웃", description = "로그아웃 합니다 (세션 삭제)")
     public ResponseEntity<?> logOut(
-            HttpServletRequest request,
-            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
+            HttpServletRequest request
+//            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
     ) {
 
-        return loginService.logOut(request, data);
+        return loginService.logOut(request);
     }
 
     @PostMapping("/check")
