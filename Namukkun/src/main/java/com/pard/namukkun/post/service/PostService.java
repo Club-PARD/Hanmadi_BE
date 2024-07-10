@@ -139,7 +139,7 @@ public class PostService {
                         // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
                         List<Img> imgs = user.getImgs(); // 이미지 Url이 담긴 리스트를 받아온다.
                         log.info("imgs length: " + imgs.size());
-                        List<Img> tempimgs = new ArrayList<>(imgs);
+                        //List<Img> tempimgs = new ArrayList<>(imgs);
                         log.info("postImgUrl: " + postImgUrl);
                         log.info("check img empty: {}", imgs.isEmpty());
                         for (Img img : imgs) {
@@ -150,8 +150,7 @@ public class PostService {
                                 log.info("이미지: {}", img.getImgUrl());
                             } //tempimgs.remove(img);
                         }
-                        log.info("tempImgs length: {}", tempimgs.size());
-                        user.setImgs(tempimgs);
+                        //log.info("tempImgs length: {}", tempimgs.size());
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
                     }
@@ -530,59 +529,11 @@ public class PostService {
         List<S3Attachment> s3Attachments = post.getS3Attachments();
         List<String> fileNames = new ArrayList<>();
 
-        // 수정할 게시물에 있는 이미지를 임시저장소에 저장
-        pickUrl(post.getProBackground());
-        pickUrl(post.getBenefit());
-        pickUrl(post.getSolution());
-
         for (S3Attachment s3Attachment : s3Attachments) {
             log.info(s3Attachment.getFileUrl());
             log.info(s3AttachmentService.extractObjectKey(s3Attachment.getFileUrl()));
             fileNames.add(s3AttachmentService.extractObjectKey(s3Attachment.getFileUrl()));
         }
         return new PostUpdateDTO(post, fileNames);
-    }
-
-    // [이미지: 주소] 여기서 주소만 빼내고, 임시 저장소에 저장하는 메서드
-    public void pickUrl(String str) {
-
-        // 정규표현식 패턴 설정
-        String patternString = "\\[이미지: (.*?)\\]";
-        Pattern pattern = Pattern.compile(patternString);
-        Matcher matcher = pattern.matcher(str);
-
-        // 매칭된 모든 URL 출력
-        while (matcher.find()) {
-            String imageUrl = matcher.group(1); // 첫 번째 그룹(괄호 안의 내용) 가져오기
-            System.out.println("Image URL: " + imageUrl);
-            saveImgTempStorage(imageUrl);
-        }
-    }
-
-    public void saveImgTempStorage(String str) {
-        try {
-            File downloadedFile = s3AttachmentService.downloadFileFromS3(str);
-
-            log.info(s3AttachmentService.extractFileName(s3AttachmentService.extractObjectKey(str)));
-
-            // 임시 저장소에 파일 경로 추가
-            String fileName = downloadedFile.getName();
-            log.info("임시저장소에 들어갈 파일 이름" + fileName);
-            Path tempFilePath = Paths.get(TEMP_DIR, fileName);
-            Files.copy(downloadedFile.toPath(), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
-            tempStorage.put(fileName, tempFilePath);
-
-            // 다운로드된 파일 삭제
-            if (!downloadedFile.delete()) {
-                throw new IOException("임시 파일 삭제 실패: " + downloadedFile.getAbsolutePath());
-            }
-
-            // 성공적인 응답 반환
-            log.info("파일을 성공적으로 다운로드하였습니다." + tempStorage.keySet());
-        } catch (IOException e) {
-            // 오류 처리
-            e.printStackTrace();
-            log.info(String.valueOf(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 다운로드 중 오류 발생")));
-        }
     }
 }
