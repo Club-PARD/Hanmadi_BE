@@ -73,7 +73,7 @@ public class PostService {
             for (String fileName : fileNames)
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
-            user.setImgs(new ArrayList<>());
+            user.getImgs().clear();
             userRepo.save(user);
             postRepo.save(post);
             return ResponseEntity.ok(post.getPostId());
@@ -115,7 +115,7 @@ public class PostService {
 //        log.info("solution: " + solutionText);
 //        log.info("benefit: " + benefitText);
 
-        user.setImgs(new ArrayList<>());
+        user.getImgs().clear();
         log.info("set image clear");
         userRepo.save(user);
         log.info("save user clear");
