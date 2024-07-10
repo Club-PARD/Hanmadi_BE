@@ -146,16 +146,13 @@ public class PostService {
                             log.warn("img.getImgUrl : {}, postImgUrl : {}", URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8), postImgName);
                             if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
                                 sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
+                                log.info("이미지: {}", img.getImgUrl());
                                 tempimgs.remove(img);
-                                log.info("deleted img: " + img.getImgUrl());
                             }
                         }
                         user.setImgs(tempimgs);
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
-                    }
-                    finally {
-                        userRepo.save(user);
                     }
                 } else if (element.tagName().equals("br")) { // <br> 태그 처리
                     sb.append("\n");
@@ -198,6 +195,7 @@ public class PostService {
                 }
             }
         }
+        userRepo.save(user);
     }
 
     @Transactional
