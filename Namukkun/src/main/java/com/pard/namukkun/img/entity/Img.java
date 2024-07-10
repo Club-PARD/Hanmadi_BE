@@ -21,7 +21,6 @@ public class Img {
     @Lob
     @Column(columnDefinition = "TEXT")
     private String imgUrl;
-    private Boolean publish;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "userId")
@@ -31,7 +30,6 @@ public class Img {
         return Img.builder()
                 .user(user)
                 .imgUrl(imgUrl)
-                .publish(false)
                 .build();
     }
 
@@ -39,12 +37,4 @@ public class Img {
         this.user = user;
     }
 
-    public void setPublish(Boolean publish) {
-        this.publish = publish;
-    }
-
-    public void setImgUrl(String imgUrl, User user){
-        this.imgUrl = imgUrl;
-        this.user = user;
-    }
 }
