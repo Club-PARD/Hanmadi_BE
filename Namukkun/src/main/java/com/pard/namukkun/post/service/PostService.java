@@ -239,7 +239,7 @@ public class PostService {
 
                 if (element.tagName().equals("img")) {
                     String postImgName = element.attr("src");
-                    String postImgUrl = s3AttachmentService.getUrlWithFileName(postImgName);
+                    String postImgUrl = URLEncoder.encode(postImgName, StandardCharsets.UTF_8);
                     try {
                         // 게시물에 첨부된 이미지가 Img에 있는지 확인
                         // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
@@ -502,7 +502,7 @@ public class PostService {
         String originalImgName = file.getOriginalFilename();
         String UUIDImgName = UUID.randomUUID()+"_"+originalImgName;
         s3AttachmentService.upload(file, UUIDImgName);
-        String imgUrl = s3AttachmentService.getUrlWithFileName(UUIDImgName);
+        String imgUrl = s3AttachmentService.getUrlWithFileName(UUIDImgName);;
 
         // ImgDTO에 Url 저장
         try{
