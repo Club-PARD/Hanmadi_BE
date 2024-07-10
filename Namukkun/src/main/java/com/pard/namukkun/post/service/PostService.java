@@ -249,10 +249,11 @@ public class PostService {
                         log.info("postImgUrl: " + postImgUrl);
                         log.info("check img empty: {}", imgs.isEmpty());
                         for (Img img : imgs) {
-                            img.setPublish(true);
                             log.info("img.getImgUrl: " + img.getImgUrl());
                             log.warn("img.getImgUrl : {}, postImgUrl : {}", URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8), postImgName);
                             if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
+                                img.setPublish(true);
+                                imgRepo.save(img);
                                 // S3에 저장하고 받은 주소랑 프론트에서 받은 파일이름 인코딩된 형태랑 비교해서 포함하는지 확인
 //                                imgRepo.deleteById(img.getImageId());
 //                                userRepo.save(user);
@@ -261,7 +262,7 @@ public class PostService {
                                 log.info("deleted img: " + img.getImgUrl());
                             }
                         }
-                        imgRepo.deleteAllByPublishTrueAndUser(user.getUserId());
+                        imgRepo.deleteAllByPublishTrueAndUser(user);
                         //imgs.removeIf(img -> (postImgUrl.equals(img.getImgUrl()))); // 게시물에 업로드 돼야하는건 리스트에서 제거
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
