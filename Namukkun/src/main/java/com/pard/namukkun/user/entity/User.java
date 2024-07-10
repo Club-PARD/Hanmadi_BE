@@ -111,6 +111,7 @@ public class User {
 
     public void deleteImg(Img img) {
         this.imgs.remove(img);
+        img.setUser(null); // 관계를 완전히 끊기 위해
     }
     // ---------------- 준현 수정 -------------
 }

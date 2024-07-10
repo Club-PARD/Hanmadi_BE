@@ -73,13 +73,17 @@ public class PostService {
             for (String fileName : fileNames)
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
-            user.getImgs().clear();
-            userRepo.save(user);
+            clearImgs(user);
             postRepo.save(post);
             return ResponseEntity.ok(post.getPostId());
 //        } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
 //        }
+    }
+
+    public void clearImgs(User user) {
+        user.getImgs().clear();
+        userRepo.save(user); // 변경 사항 저장
     }
 
 
