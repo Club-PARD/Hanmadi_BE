@@ -207,7 +207,7 @@ public class PostService {
         List<Img> imgs = user.getImgs();
         for (Img img : imgs) {
             s3AttachmentService.deleteByUrl(img.getImgUrl());
-            imgRepo.deleteById(img.getImageId());
+            user.deleteImg(img);
             log.info("이미지 삭제 완료: " + img.getImgUrl());
         }
         log.info("background: " + proBackgroundText);
