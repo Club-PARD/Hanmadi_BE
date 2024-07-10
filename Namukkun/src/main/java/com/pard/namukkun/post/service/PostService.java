@@ -139,7 +139,7 @@ public class PostService {
                         // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
                         List<Img> imgs = user.getImgs(); // 이미지 Url이 담긴 리스트를 받아온다.
                         log.info("imgs length: " + imgs.size());
-                        List<Img> tempimgs = new ArrayList<>();
+                        List<Img> tempimgs = new ArrayList<>(imgs);
                         log.info("postImgUrl: " + postImgUrl);
                         log.info("check img empty: {}", imgs.isEmpty());
                         for (Img img : imgs) {
@@ -148,7 +148,7 @@ public class PostService {
                             if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
                                 sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
                                 log.info("이미지: {}", img.getImgUrl());
-                            } else tempimgs.add(img);
+                            } tempimgs.remove(img);
                         }
                         log.info("tempImgs length: {}", tempimgs.size());
                         user.setImgs(tempimgs);
