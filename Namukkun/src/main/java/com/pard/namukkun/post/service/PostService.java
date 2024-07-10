@@ -249,6 +249,7 @@ public class PostService {
                         for(Img img : imgs){
                             log.info("img.getImgUrl: "+img.getImgUrl());
                             if(img.getImgUrl().contains(postImgUrl)){
+                                log.warn("img.getImgUrl : {}, postImgUrl : {}",img.getImgUrl(),postImgUrl);
                                 // S3에 저장하고 받은 주소랑 프론트에서 받은 파일이름 인코딩된 형태랑 비교해서 포함하는지 확인
                                 imgRepo.deleteById(img.getImageId());
                                 userRepo.save(user);
