@@ -210,9 +210,11 @@ public class PostService {
             imgRepo.deleteById(img.getImageId());
             log.info("이미지 삭제 완료: " + img.getImgUrl());
         }
+        log.info("background: "+proBackgroundText);
+        log.info("solution: "+solutionText);
+        log.info("benefit: "+benefitText);
         userRepo.save(user);
         return Post.toEntity(postCreateDTO,proBackgroundText,solutionText,benefitText,user);
-
     }
 
     // HTML에서 텍스트와 이미지를 골라서 파싱하는 메서드
@@ -248,6 +250,8 @@ public class PostService {
                         for(Img img : imgs){
                             if(img.getImgUrl().equals(postImgUrl)){
                                 imgRepo.delete(img);
+                                user.setImgs(imgs);
+                                userRepo.save(user);
                                 log.info("deleted img: "+img.getImgUrl());
                             }
                         }
@@ -297,7 +301,6 @@ public class PostService {
                 }
             }
         }
-        userRepo.save(user);
     }
 
     @Transactional
