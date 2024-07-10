@@ -62,7 +62,7 @@ public class PostService {
     public ResponseEntity<?> createPost(PostCreateDTO postCreateDTO) {
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
                 -> new RuntimeException("Error find user -> " + postCreateDTO.getUserId()));
-        try {
+//        try {
             Post post = makePost(postCreateDTO, user);
 
             log.info("post created");
@@ -73,11 +73,13 @@ public class PostService {
             for (String fileName : fileNames)
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
+            user.setImgs(new ArrayList<>());
+            userRepo.save(user);
             postRepo.save(post);
             return ResponseEntity.ok(post.getPostId());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
+//        }
     }
 
 
@@ -175,6 +177,8 @@ public class PostService {
 //                    } catch (Exception e) {
 //                        log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
 //                    }
+
+
                 } else if (element.tagName().equals("br")) { // <br> 태그 처리
                     sb.append("\n");
                 } else if (element.tagName().equals("p")) { // <p> 태그 처리
@@ -310,8 +314,9 @@ public class PostService {
             post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
         }
 
-        postRepo.save(post);
+        user.setImgs(new ArrayList<>());
         userRepo.save(user);
+        postRepo.save(post);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
