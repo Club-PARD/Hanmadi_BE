@@ -208,12 +208,12 @@ public class PostService {
         for (Img img : imgs) {
             s3AttachmentService.deleteByUrl(img.getImgUrl());
             user.deleteImg(img);
+            userRepo.save(user);
             log.info("이미지 삭제 완료: " + img.getImgUrl());
         }
         log.info("background: " + proBackgroundText);
         log.info("solution: " + solutionText);
         log.info("benefit: " + benefitText);
-        userRepo.save(user);
         return Post.toEntity(postCreateDTO, proBackgroundText, solutionText, benefitText, user);
     }
 
@@ -261,9 +261,11 @@ public class PostService {
                                 log.info("deleted img: " + img.getImgUrl());
                             }
                         }
-                        userRepo.save(user);
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
+                    }
+                    finally {
+                        userRepo.save(user);
                     }
                 } else if (element.tagName().equals("br")) { // <br> 태그 처리
                     sb.append("\n");
