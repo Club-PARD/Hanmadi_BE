@@ -74,6 +74,7 @@ public class PostService {
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
             postRepo.save(post);
+            userRepo.save(user);
             return ResponseEntity.ok(post.getPostId());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
@@ -95,17 +96,26 @@ public class PostService {
         String benefitHtml = postCreateDTO.getBenefit();
         String benefitText = parseHtml(benefitHtml, user);
 
+
+
+        // -------------- S3에 쓸모없는 이미지 저장된거 삭제 처리로직 (임시 폐기) --------//
         // 리스트에 남은 이미지들은 S3에서 삭제한다.
 //        List<Img> imgs = user.getImgs();
+//        List<Img> tempImgs = new ArrayList<>(imgs);
 //        for (Img img : imgs) {
 //            s3AttachmentService.deleteByUrl(img.getImgUrl());
-//            user.deleteImg(img);
+//            tempImgs.remove(img);
 //            userRepo.save(user);
 //            log.info("이미지 삭제 완료: " + img.getImgUrl());
 //        }
-        log.info("background: " + proBackgroundText);
-        log.info("solution: " + solutionText);
-        log.info("benefit: " + benefitText);
+//        user.setImgs(tempImgs);
+//        userRepo.save(user);
+//        log.info("background: " + proBackgroundText);
+//        log.info("solution: " + solutionText);
+//        log.info("benefit: " + benefitText);
+
+        user.setImgs(new ArrayList<>());
+        userRepo.save(user);
         return Post.toEntity(postCreateDTO, proBackgroundText, solutionText, benefitText, user);
     }
 
@@ -134,28 +144,36 @@ public class PostService {
                     String postImgName = element.attr("src");
                     String postImgUrl = URLEncoder.encode(postImgName, StandardCharsets.UTF_8);
                     // 프론트에서 받은 이미지 이름을 인코딩된 형태로 저장함
-                    try {
-                        // 게시물에 첨부된 이미지가 Img에 있는지 확인
-                        // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
-                        List<Img> imgs = user.getImgs(); // 이미지 Url이 담긴 리스트를 받아온다.
-                        log.info("imgs length: " + imgs.size());
-                        List<Img> tempimgs = new ArrayList<>(imgs);
-                        log.info("postImgUrl: " + postImgUrl);
-                        log.info("check img empty: {}", imgs.isEmpty());
-                        for (Img img : imgs) {
-                            log.info("img.getImgUrl: " + img.getImgUrl());
-                            log.warn("img.getImgUrl : {}, postImgUrl : {}", URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8), postImgName);
-                            if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
-                                sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
-                                log.info("이미지: {}", img.getImgUrl());
-                            } tempimgs.remove(img);
+                    List<Img> imgs = user.getImgs();
+                    for(Img img : imgs) {
+                        if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
+                            sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
                         }
-                        user.setImgs(tempimgs);
-                        userRepo.save(user);
-                        //log.info("tempImgs length: {}", tempimgs.size());
-                    } catch (Exception e) {
-                        log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
                     }
+
+                    // -------------- S3에 쓸모없는 이미지 저장된거 삭제 처리로직 (임시 폐기) --------//
+//                    try {
+//                        // 게시물에 첨부된 이미지가 Img에 있는지 확인
+//                        // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
+//                        List<Img> imgs = user.getImgs(); // 이미지 Url이 담긴 리스트를 받아온다.
+//                        log.info("imgs length: " + imgs.size());
+//                        List<Img> tempimgs = new ArrayList<>(imgs);
+//                        log.info("postImgUrl: " + postImgUrl);
+//                        log.info("check img empty: {}", imgs.isEmpty());
+//                        for (Img img : imgs) {
+//                            log.info("img.getImgUrl: " + img.getImgUrl());
+//                            log.warn("img.getImgUrl : {}, postImgUrl : {}", URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8), postImgName);
+//                            if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
+//                                sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
+//                                log.info("이미지: {}", img.getImgUrl());
+//                            } tempimgs.remove(img);
+//                        }
+//                        user.setImgs(tempimgs);
+//                        userRepo.save(user);
+//                        //log.info("tempImgs length: {}", tempimgs.size());
+//                    } catch (Exception e) {
+//                        log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
+//                    }
                 } else if (element.tagName().equals("br")) { // <br> 태그 처리
                     sb.append("\n");
                 } else if (element.tagName().equals("p")) { // <p> 태그 처리
@@ -292,6 +310,7 @@ public class PostService {
         }
 
         postRepo.save(post);
+        userRepo.save(user);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
