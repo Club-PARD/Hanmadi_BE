@@ -3,6 +3,7 @@ package com.pard.namukkun.user.service;
 
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.pard.namukkun.attachment.service.S3AttachmentService;
+import com.pard.namukkun.img.entity.Img;
 import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.user.dto.*;
 import com.pard.namukkun.user.entity.User;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -84,6 +86,14 @@ public class UserService {
         userRepo.save(user); // 저장
 
         return ResponseEntity.ok().build();
+    }
+
+    public void clearImgs(User user) {
+        List<Img> imgs = user.getImgs();
+        if (imgs != null && !imgs.isEmpty()) {
+            imgs.clear();
+            userRepo.save(user); // 변경 사항 저장
+        }
     }
 
     // -------------- 준현 수정 ----------------

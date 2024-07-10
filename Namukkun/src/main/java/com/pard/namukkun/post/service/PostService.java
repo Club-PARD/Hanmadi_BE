@@ -13,6 +13,7 @@ import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
+import com.pard.namukkun.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -55,6 +56,7 @@ public class PostService {
     private final ImgRepo imgRepo;
 
     private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
+    private final UserService userService;
     private Map<String, Path> tempStorage = new HashMap<>();
 
 
@@ -73,17 +75,12 @@ public class PostService {
             for (String fileName : fileNames)
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
-            clearImgs(user);
+            userService.clearImgs(user);
             postRepo.save(post);
             return ResponseEntity.ok(post.getPostId());
 //        } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
 //        }
-    }
-
-    public void clearImgs(User user) {
-        user.getImgs().clear();
-        userRepo.save(user); // 변경 사항 저장
     }
 
 
