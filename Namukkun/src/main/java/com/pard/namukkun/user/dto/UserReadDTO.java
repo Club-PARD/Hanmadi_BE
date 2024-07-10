@@ -30,6 +30,9 @@ public class UserReadDTO {
         this.email = user.getEmail();
 
         this.tempPost = new PostReadDTO(user.getTempPost());
-        this.posts = user.getPosts().stream().map(PostReadDTO::new).toList();
+
+        // null exception 처리
+        if (user.getPosts() != null) this.posts = user.getPosts().stream().map(PostReadDTO::new).toList();
+        else this.posts = null;
     }
 }
