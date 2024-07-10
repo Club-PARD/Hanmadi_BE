@@ -21,4 +21,5 @@ public class NamukkunApplication {
         SpringApplication.run(NamukkunApplication.class, args);
     }
 
+    
 }

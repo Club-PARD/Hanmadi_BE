@@ -100,8 +100,17 @@ public class User {
         this.profileImage = profileImage;
     }
 
+    public void setImgs(List<Img> imgs) {
+        this.imgs = imgs;
+    }
+
     public void addImg(Img img) {
+        img.setUser(this);
         this.imgs.add(img);
+    }
+
+    public void deleteImg(Img img) {
+        this.imgs.remove(img);
     }
     // ---------------- 준현 수정 -------------
 }
