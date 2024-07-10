@@ -74,7 +74,6 @@ public class PostService {
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
             postRepo.save(post);
-            userRepo.save(user);
             return ResponseEntity.ok(post.getPostId());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
@@ -115,7 +114,9 @@ public class PostService {
 //        log.info("benefit: " + benefitText);
 
         user.setImgs(new ArrayList<>());
+        log.info("set image clear");
         userRepo.save(user);
+        log.info("save user clear");
         return Post.toEntity(postCreateDTO, proBackgroundText, solutionText, benefitText, user);
     }
 
