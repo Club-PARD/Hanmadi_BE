@@ -30,7 +30,7 @@ public class PostController {
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
         // 권한 확인 - 로그인 되어있으면 가능함
-        if (userId == null)
+        if (userId == null || !userId.equals(postCreateDTO.getUserId()))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         // Post에서 첨부파일을 제외한 데이터는 CreateDTO형태로 받고, 첨부파일은 List형태로 따로 받음
