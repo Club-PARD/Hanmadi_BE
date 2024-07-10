@@ -58,7 +58,6 @@ public class PostService {
 
 
     // PostCreateDTO 받아서 postDTO 생성
-    @Transactional
     public ResponseEntity<?> createPost(PostCreateDTO postCreateDTO) {
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
                 -> new RuntimeException("Error find user -> "+postCreateDTO.getUserId()));
@@ -248,7 +247,7 @@ public class PostService {
                         log.info("postImgUrl: "+postImgUrl);
                         log.info("img.getImgUrl: "+imgs.get(0).getImgUrl());
                         for(Img img : imgs){
-                            if(img.getImgUrl().equals(postImgUrl)){
+                            if(img.getImgUrl().contains(postImgUrl)){
                                 imgRepo.delete(img);
                                 user.setImgs(imgs);
                                 userRepo.save(user);
