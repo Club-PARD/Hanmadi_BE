@@ -240,6 +240,7 @@ public class PostService {
                 if (element.tagName().equals("img")) {
                     String postImgName = element.attr("src");
                     String postImgUrl = URLEncoder.encode(postImgName, StandardCharsets.UTF_8);
+                    // 프론트에서 받은 이미지 이름을 인코딩된 형태로 저장함
                     try {
                         // 게시물에 첨부된 이미지가 Img에 있는지 확인
                         // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
@@ -248,14 +249,14 @@ public class PostService {
                         log.info("img.getImgUrl: "+imgs.get(0).getImgUrl());
                         for(Img img : imgs){
                             if(img.getImgUrl().contains(postImgUrl)){
-                                imgRepo.delete(img);
-                                user.setImgs(imgs);
+                                // S3에 저장하고 받은 주소랑 프론트에서 받은 파일이름 인코딩된 형태랑 비교해서 포함하는지 확인
+                                imgRepo.deleteById(img.getImageId());
                                 userRepo.save(user);
+                                sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
                                 log.info("deleted img: "+img.getImgUrl());
                             }
                         }
                         //imgs.removeIf(img -> (postImgUrl.equals(img.getImgUrl()))); // 게시물에 업로드 돼야하는건 리스트에서 제거
-                        sb.append("[이미지: ").append(postImgUrl).append("]"); // stringbuilder에 추가
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
                     }
