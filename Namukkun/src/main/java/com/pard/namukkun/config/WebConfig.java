@@ -13,13 +13,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${server.serviceDomain}")
     private String serviceDomain;
 
-
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-
-        @Value("${kakao.client_secret_id}") String FrontServer;
-
         registry.addMapping("/**")
                 .allowedOrigins(
                         serverDomain,
@@ -29,7 +24,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .exposedHeaders("Access-Control-Allow-Private-Network")
                 .allowCredentials(true);
-
-
     }
 }
