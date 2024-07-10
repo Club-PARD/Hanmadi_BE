@@ -191,5 +191,4 @@ public class PostController {
 
         return postService.decreaseUpCountPost(postId, userId);
     }
-
 }
