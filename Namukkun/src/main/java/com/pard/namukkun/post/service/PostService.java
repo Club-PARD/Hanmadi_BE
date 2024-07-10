@@ -262,7 +262,7 @@ public class PostService {
                                 log.info("deleted img: " + img.getImgUrl());
                             }
                         }
-                        imgRepo.deleteAllByPublishTrueAndUser(user);
+                        deleteImgPulishTrue(imgs);
                         //imgs.removeIf(img -> (postImgUrl.equals(img.getImgUrl()))); // 게시물에 업로드 돼야하는건 리스트에서 제거
                     } catch (Exception e) {
                         log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
@@ -310,6 +310,14 @@ public class PostService {
         }
     }
 
+    public void deleteImgPulishTrue(List<Img> img){
+        for(Img checkImg : img){
+            if(checkImg.getPublish()){
+                log.warn("이미지 id : {} 이미지 Url : {} 이미지 pulbish : {}", checkImg.getImageId(), checkImg.getImgUrl(), checkImg.getPublish());
+                imgRepo.delete(checkImg);
+            }
+        }
+    }
     @Transactional
     // 게시물 임시저장
     public ResponseEntity<?> saveTempPost(PostCreateDTO postCreateDTO) {
