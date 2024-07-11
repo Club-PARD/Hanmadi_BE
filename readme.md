@@ -1,7 +1,8 @@
 <p align="center">
-  <img width="80%" src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/83900d5e-74b8-4b19-90c4-3f9f28663607">
+  <img width="40%" src="https://github.com/Club-PARD/Hanmadi_WEB/assets/143365441/7bfec7dc-d9c1-4699-acc0-6e903f2992c8">
 </p>
 <h1 align="center">🪵 WE ARE GROOT 🪵</h1> 
+<h4 align="center"> 🌊 Hanmadi BackEnd Repo 🌊</h4> 
 
 <p align="center">
   <a>
@@ -17,6 +18,15 @@
 <img src="https://img.shields.io/badge/AWS-%23FF9900?style=flat&logo=Amazon&logoColor=white"/>
   </a>
 </p>
+
+
+<p align="center">
+  <img width="50%" src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/83900d5e-74b8-4b19-90c4-3f9f28663607">
+</p>
+
+<br />
+
+---
 
 ## Service Introduction
 
