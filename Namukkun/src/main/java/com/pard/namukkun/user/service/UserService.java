@@ -88,13 +88,5 @@ public class UserService {
         return ResponseEntity.ok().build();
     }
 
-    public void clearImgs(User user) {
-        List<Img> imgs = user.getImgs();
-        if (imgs != null && !imgs.isEmpty()) {
-            imgs.clear();
-            userRepo.save(user); // 변경 사항 저장
-        }
-    }
-
     // -------------- 준현 수정 ----------------
 }

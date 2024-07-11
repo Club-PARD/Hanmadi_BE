@@ -75,7 +75,6 @@ public class PostService {
             for (String fileName : fileNames)
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
-            userService.clearImgs(user);
             postRepo.save(post);
             return ResponseEntity.ok(post.getPostId());
 //        } catch (Exception e) {
@@ -146,14 +145,30 @@ public class PostService {
 
                 if (element.tagName().equals("img")) {
                     String postImgName = element.attr("src");
-                    String postImgUrl = URLEncoder.encode(postImgName, StandardCharsets.UTF_8);
+                    String decodedPostImgName = URLDecoder.decode(postImgName, StandardCharsets.UTF_8);
                     // 프론트에서 받은 이미지 이름을 인코딩된 형태로 저장함
                     List<Img> imgs = user.getImgs();
-                    for(Img img : imgs) {
-                        if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
-                            sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
+                    List<Img> imgsToRemove = new ArrayList<>();
+
+                    for (Img img : imgs) {
+                        String decodedImgUrl = URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8);
+                        if (decodedImgUrl.contains(decodedPostImgName)) {
+                            sb.append("[이미지: ").append(img.getImgUrl()).append("]");
+                            //imgsToRemove.add(img);
                         }
                     }
+
+//                    for (Img img : imgsToRemove) {
+//                        user.deleteImg(img);
+//                        imgRepo.delete(img);
+//                        userRepo.save(user);
+//                    }
+                    for (Img img : imgs) {
+                        user.deleteImg(img);
+                        imgRepo.delete(img);
+                        userRepo.save(user);
+                    }
+
 
                     // -------------- S3에 쓸모없는 이미지 저장된거 삭제 처리로직 (임시 폐기) --------//
 //                    try {
