@@ -142,7 +142,7 @@ public class PostController {
     public ResponseEntity<?> findByUpCount() {
         List<PostReadDTO> dtos = postService.findByUpCountPost();
 
-        return new ResponseEntity<?>(dtos, HttpStatus.OK);
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     @PatchMapping("/update")
