@@ -153,6 +153,8 @@ public class PostController {
             @RequestParam("postId") Long postId,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        if(!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         // 권한확인 - 글 작성자만 가능
         if (userId == null || !userId.equals(postService.getWriterUserId(postId)))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -166,6 +168,10 @@ public class PostController {
             @RequestParam("postId") Long postId,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+
+        if(!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한확인 - 글 작성자만 가능
         if (userId == null || !userId.equals(postService.getWriterUserId(postId)))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -180,6 +186,10 @@ public class PostController {
             @RequestParam("postId") Long postId,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+
+        if(!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한확인 - 로그인 되어있으면 가능
         if (userId == null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -193,6 +203,10 @@ public class PostController {
             @RequestParam("postId") Long postId,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+
+        if(!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한확인 - 로그인 되어있으면 가능
         if (userId == null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
