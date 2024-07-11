@@ -157,7 +157,7 @@ public class PostService {
 
                     for (Img img : imgs) {
                         log.info("프로트에서 받은 이미지 이름임: {}", decodedPostImgName);
-                        log.info("유저에 있는 이미지 이름임: {}", img.getImageId());
+                        log.info("유저에 있는 이미지 이름임: {}", img.getImgUrl());
                         String decodedImgUrl = URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8);
                         if (decodedImgUrl.contains(decodedPostImgName)) {
                             sb.append("[이미지: ").append(img.getImgUrl()).append("]");
