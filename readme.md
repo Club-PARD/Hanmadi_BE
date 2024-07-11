@@ -1,26 +1,21 @@
-![KakaoTalk_Photo_2024-07-09-16-01-11](https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/83900d5e-74b8-4b19-90c4-3f9f28663607)
-
-
+<p align="center">
+<img width="80%" src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/83900d5e-74b8-4b19-90c4-3f9f28663607">
+</p>
 <center>
 <h1>🪵 WE ARE GROOT 🪵</h1>
 </center> 
 
 <p align="center">
   <a>
-    <img src="https://img.shields.io/badge/HTML5-E34F26.svg?style=flat&logo=html5&logoColor=white" alt="HTML">
-  </a>
-  <a>
-    <img src="https://img.shields.io/badge/CSS3-1572B6.svg?style=flat&logo=css3&logoColor=white" alt="CSS">
-  </a>
-  <a>
-    <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat&logo=javascript&logoColor=white" alt="js">
+    <img src="https://img.shields.io/badge/springboot-6DB33F.svg?style=flat&logo=springboot&logoColor=white" alt="springboot">
   </a>
   <a>
     <img src="https://img.shields.io/badge/AWS-232F3E.svg?style=flat&logo=amazonwebservices&logoColor=white" alt="aws">
-  </a>
+  </a>  
   <a>
-    <img src="https://img.shields.io/badge/springboot-6DB33F.svg?style=flat&logo=springboot&logoColor=white" alt="springboot">
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/>
   </a>
+
 </p>
 
 ## Service Introduction
@@ -62,3 +57,96 @@
 
 1. 글쓴이는 댓글 중 마음에 드는 의견을 채택할 수 있습니다.
 2. 채택된 댓글은 포스트잇으로 게시글 옆에 고정됩니다.
+
+---
+
+# 🗃️ 시스템 설계 및 문서화
+
+### 엔티티 연결 관계도
+
+<img width="965" alt="ERD" src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/425f9797-ea35-4626-b313-edf1c17aa0aa">
+
+### 커밋 메시지 규칙
+
+```text
+[Add]    : 엔티티, 서비스 등 새로운 파일, 새로운 기능 추가
+
+[Update] : 기존 기능 수정
+
+[Delete] : 파일 삭제, 기능 삭제
+
+[Fix]    : 에러 수정
+
+[Wow]    : 성공 (인줄 알았던 것)
+```
+
+---
+
+# 기술 스텍
+
+<p>
+FrontEnd<br>
+  <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=Axios&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Recoil-3578E5?style=flat&logo=Recoil&logoColor=white"/>
+  <img src="https://img.shields.io/badge/StyledComponents-DB7093?style=flat&logo=styledcomponents&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=CSS3&logoColor=white"/> <br />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=JavaScript&logoColor=white"/>
+  <br>
+  <br>
+BackEnd<br>
+  <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=springboot&logoColor=white"/>
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/>
+  <img src="https://img.shields.io/badge/JAVA-ED8B00?style=flat&logo=Openjdk&logoColor=white"/>
+  <br>
+  <br>
+배포<br>
+  <img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=flat&logo=amazonec2&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AmazonS3-569A31?style=flat&logo=amazonS3&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AmazonRDS-527FFF?style=flat&logo=amazonrds&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AmazonRoute53-8C4FFF?style=flat&logo=AmazonRoute53&logoColor=white"/>
+<br>
+<br>
+협업도구<br>
+  <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=Figma&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Notion-FFFFFF?style=flat&logo=notion&logoColor=black"/>
+<br>
+  </p>
+
+# 👥 나무꾼들
+
+> 🌊[@namukkun8](https://www.instagram.com/namukkun8/)🌊
+
+|                                                             **[이한결](https://github.com/leehan416)**                                                              |                                                                           **[박준현]()**                                                                            |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|                                                                             백엔드 개발자                                                                              |                                                                             백엔드 개발자                                                                              |
+| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/cc6f183e-61a4-4b51-a1f2-935d79d084db" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/6a6439ad-0d61-4d33-9545-433ef8a5000d" style="width: 135px; height: 140px; object-fit: cover;"> |
+
+<br />
+
+|                                                               **[이유현](https://github.com/LYH513)**                                                               |                                                              **[이온유](https://github.com/ROWELLI)**                                                               | [임성빈](https://github.com/seongkong)                                                                                                                              |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|                                                                             프론트 개발자                                                                              |                                                                             프론트 개발자                                                                              |                                                                       프론트 개발자                                                                                    |                                                                                                               |                                                                  |
+| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/7889fcba-546c-4c9a-8bcf-18c54a538dcc" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/f6ec4398-01b2-4afd-b2e2-606f7d579a3d" style="width: 135px; height: 140px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/ae7409c4-1fb8-4751-b07e-5deb90279e91" style="width: 135px; height: 140px; object-fit: cover;"> |
+
+<br />
+
+|                                                                             **한지훈**                                                                              |                                                                             **이가연**                                                                              | **김영채**                                                                                                                                                          |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|                                                                                PM                                                                                |                                                                               기획자                                                                                |                                                                      디자이너                                                                                        |
+| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/179bdaeb-5ae5-4b85-8642-efba51602f36" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/56012c4a-9467-44ba-8f44-7050580bcb47" style="width: 135px; height: 140px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/b2399c2d-4d5d-4c4f-bab8-ad5b2ee03879" style="width: 135px; height: 140px; object-fit: cover;"> |
+
+---
+[프로젝트 및 팀소개 페이지](https://boggy-ticket-cde.notion.site/Namukkun-f28e9c28f6cb4bb0be6368d6fb889096?pvs=4)
+
+[API 명세서](https://boggy-ticket-cde.notion.site/Namukkun-f28e9c28f6cb4bb0be6368d6fb889096?pvs=4)
+
+[서비스 홈페이지]()
+
+> **Pat It Forward** </br>
+>
+> <p align="center">
+>   <img width="100%", src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/335df531-4be4-4441-bec5-0a567a5b3af6">
+> <p/>
+
+----
