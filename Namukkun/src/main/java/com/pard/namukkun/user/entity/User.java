@@ -84,7 +84,7 @@ public class User {
     public void updateUserinfo(String nickName, Integer local, String image) {
         this.nickName = nickName;
         this.local = local;
-        this.profileImage = image;
+        if (image != null) this.profileImage = image;
     }
 
     public void updateUpPostList(List<Long> list) {

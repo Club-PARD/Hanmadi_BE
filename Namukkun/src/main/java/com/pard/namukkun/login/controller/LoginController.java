@@ -1,5 +1,6 @@
 package com.pard.namukkun.login.controller;
 
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.pard.namukkun.login.service.LoginService;
 import com.pard.namukkun.login.session.DTO.UserSessionData;
 import com.pard.namukkun.login.session.service.SessionService;
@@ -48,6 +49,8 @@ public class LoginController {
             @SessionAttribute(name = "userinfo", required = false) UserSessionData data,
             @RequestParam("local") Integer local
     ) {
+        if (data == null)
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         return loginService.signUpLocalSet(request, data, local);
     }
 
@@ -55,17 +58,15 @@ public class LoginController {
     @Operation(summary = "로그아웃", description = "로그아웃 합니다 (세션 삭제)")
     public ResponseEntity<?> logOut(
             HttpServletRequest request
-//            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
     ) {
-
         return loginService.logOut(request);
     }
 
     @PostMapping("/check")
     public ResponseEntity<?> logInCheck(
             @SessionAttribute(name = "userid", required = false) Long userId
-    ){
-        if (userId == null)  return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    ) {
+        if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         else return new ResponseEntity<>(HttpStatus.OK);
     }
 }

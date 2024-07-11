@@ -26,7 +26,6 @@ public class PostItController {
     @Operation(summary = "포스트잇 생성", description = "덧글의 내용을 포스트잇으로 생성합니다.")
     public ResponseEntity<?> selectCommentToPostIt(
             @SessionAttribute(name = "userid", required = false) Long userId,
-//            @RequestParam(value = "userid", required = false) Long userId, // debug
             @RequestBody PostItCreateDTO dto
     ) {
         // 권한 없음
@@ -88,7 +87,7 @@ public class PostItController {
     ) {
         // 권한 없음
         if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userId))
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         postItService.movePostIt(dto);
         return new ResponseEntity<>(HttpStatus.OK);

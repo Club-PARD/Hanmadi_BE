@@ -95,7 +95,7 @@ public class PostController {
     @Operation(summary = "모든 게시물을 읽습니다.")
     public ResponseEntity<?> findAllPost() {
         List<PostReadDTO> dtos = postService.readAllPosts();
-        return new ResponseEntity<>(dtos, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     @GetMapping("/read/update")
