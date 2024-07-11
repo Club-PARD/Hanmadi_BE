@@ -1,9 +1,7 @@
 <p align="center">
-<img width="80%" src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/83900d5e-74b8-4b19-90c4-3f9f28663607">
+  <img width="80%" src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/83900d5e-74b8-4b19-90c4-3f9f28663607">
 </p>
-<center>
-<h1>🪵 WE ARE GROOT 🪵</h1>
-</center> 
+<h1 align="center">🪵 WE ARE GROOT 🪵</h1> 
 
 <p align="center">
   <a>
@@ -13,9 +11,11 @@
     <img src="https://img.shields.io/badge/AWS-232F3E.svg?style=flat&logo=amazonwebservices&logoColor=white" alt="aws">
   </a>  
   <a>
-<img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/>
+    <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/>
   </a>
-
+  <a>
+<img src="https://img.shields.io/badge/AWS-%23FF9900?style=flat&logo=Amazon&logoColor=white"/>
+  </a>
 </p>
 
 ## Service Introduction
@@ -101,15 +101,18 @@ BackEnd<br>
   <br>
   <br>
 배포<br>
+  <img src="https://img.shields.io/badge/AWS-%23FF9900?style=flat&logo=Amazon&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AmazonRoute53-8C4FFF?style=flat&logo=AmazonRoute53&logoColor=white"/>
   <img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=flat&logo=amazonec2&logoColor=white"/>
   <img src="https://img.shields.io/badge/AmazonS3-569A31?style=flat&logo=amazonS3&logoColor=white"/>
   <img src="https://img.shields.io/badge/AmazonRDS-527FFF?style=flat&logo=amazonrds&logoColor=white"/>
-  <img src="https://img.shields.io/badge/AmazonRoute53-8C4FFF?style=flat&logo=AmazonRoute53&logoColor=white"/>
 <br>
 <br>
 협업도구<br>
   <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=Figma&logoColor=white"/>
   <img src="https://img.shields.io/badge/Notion-FFFFFF?style=flat&logo=notion&logoColor=black"/>
+  <img src="https://img.shields.io/badge/Discord-blue?style=flat&logo=discord&logoColor=white"/>
+  <img src="https://img.shields.io/badge/slack-FFFFFF?style=flat&logo=slack&logoColor=skyblue"/>
 <br>
   </p>
 
@@ -117,24 +120,24 @@ BackEnd<br>
 
 > 🌊[@namukkun8](https://www.instagram.com/namukkun8/)🌊
 
-|                                                             **[이한결](https://github.com/leehan416)**                                                              |                                                                           **[박준현]()**                                                                            |
+|                                                             **[이한결](https://github.com/leehan416)**                                                              |                                                          **[박준현](https://github.com/ParkJunhyun0304)**                                                           |
 |:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 |                                                                             백엔드 개발자                                                                              |                                                                             백엔드 개발자                                                                              |
-| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/cc6f183e-61a4-4b51-a1f2-935d79d084db" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/6a6439ad-0d61-4d33-9545-433ef8a5000d" style="width: 135px; height: 140px; object-fit: cover;"> |
+| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/59ddfbb0-a407-4f76-adf8-3f0997fd789e" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/a2ec2d01-09f9-4c6d-bb6d-8070835b9a5c" style="width: 135px; height: 140px; object-fit: cover;"> |
 
 <br />
 
-|                                                               **[이유현](https://github.com/LYH513)**                                                               |                                                              **[이온유](https://github.com/ROWELLI)**                                                               | [임성빈](https://github.com/seongkong)                                                                                                                              |
-|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|                                                                             프론트 개발자                                                                              |                                                                             프론트 개발자                                                                              |                                                                       프론트 개발자                                                                                    |                                                                                                               |                                                                  |
-| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/7889fcba-546c-4c9a-8bcf-18c54a538dcc" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/f6ec4398-01b2-4afd-b2e2-606f7d579a3d" style="width: 135px; height: 140px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/ae7409c4-1fb8-4751-b07e-5deb90279e91" style="width: 135px; height: 140px; object-fit: cover;"> |
+|                                                               **[이유현](https://github.com/LYH513)**                                                               |                                                              **[이온유](https://github.com/ROWELLI)**                                                               |                                                               [임성빈](https://github.com/seongkong)                                                                |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|                                                                             프론트 개발자                                                                              |                                                                             프론트 개발자                                                                              |                                                                             프론트 개발자                                                                              |                                                                                                               |                                                                  |
+| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/89fbed5c-b1e7-4227-89d5-9c3d29f590f1" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/e7ebb29f-1310-402e-bb13-b9ef208e8c81" style="width: 135px; height: 140px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/f1a39a0f-218a-42b8-8159-17298dfaab5c" style="width: 135px; height: 140px; object-fit: cover;"> |
 
 <br />
 
-|                                                                             **한지훈**                                                                              |                                                                             **이가연**                                                                              | **김영채**                                                                                                                                                          |
-|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|                                                                                PM                                                                                |                                                                               기획자                                                                                |                                                                      디자이너                                                                                        |
-| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/179bdaeb-5ae5-4b85-8642-efba51602f36" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/56012c4a-9467-44ba-8f44-7050580bcb47" style="width: 135px; height: 140px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/b2399c2d-4d5d-4c4f-bab8-ad5b2ee03879" style="width: 135px; height: 140px; object-fit: cover;"> |
+|                                                         **[한지훈](https://www.instagram.com/njr07_hjh/)**                                                          |                                                          **[이가연](https://www.instagram.com/gxyeon__/)**                                                          |                                                           **[김영채](https://www.instagram.com/147ck_/)**                                                           |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|                                                                                PM                                                                                |                                                                               기획자                                                                                |                                                                               디자이너                                                                               |
+| <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/75c4ee55-8fc6-4211-a320-4a3c7d4aaee1" style="width: 140px; height: 150px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/bfec72ee-49fc-429e-8f85-5d5fc08ce5dc" style="width: 135px; height: 140px; object-fit: cover;"> | <img src="https://github.com/Club-PARD/Hanmadi_BE/assets/35258105/0780b2e3-3868-4619-9173-89df2983bc39" style="width: 135px; height: 140px; object-fit: cover;"> |
 
 ---
 [프로젝트 및 팀소개 페이지](https://boggy-ticket-cde.notion.site/Namukkun-f28e9c28f6cb4bb0be6368d6fb889096?pvs=4)
