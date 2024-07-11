@@ -58,7 +58,6 @@ public class CommentService {
     // 덧글 작성자 아이디 가져오기
     public Long getCommentWriterId(Long commentId) {
         Long commentWriterId = commentRepo.findById(commentId).orElseThrow().getUser().getUserId();
-//        log.info(String.valueOf(commentWriterId));
         return commentWriterId;
     }
 

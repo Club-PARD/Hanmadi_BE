@@ -62,7 +62,7 @@ public class User {
     private List<Long> upCommentList = new ArrayList<>();
 
     // 이미지
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = false)
     private List<Img> imgs = new ArrayList<>();
 
     public static User toEntity(UserCreateDTO userCreateDTO) {
