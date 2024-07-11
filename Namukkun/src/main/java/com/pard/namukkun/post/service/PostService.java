@@ -115,12 +115,13 @@ public class PostService {
 //        log.info("solution: " + solutionText);
 //        log.info("benefit: " + benefitText);
 
-        List<Img> tempImg = new ArrayList<>(user.getImgs());
-        for(int i=0; i<tempImg.size(); i++) {
-            Img toBeDeletedImg = tempImg.get(i);
-            s3AttachmentService.deleteByUrl(toBeDeletedImg.getImgUrl());
-            user.deleteImg(toBeDeletedImg);
-            imgRepo.delete(toBeDeletedImg);
+        List<Img> imgsToRemove = user.getImgs();
+        for (int  j = 0; j < imgsToRemove.size(); j++) {
+            log.warn("S3에서 지워질 이미지임: {}", imgsToRemove.get(j).getImgUrl());
+            s3AttachmentService.deleteByUrl(imgsToRemove.get(j).getImgUrl());
+            Img img = imgsToRemove.get(j);
+            user.deleteImg(img);
+            imgRepo.delete(img);
         }
         userRepo.save(user);
         return Post.toEntity(postCreateDTO, proBackgroundText, solutionText, benefitText, user);
@@ -152,15 +153,22 @@ public class PostService {
                     String decodedPostImgName = URLDecoder.decode(postImgName, StandardCharsets.UTF_8);
                     // 프론트에서 받은 이미지 이름을 인코딩된 형태로 저장함
                     List<Img> imgs = user.getImgs();
-                    List<Img> tempImgs = new ArrayList<>(imgs);
+                    List<Img> imgsToRemove = new ArrayList<>();
 
-                    for (Img img : tempImgs) {
+                    for (Img img : imgs) {
+                        log.info("프로트에서 받은 이미지 이름임: {}", decodedPostImgName);
+                        log.info("유저에 있는 이미지 이름임: {}", img.getImageId());
                         String decodedImgUrl = URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8);
                         if (decodedImgUrl.contains(decodedPostImgName)) {
                             sb.append("[이미지: ").append(img.getImgUrl()).append("]");
-                            user.deleteImg(img);
-                            imgRepo.delete(img);
+                            imgsToRemove.add(img);
                         }
+                    }
+                    for (int  j = 0; j < imgsToRemove.size(); j++) {
+                        log.warn("지워질 이미지임: {}", imgsToRemove.get(j).getImgUrl());
+                        Img img = imgsToRemove.get(j);
+                        user.deleteImg(img);
+                        imgRepo.delete(img);
                     }
                     userRepo.save(user);
 
