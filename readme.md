@@ -147,7 +147,7 @@
 ---
 [프로젝트 및 팀소개 페이지](https://boggy-ticket-cde.notion.site/Namukkun-f28e9c28f6cb4bb0be6368d6fb889096?pvs=4)
 
-[API 명세서](https://boggy-ticket-cde.notion.site/Namukkun-f28e9c28f6cb4bb0be6368d6fb889096?pvs=4)
+[API 명세서](https://boggy-ticket-cde.notion.site/API-c041d5cf43e047828bddaff9fc4272f3?pvs=4)
 
 [서비스 홈페이지](https://)
 
