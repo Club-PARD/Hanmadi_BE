@@ -115,18 +115,14 @@ public class PostService {
 //        log.info("solution: " + solutionText);
 //        log.info("benefit: " + benefitText);
 
-        List<Img> imgsToRemove = user.getImgs();
-        for (int  j = 0; j < imgsToRemove.size(); j++) {
-            s3AttachmentService.deleteByUrl(imgsToRemove.get(j).getImgUrl());
-            Img img = imgsToRemove.get(j);
-            user.deleteImg(img);
-            imgRepo.delete(img);
-            userRepo.save(user);
+        List<Img> tempImg = new ArrayList<>(user.getImgs());
+        for(int i=0; i<tempImg.size(); i++) {
+            Img toBeDeletedImg = tempImg.get(i);
+            s3AttachmentService.deleteByUrl(toBeDeletedImg.getImgUrl());
+            user.deleteImg(toBeDeletedImg);
+            imgRepo.delete(toBeDeletedImg);
         }
-        user.getImgs().clear();
-        log.info("set image clear");
         userRepo.save(user);
-        log.info("save user clear");
         return Post.toEntity(postCreateDTO, proBackgroundText, solutionText, benefitText, user);
     }
 
@@ -156,47 +152,17 @@ public class PostService {
                     String decodedPostImgName = URLDecoder.decode(postImgName, StandardCharsets.UTF_8);
                     // 프론트에서 받은 이미지 이름을 인코딩된 형태로 저장함
                     List<Img> imgs = user.getImgs();
-                    List<Img> imgsToRemove = new ArrayList<>();
+                    List<Img> tempImgs = new ArrayList<>(imgs);
 
-                    for (Img img : imgs) {
+                    for (Img img : tempImgs) {
                         String decodedImgUrl = URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8);
                         if (decodedImgUrl.contains(decodedPostImgName)) {
                             sb.append("[이미지: ").append(img.getImgUrl()).append("]");
-                            imgsToRemove.add(img);
+                            user.deleteImg(img);
+                            imgRepo.delete(img);
                         }
                     }
-                    for (int  j = 0; j < imgsToRemove.size(); j++) {
-                        Img img = imgsToRemove.get(j);
-                        user.deleteImg(img);
-                        imgRepo.delete(img);
-                        userRepo.save(user);
-                    }
-
-
-                    // -------------- S3에 쓸모없는 이미지 저장된거 삭제 처리로직 (임시 폐기) --------//
-//                    try {
-//                        // 게시물에 첨부된 이미지가 Img에 있는지 확인
-//                        // 이미지가 첨부 안된 경우도 있으니 Optional로 생성하고 있는지 확인 후 매칭한다.
-//                        List<Img> imgs = user.getImgs(); // 이미지 Url이 담긴 리스트를 받아온다.
-//                        log.info("imgs length: " + imgs.size());
-//                        List<Img> tempimgs = new ArrayList<>(imgs);
-//                        log.info("postImgUrl: " + postImgUrl);
-//                        log.info("check img empty: {}", imgs.isEmpty());
-//                        for (Img img : imgs) {
-//                            log.info("img.getImgUrl: " + img.getImgUrl());
-//                            log.warn("img.getImgUrl : {}, postImgUrl : {}", URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8), postImgName);
-//                            if (URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8).contains(postImgName)) {
-//                                sb.append("[이미지: ").append(img.getImgUrl()).append("]"); // stringbuilder에 추가
-//                                log.info("이미지: {}", img.getImgUrl());
-//                            } tempimgs.remove(img);
-//                        }
-//                        user.setImgs(tempimgs);
-//                        userRepo.save(user);
-//                        //log.info("tempImgs length: {}", tempimgs.size());
-//                    } catch (Exception e) {
-//                        log.error("이미지 업로드 중 오류 발생: " + e.getMessage(), e);
-//                    }
-
+                    userRepo.save(user);
 
                 } else if (element.tagName().equals("br")) { // <br> 태그 처리
                     sb.append("\n");
@@ -333,7 +299,6 @@ public class PostService {
             post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
         }
 
-        user.setImgs(new ArrayList<>());
         userRepo.save(user);
         postRepo.save(post);
 
