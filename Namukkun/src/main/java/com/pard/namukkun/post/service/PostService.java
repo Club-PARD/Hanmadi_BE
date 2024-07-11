@@ -119,8 +119,9 @@ public class PostService {
 
         List<Img> imgsToRemove = user.getImgs();
         for (int  j = 0; j < imgsToRemove.size(); j++) {
-            log.warn("S3에서 지워질 이미지임: {}", imgsToRemove.get(j).getImgUrl());
-            s3AttachmentService.deleteByUrl(imgsToRemove.get(j).getImgUrl());
+            String decodedImgUrl = URLDecoder.decode(imgsToRemove.get(j).getImgUrl(),StandardCharsets.UTF_8);
+            log.warn("S3에서 지워질 이미지임: {}", decodedImgUrl);
+            s3AttachmentService.deleteByUrl(decodedImgUrl);
             Img img = imgsToRemove.get(j);
             user.deleteImg(img);
             imgRepo.delete(img);
@@ -165,6 +166,7 @@ public class PostService {
                         if (URLDecoder.decode(decodedImgUrl, StandardCharsets.UTF_8).contains(decodedPostImgName)) {
                             sb.append("[이미지: ").append(img.getImgUrl()).append("]");
                             imgsToRemove.add(img);
+                            break;
                         }
                     }
                     for (int  j = 0; j < imgsToRemove.size(); j++) {
