@@ -14,9 +14,6 @@
   <a>
     <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/>
   </a>
-  <a>
-<img src="https://img.shields.io/badge/AWS-%23FF9900?style=flat&logo=Amazon&logoColor=white"/>
-  </a>
 </p>
 
 
@@ -111,7 +108,7 @@ BackEnd<br>
   <br>
   <br>
 배포<br>
-  <img src="https://img.shields.io/badge/AWS-%23FF9900?style=flat&logo=Amazon&logoColor=white"/>
+<img src="https://img.shields.io/badge/AWS-232F3E.svg?style=flat&logo=amazonwebservices&logoColor=white" alt="aws">
   <img src="https://img.shields.io/badge/AmazonRoute53-8C4FFF?style=flat&logo=AmazonRoute53&logoColor=white"/>
   <img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=flat&logo=amazonec2&logoColor=white"/>
   <img src="https://img.shields.io/badge/AmazonS3-569A31?style=flat&logo=amazonS3&logoColor=white"/>
