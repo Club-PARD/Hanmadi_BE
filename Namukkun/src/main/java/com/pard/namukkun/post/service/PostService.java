@@ -115,6 +115,14 @@ public class PostService {
 //        log.info("solution: " + solutionText);
 //        log.info("benefit: " + benefitText);
 
+        List<Img> imgsToRemove = user.getImgs();
+        for (int  j = 0; j < imgsToRemove.size(); j++) {
+            s3AttachmentService.deleteByUrl(imgsToRemove.get(j).getImgUrl());
+            Img img = imgsToRemove.get(j);
+            user.deleteImg(img);
+            imgRepo.delete(img);
+            userRepo.save(user);
+        }
         user.getImgs().clear();
         log.info("set image clear");
         userRepo.save(user);
@@ -157,13 +165,6 @@ public class PostService {
                             imgsToRemove.add(img);
                         }
                     }
-//
-//                    for (Img img : imgsToRemove) {
-//                        user.deleteImg(img);
-//                        imgRepo.delete(img);
-//                        userRepo.save(user);
-//                    }
-//                    for (Img img : imgsToRemove) {
                     for (int  j = 0; j < imgsToRemove.size(); j++) {
                         Img img = imgsToRemove.get(j);
                         user.deleteImg(img);
