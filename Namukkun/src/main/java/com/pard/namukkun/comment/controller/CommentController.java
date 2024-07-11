@@ -32,6 +32,8 @@ public class CommentController {
             @RequestBody() CommentCreateDTO dto,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        log.info("[POST:/post/comment] userid = {}", userId);
+
         // 글이 존재하지 않음
         if (postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -52,10 +54,12 @@ public class CommentController {
     public ResponseEntity<?> readAllComment(
             @RequestParam("postid") Long postId
     ) {
+        log.info("[Get:/post/comment] postId = {}", postId);
+
         if (postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         try {
-            List<CommentReadDTO> list =  commentService.readALlComment(postId);
+            List<CommentReadDTO> list = commentService.readALlComment(postId);
             return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (Exception Ignore) {
             return null;
@@ -81,6 +85,7 @@ public class CommentController {
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam(value = "commentid") Long commentId
     ) {
+        log.info("[Delete:/post/comment] uesrId = {} commentId = {}", userId, commentId);
         Long commentWriterId = commentService.getCommentWriterId(commentId);
 
         // 권한 확인
@@ -98,8 +103,9 @@ public class CommentController {
     public ResponseEntity<?> upButton(
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("commentid") Long commentId,
-            @RequestParam("up") Boolean up
-    ) {
+            @RequestParam("up") Boolean up) {
+        log.info("[Patch:/post/comment/up] userId = {}, commentId = {}", userId, commentId);
+
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         commentService.upButton(commentId, userId, up);
@@ -115,6 +121,9 @@ public class CommentController {
             @RequestParam("commentid") Long commentId,
             @RequestParam("take") Boolean take
     ) {
+        log.info("[Patch:/post/comment/take] userId = {}, postId = {}, commentId = {}, take = {}",
+                userId, postId, commentId, take);
+
         // 포스트가 존재하지 않음
         if (postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -132,6 +141,7 @@ public class CommentController {
     public ResponseEntity<?> myCommentList(
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        log.info("[Get:/post/comment/list/mycomment] userId = {}", userId);
         // 권한 없음
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
