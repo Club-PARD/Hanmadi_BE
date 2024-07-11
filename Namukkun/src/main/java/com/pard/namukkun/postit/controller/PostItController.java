@@ -30,6 +30,8 @@ public class PostItController {
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestBody PostItCreateDTO dto
     ) {
+        log.info("[Post:/post/postit/create] userId={}, commentId={}", userId, dto.getCommentId());
+
         // 포스터가 존재하지 않음
         if (!postService.checkValid(dto.getPostId())) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -55,6 +57,7 @@ public class PostItController {
     public ResponseEntity<?> readPostIts(
             @RequestParam("postid") Long postId
     ) {
+        log.info("[Get:/post/postit/read] postid={}", postId);
         // 권한 없이 가능
 
         // post가 없음
@@ -72,7 +75,7 @@ public class PostItController {
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("postitid") Long postItId,
             @RequestParam("section") String section) {
-
+        log.info("[Patch:/post/postit/sectionmove] userid={}, postItId={}, section={}", userId, postItId, section);
         // 로그인 안됨
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
@@ -95,6 +98,7 @@ public class PostItController {
             @RequestParam("userid") Long userId,
             @RequestBody() PostItMoveDTO dto
     ) {
+        log.info("[Patch:/post/postit/move] userid={}, postItId={}", userId, dto.getPostItId());
         // 페이지가 존재하지 않음
         if (postService.checkValid(dto.getPostId()))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -114,7 +118,7 @@ public class PostItController {
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("postitid") Long postItId
     ) {
-
+        log.info("[Delete:/post/postit/delete] userid={} postitid={}", userId, postItId);
         // 권한 없음
         if (!Objects.equals(userId, postItService.getWriterIdByPostItId(postItId)))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
