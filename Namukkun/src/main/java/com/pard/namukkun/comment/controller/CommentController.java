@@ -114,4 +114,16 @@ public class CommentController {
         commentService.takeComment(commentId, take);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("list/mycomment")
+    @Operation(summary = "유저의 댓글 리스트 받기", description = "리스트 형식으로 유저가 작성한 댓글의 아이디 리스트를 전송합니다")
+    public ResponseEntity<?> myCommentList(
+            @SessionAttribute(name = "userid", required = false) Long userId
+    ) {
+        // 권한 없음
+        if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        List<Long> commentIdList = commentService.getUserCommentList(userId);
+        return new ResponseEntity<>(commentIdList, HttpStatus.OK);
+    }
 }

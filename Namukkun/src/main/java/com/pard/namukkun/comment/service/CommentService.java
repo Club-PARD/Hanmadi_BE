@@ -122,4 +122,13 @@ public class CommentService {
 
         return new UserUpListDTO(list);
     }
+
+    public List<Long> getUserCommentList(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow();
+
+        if (user.getComments() == null) return null;
+        List<Long> list = user.getComments()
+                .stream().map(Comment::getId).toList();
+        return list;
+    }
 }
