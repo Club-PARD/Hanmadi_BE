@@ -62,21 +62,23 @@ public class PostService {
 
     // PostCreateDTO 받아서 postDTO 생성
     public ResponseEntity<?> createPost(PostCreateDTO postCreateDTO) {
+        log.error("---------------------------------게시물 생성 시작------------------------------");
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
                 -> new RuntimeException("Error find user -> " + postCreateDTO.getUserId()));
 //        try {
-            Post post = makePost(postCreateDTO, user);
+        Post post = makePost(postCreateDTO, user);
 
-            log.info("post created");
+        log.info("post created");
 
-            List<String> fileNames = postCreateDTO.getFileNames();
-            post.setInitial(true, Data.getDeadLine(post.getPostTime()));
+        List<String> fileNames = postCreateDTO.getFileNames();
+        post.setInitial(true, Data.getDeadLine(post.getPostTime()));
 
-            for (String fileName : fileNames)
+        for (String fileName : fileNames)
                 post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
-            postRepo.save(post);
-            return ResponseEntity.ok(post.getPostId());
+        postRepo.save(post);
+        log.error("---------------------------------게시물 생성 종료------------------------------");
+        return ResponseEntity.ok(post.getPostId());
 //        } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
 //        }
