@@ -9,10 +9,10 @@
     <img src="https://img.shields.io/badge/springboot-6DB33F.svg?style=flat&logo=springboot&logoColor=white" alt="springboot">
   </a>
   <a>
-    <img src="https://img.shields.io/badge/AWS-232F3E.svg?style=flat&logo=amazonwebservices&logoColor=white" alt="aws">
+    <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/>
   </a>  
   <a>
-    <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/>
+    <img src="https://img.shields.io/badge/AWS-232F3E.svg?style=flat&logo=amazonwebservices&logoColor=white" alt="aws">
   </a>
 </p>
 
@@ -92,38 +92,43 @@
 # 기술 스텍
 
 <p>
-FrontEnd<br>
+<h3>FrontEnd</h3>
   <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=white"/>
   <img src="https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=Axios&logoColor=white"/>
   <img src="https://img.shields.io/badge/Recoil-3578E5?style=flat&logo=Recoil&logoColor=white"/>
   <img src="https://img.shields.io/badge/StyledComponents-DB7093?style=flat&logo=styledcomponents&logoColor=white"/> 
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=CSS3&logoColor=white"/> <br />
+  <br>
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=JavaScript&logoColor=white"/>
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=CSS3&logoColor=white"/>
   <br>
   <br>
-BackEnd<br>
+<h3>BackEnd</h3>
   <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=springboot&logoColor=white"/>
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"/>
   <img src="https://img.shields.io/badge/JAVA-ED8B00?style=flat&logo=Openjdk&logoColor=white"/>
   <br>
   <br>
-배포<br>
-<img src="https://img.shields.io/badge/AWS-232F3E.svg?style=flat&logo=amazonwebservices&logoColor=white" alt="aws">
+<h3>사이트 배포</h3>
+  <img src="https://img.shields.io/badge/AWS-232F3E.svg?style=flat&logo=amazonwebservices&logoColor=white" alt="aws">
   <img src="https://img.shields.io/badge/AmazonRoute53-8C4FFF?style=flat&logo=AmazonRoute53&logoColor=white"/>
   <img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=flat&logo=amazonec2&logoColor=white"/>
+<br>
   <img src="https://img.shields.io/badge/AmazonS3-569A31?style=flat&logo=amazonS3&logoColor=white"/>
   <img src="https://img.shields.io/badge/AmazonRDS-527FFF?style=flat&logo=amazonrds&logoColor=white"/>
 <br>
 <br>
-협업도구<br>
+<h3>협업도구</h3>
   <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=Figma&logoColor=white"/>
   <img src="https://img.shields.io/badge/Notion-FFFFFF?style=flat&logo=notion&logoColor=black"/>
   <img src="https://img.shields.io/badge/Discord-blue?style=flat&logo=discord&logoColor=white"/>
   <img src="https://img.shields.io/badge/slack-FFFFFF?style=flat&logo=slack&logoColor=skyblue"/>
 <br>
+  <img src="https://img.shields.io/badge/git-black?style=flat&logo=git&logoColor=red"/>
+  <img src="https://img.shields.io/badge/github-black?style=flat&logo=github&logoColor=white"/>
+<br>
   </p>
 
-# 👥 나무꾼들
+# 🌲 나무꾼들
 
 > 🌊[@namukkun8](https://www.instagram.com/namukkun8/)🌊
 
@@ -151,7 +156,7 @@ BackEnd<br>
 
 [API 명세서](https://boggy-ticket-cde.notion.site/Namukkun-f28e9c28f6cb4bb0be6368d6fb889096?pvs=4)
 
-[서비스 홈페이지]()
+[서비스 홈페이지](https://)
 
 > **Pat It Forward** </br>
 >
