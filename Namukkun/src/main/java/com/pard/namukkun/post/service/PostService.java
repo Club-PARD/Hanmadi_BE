@@ -154,16 +154,18 @@ public class PostService {
                         String decodedImgUrl = URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8);
                         if (decodedImgUrl.contains(decodedPostImgName)) {
                             sb.append("[이미지: ").append(img.getImgUrl()).append("]");
-                            //imgsToRemove.add(img);
+                            imgsToRemove.add(img);
                         }
                     }
-
+//
 //                    for (Img img : imgsToRemove) {
 //                        user.deleteImg(img);
 //                        imgRepo.delete(img);
 //                        userRepo.save(user);
 //                    }
-                    for (Img img : imgs) {
+//                    for (Img img : imgsToRemove) {
+                    for (int  j = 0; j < imgsToRemove.size(); j++) {
+                        Img img = imgsToRemove.get(j);
                         user.deleteImg(img);
                         imgRepo.delete(img);
                         userRepo.save(user);
