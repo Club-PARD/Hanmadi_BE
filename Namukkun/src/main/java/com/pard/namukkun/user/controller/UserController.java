@@ -29,6 +29,7 @@ public class UserController {
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
         if (userId == null) return null;
+
         return userService.getUserLoginInfoDTO(userId);
     }
 

@@ -47,11 +47,13 @@ public class PostItController {
     // 포스트잇 읽기
     @GetMapping("/read")
     @Operation(summary = "포스트잇 읽기", description = "포스트에 있는 모든 포스트잇의 내용을 읽어옵니다")
-    public List<PostItReadDTO> readPostIts(
+    public ResponseEntity<?> readPostIts(
             @RequestParam("postid") Long postId
     ) {
         // 권한 없이 가능
-        return postItService.readAllByPostId(postId);
+
+        List<PostItReadDTO> dtos = postItService.readAllByPostId(postId);
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     // 포스트잇 좌우 이동

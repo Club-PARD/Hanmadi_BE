@@ -93,8 +93,9 @@ public class PostController {
 
     @GetMapping("/read/all")
     @Operation(summary = "모든 게시물을 읽습니다.")
-    public List<PostReadDTO> findAllPost() {
-        return postService.readAllPosts();
+    public ResponseEntity<?> findAllPost() {
+        List<PostReadDTO> dtos = postService.readAllPosts();
+        return new ResponseEntity<>(dtos, HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("/read/update")
@@ -113,28 +114,35 @@ public class PostController {
 
     @GetMapping("/read")
     @Operation(summary = "게시물 id를 통해서 게시물을 읽습니다.")
-    public PostReadDTO findById(@RequestParam("id") Long id) {
-        return postService.findPostById(id);
+    public ResponseEntity<?> findById(@RequestParam("id") Long id) {
+        PostReadDTO dto = postService.findPostById(id);
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @GetMapping("/read/by-local/by-up-count")
     @Operation(summary = "선택된 지역 게시물중 추천순으로 나열합니다.")
-    public List<PostReadDTO> findByUpCount(Integer localPageId) {
+    public ResponseEntity<?> findByUpCount(Integer localPageId) {
         List<PostReadDTO> postReadDTOS = postService.findByLocal(localPageId);
-        return postService.sortByUpCountPost(postReadDTOS);
+
+        List<PostReadDTO> dtos = postService.sortByUpCountPost(postReadDTOS);
+        return new ResponseEntity(dtos, HttpStatus.OK);
     }
 
     @GetMapping("/read/by-local")
     @Operation(summary = "선택된 지역 게시물중 최신순으로 나열합니다.")
-    public List<PostReadDTO> findByRecent(Integer localPageId) {
+    public ResponseEntity<?> findByRecent(Integer localPageId) {
         List<PostReadDTO> postReadDTOS = postService.findByLocal(localPageId);
-        return postService.sortByRecentPost(postReadDTOS);
+        List<PostReadDTO> dtos = postService.sortByRecentPost(postReadDTOS);
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     @GetMapping("/read/by-Upcount")
     @Operation(summary = "게시물을 추천 높은순으로 정렬해 나열합니다.")
-    public List<PostReadDTO> findByUpCount() {
-        return postService.findByUpCountPost();
+    public ResponseEntity<?> findByUpCount() {
+        List<PostReadDTO> dtos = postService.findByUpCountPost();
+
+        return new ResponseEntity<?>(dtos, HttpStatus.OK);
     }
 
     @PatchMapping("/update")
