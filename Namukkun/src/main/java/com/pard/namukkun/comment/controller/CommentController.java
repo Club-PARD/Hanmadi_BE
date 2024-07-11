@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -31,6 +32,10 @@ public class CommentController {
             @RequestBody() CommentCreateDTO dto,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        // 글이 존재하지 않음
+        if (postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한 확인
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
@@ -44,11 +49,14 @@ public class CommentController {
     // 덧글 읽기 전체 허용
     @GetMapping("")
     @Operation(summary = "덧글 읽기", description = "포스트에 있는 덧글을 읽어옵니다.")
-    public List<CommentReadDTO> readAllComment(
+    public ResponseEntity<?> readAllComment(
             @RequestParam("postid") Long postId
     ) {
+        if (postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         try {
-            return commentService.readALlComment(postId);
+            List<CommentReadDTO> list =  commentService.readALlComment(postId);
+            return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (Exception Ignore) {
             return null;
         }
@@ -107,6 +115,10 @@ public class CommentController {
             @RequestParam("commentid") Long commentId,
             @RequestParam("take") Boolean take
     ) {
+        // 포스트가 존재하지 않음
+        if (postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한 확인
         if (!postService.getWriterUserId(postId).equals(userId))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

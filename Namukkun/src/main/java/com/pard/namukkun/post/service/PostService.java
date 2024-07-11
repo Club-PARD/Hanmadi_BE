@@ -60,6 +60,11 @@ public class PostService {
     private Map<String, Path> tempStorage = new HashMap<>();
 
 
+    public boolean checkValid(Long postId) {
+        return postRepo.existsById(postId);
+    }
+
+
     // PostCreateDTO 받아서 postDTO 생성
     public ResponseEntity<?> createPost(PostCreateDTO postCreateDTO) {
         log.error("---------------------------------게시물 생성 시작------------------------------");
@@ -74,7 +79,7 @@ public class PostService {
         post.setInitial(true, Data.getDeadLine(post.getPostTime()));
 
         for (String fileName : fileNames)
-                post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
+            post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
 
         postRepo.save(post);
         log.error("---------------------------------게시물 생성 종료------------------------------");
@@ -100,7 +105,6 @@ public class PostService {
         String benefitText = parseHtml(benefitHtml, user);
 
 
-
         // -------------- S3에 쓸모없는 이미지 저장된거 삭제 처리로직 (임시 폐기) --------//
         // 리스트에 남은 이미지들은 S3에서 삭제한다.
 //        List<Img> imgs = user.getImgs();
@@ -118,8 +122,8 @@ public class PostService {
 //        log.info("benefit: " + benefitText);
 
         List<Img> imgsToRemove = user.getImgs();
-        for (int  j = 0; j < imgsToRemove.size(); j++) {
-            String decodedImgUrl = URLDecoder.decode(imgsToRemove.get(j).getImgUrl(),StandardCharsets.UTF_8);
+        for (int j = 0; j < imgsToRemove.size(); j++) {
+            String decodedImgUrl = URLDecoder.decode(imgsToRemove.get(j).getImgUrl(), StandardCharsets.UTF_8);
             log.warn("S3에서 지워질 이미지임: {}", decodedImgUrl);
             s3AttachmentService.deleteByUrl(decodedImgUrl);
             Img img = imgsToRemove.get(j);
@@ -169,7 +173,7 @@ public class PostService {
                             break;
                         }
                     }
-                    for (int  j = 0; j < imgsToRemove.size(); j++) {
+                    for (int j = 0; j < imgsToRemove.size(); j++) {
                         log.warn("지워질 이미지임: {}", imgsToRemove.get(j).getImgUrl());
                         Img img = imgsToRemove.get(j);
                         user.deleteImg(img);

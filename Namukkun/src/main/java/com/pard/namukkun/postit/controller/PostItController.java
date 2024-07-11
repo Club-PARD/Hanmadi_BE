@@ -1,5 +1,6 @@
 package com.pard.namukkun.postit.controller;
 
+import com.pard.namukkun.post.service.PostService;
 import com.pard.namukkun.postit.dto.*;
 import com.pard.namukkun.postit.service.PostItService;
 import com.pard.namukkun.user.service.UserService;
@@ -20,6 +21,7 @@ import java.util.Objects;
 public class PostItController {
     private final PostItService postItService;
     private final UserService userService;
+    private final PostService postService;
 
     // 덧글 선택하여 포스트잇으로 만들기
     @PostMapping("/create")
@@ -28,6 +30,10 @@ public class PostItController {
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestBody PostItCreateDTO dto
     ) {
+        // 포스터가 존재하지 않음
+        if (!postService.checkValid(dto.getPostId())) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         // 권한 없음
         if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userId))
             return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
@@ -51,6 +57,10 @@ public class PostItController {
     ) {
         // 권한 없이 가능
 
+        // post가 없음
+        if (!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         List<PostItReadDTO> dtos = postItService.readAllByPostId(postId);
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
@@ -59,10 +69,10 @@ public class PostItController {
     @PatchMapping("/sectionmove")
     @Operation(summary = "포스트잇 섹션 이동", description = "덧글의 섹션을 이동합니다." + "left, right 아니면 값을 받지 않습니다")
     public ResponseEntity<?> moveSectionPostIt(
-//            @RequestParam("userid") Long userId, // debug
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("postitid") Long postItId,
             @RequestParam("section") String section) {
+
         // 로그인 안됨
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
@@ -85,6 +95,10 @@ public class PostItController {
             @RequestParam("userid") Long userId,
             @RequestBody() PostItMoveDTO dto
     ) {
+        // 페이지가 존재하지 않음
+        if (postService.checkValid(dto.getPostId()))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한 없음
         if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userId))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -98,7 +112,6 @@ public class PostItController {
     @Operation(summary = "포스트잇 제거", description = "포스트잇을 지웁니다")
     public ResponseEntity<?> deletePostIt(
             @SessionAttribute(name = "userid", required = false) Long userId,
-//            @RequestParam("userid") Long userId,
             @RequestParam("postitid") Long postItId
     ) {
 
