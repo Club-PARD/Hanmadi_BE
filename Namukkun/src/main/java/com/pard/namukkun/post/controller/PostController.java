@@ -29,6 +29,7 @@ public class PostController {
             @RequestBody() PostCreateDTO postCreateDTO,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        log.info("[Post:/post/upload/post] userid={}", userId);
         // 권한 확인 - 로그인 되어있으면 가능함
         if (userId == null || !userId.equals(postCreateDTO.getUserId()))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -43,6 +44,8 @@ public class PostController {
             @RequestBody() PostCreateDTO postCreateDTO,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        log.info("[Post:/post/upload/temppost] userid={}", userId);
+
         // 권한 확인 - 로그인 되어있으면 가능함
         if (userId == null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -56,6 +59,7 @@ public class PostController {
             @SessionAttribute(name = "userid", required = false) Long userid,
             @RequestPart("files") List<MultipartFile> files
     ) {
+        log.info("[Post:/post/upload/file] userid={}", userid);
         //권한 확인 - 로그인 되어있으면 가능함
         if (userid == null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -70,6 +74,7 @@ public class PostController {
             @RequestParam("img") MultipartFile img,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        log.info("[Post:/post/upload/img] userid={}", userId);
         // 권한확인 - 로그인 되어있으면 가능함
         if (userId == null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -84,6 +89,7 @@ public class PostController {
             @RequestParam("fileName") String fileName,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        log.info("[Post:/post/ddelete/file] userid={}", userId);
         // 권한확인 - 로그인 되어있으면 가능함
         if (userId == null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -101,9 +107,10 @@ public class PostController {
     @GetMapping("/read/update")
     @Operation(summary = "수정할 게시물을 id를 통해서 읽습니다.")
     public ResponseEntity<?> findPostById(
+
             @RequestParam("id") Long id,  // 게시물 어이디
-            @SessionAttribute(name = "userid", required = false) Long userId
-    ) {
+            @SessionAttribute(name = "userid", required = false) Long userId) {
+        log.info("[Get:/post/read/update] postId={}, userId={}", id, userId);
         // 권한확인 - 글 작성자만 가능함
         if (userId == null || !userId.equals(postService.getWriterUserId(id)))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -151,9 +158,9 @@ public class PostController {
     public ResponseEntity<?> updatePost(
             @RequestBody PostUpdateDTO postUpdateDTO,
             @RequestParam("postId") Long postId,
-            @SessionAttribute(name = "userid", required = false) Long userId
-    ) {
-        if(!postService.checkValid(postId))
+            @SessionAttribute(name = "userid", required = false) Long userId) {
+        log.info("[Patch:/post/update] userid={}, postid={}", userId, postId);
+        if (!postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         // 권한확인 - 글 작성자만 가능
         if (userId == null || !userId.equals(postService.getWriterUserId(postId)))
@@ -166,10 +173,9 @@ public class PostController {
     @Operation(summary = "게시물을 삭제합니다.")
     public ResponseEntity<?> deletePost(
             @RequestParam("postId") Long postId,
-            @SessionAttribute(name = "userid", required = false) Long userId
-    ) {
-
-        if(!postService.checkValid(postId))
+            @SessionAttribute(name = "userid", required = false) Long userId) {
+        log.info("[Delete:/post/delete] userId={}, postId={]", userId, postId);
+        if (!postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         // 권한확인 - 글 작성자만 가능
@@ -184,10 +190,9 @@ public class PostController {
     @Operation(summary = "게시물 채택", description = "postid : 채택한 게시물 id, state 추천 상태 true : 채택 / 미채택이면 그냥 없어짐")
     public ResponseEntity<?> increaeUpCount(
             @RequestParam("postId") Long postId,
-            @SessionAttribute(name = "userid", required = false) Long userId
-    ) {
-
-        if(!postService.checkValid(postId))
+            @SessionAttribute(name = "userid", required = false) Long userId) {
+        log.info("[Post:/post/increase/UpCount] userId={}, postId={}", userId, postId);
+        if (!postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         // 권한확인 - 로그인 되어있으면 가능
@@ -201,10 +206,9 @@ public class PostController {
     @Operation(summary = "게시물 채택 취소", description = "postid : 채택한 게시물 id, state 추천 상태 true : 채택 / 미채택이면 그냥 없어짐")
     public ResponseEntity<?> decreaseUpCount(
             @RequestParam("postId") Long postId,
-            @SessionAttribute(name = "userid", required = false) Long userId
-    ) {
-
-        if(!postService.checkValid(postId))
+            @SessionAttribute(name = "userid", required = false) Long userId) {
+        log.info("[Post:/post/decrease/UpCount] userId={}, postId={}", userId, postId);
+        if (!postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         // 권한확인 - 로그인 되어있으면 가능
