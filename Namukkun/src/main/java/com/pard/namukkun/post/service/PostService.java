@@ -162,7 +162,7 @@ public class PostService {
                         log.info("유저에 있는 이미지 주소임: {}", img.getImgUrl());
                         String decodedImgUrl = URLDecoder.decode(img.getImgUrl(), StandardCharsets.UTF_8);
                         log.info("유저에 있는 이미지 주소 디코딩한거임: {}", URLDecoder.decode(decodedImgUrl, StandardCharsets.UTF_8));
-                        if (decodedImgUrl.contains(decodedPostImgName)) {
+                        if (URLDecoder.decode(decodedImgUrl, StandardCharsets.UTF_8).contains(decodedPostImgName)) {
                             sb.append("[이미지: ").append(img.getImgUrl()).append("]");
                             imgsToRemove.add(img);
                         }
