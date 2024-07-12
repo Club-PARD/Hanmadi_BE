@@ -267,6 +267,18 @@ public class PostService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    public ResponseEntity<?> uploadTempPost(PostCreateDTO postCreateDTO, Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(()
+                -> new RuntimeException("Error find user -> " + userId));
+
+        Post exsitedPost = postRepo.findById(user.getTempPost().getPostId()).orElseThrow(()
+        -> new RuntimeException("Error find temp post -> " + user.getTempPost().getPostId()));
+        // 원래 있던 임시 게시물 삭제
+        user.setTempPost(null);
+        postRepo.delete(exsitedPost);
+        return createPost(postCreateDTO);
+    }
+
     // 모든 게시물 read
     public List<PostReadDTO> readAllPosts() {
         return postRepo.findAll()

@@ -53,6 +53,20 @@ public class PostController {
         return postService.saveTempPost(postCreateDTO);
     }
 
+    @PostMapping("/save/temppost")
+    @Operation(summary = "임시저장 게시물 게시")
+    public ResponseEntity<?> saveTempPost(@RequestBody() PostCreateDTO postCreateDTO,
+                                          @SessionAttribute(name = "userid", required = false) Long userId) {
+        log.info("[Post:/post/save/temppost] userid={}", postCreateDTO.getUserId());
+        // 권한 확인 - 로그인 되어있으면 가능함
+        if (userId == null || !userId.equals(postCreateDTO.getUserId()))
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        return postService.uploadTempPost(postCreateDTO,userId);
+    }
+
+
+
     @PostMapping(value = "/upload/file", consumes = {"multipart/form-data"})
     @Operation(summary = "첨부파일 첨부", description = "첨부파일을 첨부합니다.")
     public ResponseEntity<?> uploadFile(
