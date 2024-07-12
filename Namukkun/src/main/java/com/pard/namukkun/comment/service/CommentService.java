@@ -6,6 +6,8 @@ import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.comment.repo.CommentRepo;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
+import com.pard.namukkun.postit.entity.PostIt;
+import com.pard.namukkun.postit.repo.PostItRepo;
 import com.pard.namukkun.user.dto.UserUpListDTO;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
@@ -24,6 +26,7 @@ public class CommentService {
     private final PostRepo postRepo;
     private final CommentRepo commentRepo;
     private final UserRepo userRepo;
+    private final PostItRepo postItRepo;
 
     // 덧글 생성
     public Long createComment(Long postId, Long userId, CommentCreateDTO dto) {
@@ -52,6 +55,18 @@ public class CommentService {
 
     // 덧글 삭제
     public void deleteComment(Long commentId) {
+        Comment comment = commentRepo.findById(commentId).orElseThrow();
+        PostIt postIt = comment.getPostIt();
+
+        // 연관성 제거
+        postIt.setComment(null);
+        comment.setPostIt(null);
+
+        // 연관성 제거 저장
+        commentRepo.save(comment);
+        postItRepo.save(postIt);
+
+        // 댓글 제거
         commentRepo.deleteById(commentId);
     }
 

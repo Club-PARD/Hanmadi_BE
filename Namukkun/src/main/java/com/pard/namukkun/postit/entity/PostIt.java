@@ -80,5 +80,8 @@ public class PostIt {
         this.section = section;
     }
 
+    public void setComment(Comment comment){
+        this.comment = comment;
+    }
 
 }
