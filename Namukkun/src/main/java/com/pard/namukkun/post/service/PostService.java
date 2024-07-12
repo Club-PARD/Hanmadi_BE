@@ -250,7 +250,7 @@ public class PostService {
         Post exsitedPost = postRepo.findById(user.getTempPost().getPostId()).orElseThrow(()
         -> new RuntimeException("Error find temp post"));
         // 원래 있던 임시 게시물 삭제
-//        user.setTempPost(null);
+        user.setTempPost(null);
 //        postRepo.delete(exsitedPost);
         return createPost(postCreateDTO);
     }
