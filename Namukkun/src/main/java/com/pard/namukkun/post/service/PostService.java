@@ -157,7 +157,7 @@ public class PostService {
                     userRepo.save(user);
 
                 } else if (element.tagName().equals("br")) { // <br> 태그 처리
-                    sb.append("\n");
+                    sb.append("");
                 } else if (element.tagName().equals("p")) { // <p> 태그 처리
                     if (i > 0 && nodes.get(i - 1) instanceof Element && ((Element) nodes.get(i - 1)).tagName().equals("/p")) {
                         sb.append("\n"); // 이전 노드가 </p> 태그인 경우 개행 추가
