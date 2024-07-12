@@ -271,6 +271,14 @@ public class PostService {
             log.warn("post update error: " + e.getMessage());
         }
 
+        List<Img> imgsToRemove = user.getImgs();
+        for (int j = 0; j < imgsToRemove.size(); j++) {
+            Img img = imgsToRemove.get(j);
+            user.deleteImg(img);
+            imgRepo.delete(img);
+        }
+        userRepo.save(user);
+
         // S3에 있는 첨부파일 삭제 및 저장은 글 쓰는 단계에서 이루어지기 때문에 지금은
         // post에 저장된 file이름을 통해서 s3attachmentDTO에 저장해준다.
         List<String> fileNames = postCreateDTO.getFileNames();
@@ -335,6 +343,13 @@ public class PostService {
             post.getS3Attachments().clear(); // 기존에 있던 url제거
         for (String fileName : fileNames) {
             post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
+        }
+
+        List<Img> imgsToRemove = user.getImgs();
+        for (int j = 0; j < imgsToRemove.size(); j++) {
+            Img img = imgsToRemove.get(j);
+            user.deleteImg(img);
+            imgRepo.delete(img);
         }
 
         userRepo.save(user);
