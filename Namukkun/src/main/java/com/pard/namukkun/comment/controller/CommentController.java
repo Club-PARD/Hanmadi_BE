@@ -35,7 +35,7 @@ public class CommentController {
         log.info("[POST:/post/comment] userid = {}", userId);
 
         // 글이 존재하지 않음
-        if (postService.checkValid(postId))
+        if (!postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         // 권한 확인
@@ -54,9 +54,9 @@ public class CommentController {
     public ResponseEntity<?> readAllComment(
             @RequestParam("postid") Long postId
     ) {
-        log.info("[Get:/post/comment] postId = {}", postId);
+//        log.info("[Get:/post/comment] postId = {}", postId);
 
-        if (postService.checkValid(postId))
+        if (!postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         try {
             List<CommentReadDTO> list = commentService.readALlComment(postId);
@@ -125,7 +125,7 @@ public class CommentController {
                 userId, postId, commentId, take);
 
         // 포스트가 존재하지 않음
-        if (postService.checkValid(postId))
+        if (!postService.checkValid(postId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         // 권한 확인
@@ -141,7 +141,7 @@ public class CommentController {
     public ResponseEntity<?> myCommentList(
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
-        log.info("[Get:/post/comment/list/mycomment] userId = {}", userId);
+//        log.info("[Get:/post/comment/list/mycomment] userId = {}", userId);
         // 권한 없음
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 

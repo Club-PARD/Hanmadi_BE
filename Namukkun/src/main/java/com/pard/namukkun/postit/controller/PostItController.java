@@ -57,7 +57,7 @@ public class PostItController {
     public ResponseEntity<?> readPostIts(
             @RequestParam("postid") Long postId
     ) {
-        log.info("[Get:/post/postit/read] postid={}", postId);
+//        log.info("[Get:/post/postit/read] postid={}", postId);
         // 권한 없이 가능
 
         // post가 없음
@@ -100,7 +100,7 @@ public class PostItController {
     ) {
         log.info("[Patch:/post/postit/move] userid={}, postItId={}", userId, dto.getPostItId());
         // 페이지가 존재하지 않음
-        if (postService.checkValid(dto.getPostId()))
+        if (!postService.checkValid(dto.getPostId()))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         // 권한 없음
