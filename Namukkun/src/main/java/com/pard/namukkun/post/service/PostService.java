@@ -567,6 +567,7 @@ public class PostService {
         user = getUrl(tempSolution,user);
         user = getUrl(tempBenefit,user);
 
+        userRepo.save(user);
         return user;
     }
 
