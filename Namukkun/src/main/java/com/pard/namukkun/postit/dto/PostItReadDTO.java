@@ -38,12 +38,15 @@ public class PostItReadDTO {
     public PostItReadDTO(PostIt postIt) {
         User user = postIt.getUser();
         this.postItId = postIt.getId();
+        // 댓글이 삭제된 경우
         try {
-            System.out.println(postIt.getComment());
             this.commentId = postIt.getComment().getId();
-        } catch (Exception Ignore) {}
-        this.userId = postIt.getUser().getUserId();
-        this.userInfoDTO = new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
+            this.userId = postIt.getUser().getUserId();
+            this.userInfoDTO = new UserInfoDTO(user.getNickName(), user.getLocal(), user.getProfileImage());
+        } catch (Exception e) {
+            this.userInfoDTO = new UserInfoDTO("삭제된 댓글 입니다", null, null);
+        }
+
         this.design = postIt.getDesign();
         this.section = postIt.getSection();
         this.content = postIt.getContext();
