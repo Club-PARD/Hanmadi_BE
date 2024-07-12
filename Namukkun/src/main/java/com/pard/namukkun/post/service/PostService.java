@@ -242,7 +242,7 @@ public class PostService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    // 임시 게시물 제출하기
+    // 임시저장 게시물 제출하기
     public ResponseEntity<?> uploadTempPost(PostCreateDTO postCreateDTO, Long userId) {
         User user = userRepo.findById(userId).orElseThrow(()
                 -> new RuntimeException("Error find user -> " + userId));
@@ -250,45 +250,13 @@ public class PostService {
         Post exsitedPost = postRepo.findById(user.getTempPost().getPostId()).orElseThrow(()
         -> new RuntimeException("Error find temp post"));
         // 원래 있던 임시 게시물 삭제
-        user = setImgDTO(exsitedPost,user);
         user.setTempPost(null);
         postRepo.delete(exsitedPost);
         return createPost(postCreateDTO);
     }
 
-    // 임시 게시물에 있는 이미지를 Img에 저장하기
-    public User setImgDTO(Post tempPost, User user){
-        String tempProBackground = tempPost.getProBackground();
-        String tempSolution = tempPost.getSolution();
-        String tempBenefit = tempPost.getBenefit();
-
-        user = getUrl(tempProBackground,user);
-        user = getUrl(tempSolution,user);
-        user = getUrl(tempBenefit,user);
-
-        return user;
-    }
-
-    public User getUrl(String string, User user){
-        // 정규 표현식 패턴
-        String regex = "\\[이미지: (https?://[^\\s\\]]+)\\]";
-
-        // 패턴을 컴파일
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(string);
-
-        // 매칭된 URL 추출
-        while (matcher.find()) {
-            String url = matcher.group(1);
-            Img img = Img.toEntity(user,url);
-            imgRepo.save(img);
-            user.addImg(img);
-        }
-        userRepo.save(user);
-        return user;
-    }
-
     // 모든 게시물 read
+
     public List<PostReadDTO> readAllPosts() {
         return postRepo.findAll()
                 .stream()
@@ -298,7 +266,6 @@ public class PostService {
                                 .collect(Collectors.toList())))
                 .collect(Collectors.toList());
     }
-
     @Transactional
     //post 수정 메서드
     public ResponseEntity<?> updatePost(Long postId, PostUpdateDTO postUpdateDTO) {
@@ -368,6 +335,7 @@ public class PostService {
     }
 
     // 첨부파일 업로드
+
     public ReturnFileNameDTO uploadAttachment(List<MultipartFile> files) {
         List<String> fileNames = new ArrayList<>();
         try {
@@ -388,8 +356,8 @@ public class PostService {
         log.info("save file : " + fileNames);
         return new ReturnFileNameDTO(fileNames);
     }
-
     // 이미지 업로드
+
     @Transactional
     public ResponseEntity<?> uploadImg(MultipartFile file, Long userId) {
         // S3에 이미지 저장
@@ -416,7 +384,6 @@ public class PostService {
             return ResponseEntity.badRequest().body("S3 upload failed.");
         }
     }
-
     @Transactional
     // 포스트의 시간과 현재 시간을 비교하여
     public Integer postCheck(String presentTime) {
@@ -452,13 +419,13 @@ public class PostService {
 
 
     //-----------------------------------------
+
     public Long getWriterUserId(Long postId) {
         return postRepo.findById(postId).orElseThrow().getUser().getUserId();
     }
-    //-----------------------------------------
-
 
     // 채택하는 메서드
+
     @Transactional
     public ResponseEntity<?> IncreaseUpCountPost(Long postId, Long userId) {
         User user = returnUser(userId);
@@ -477,8 +444,8 @@ public class PostService {
 
         return ResponseEntity.ok(makeUpCountInfoDTO(list, user));
     }
-
     // 채택 취소하는 메서드
+
     @Transactional
     public ResponseEntity<?> decreaseUpCountPost(Long postId, Long userId) {
         User user = returnUser(userId);
@@ -497,7 +464,6 @@ public class PostService {
 
         return ResponseEntity.ok(makeUpCountInfoDTO(list, user));
     }
-
     public List<UpCountInfoDTO> makeUpCountInfoDTO(List<Long> list, User user) {
         // UpCountInfoDTO 객체 리스트 생성
         List<UpCountInfoDTO> upCountInfoDTOList = new ArrayList<>();
@@ -518,17 +484,17 @@ public class PostService {
     }
 
     // postId를 받아서 post를 리턴하는 메서드
+
     public Post returnPost(Long postId) {
         return postRepo.findById(postId).orElseThrow(()
                 -> new RuntimeException("Error can't find post -> " + postId));
     }
-
     // userId를 받아서 user를 리턴하는 메서드
+
     public User returnUser(Long userId) {
         return userRepo.findById(userId).orElseThrow(()
                 -> new RuntimeException("Error can't find user -> " + userId));
     }
-
     public List<PostReadDTO> sortByUpCountPost(List<PostReadDTO> postReadDTOS) {
         return postReadDTOS.stream()
                 .sorted(Comparator.comparingInt(PostReadDTO::getUpCountPost).reversed())
@@ -536,6 +502,7 @@ public class PostService {
     }
 
     // 유저 아이디에 있는 지역 번호에 따라서 해당 지역을 나오게함
+
     public List<PostReadDTO> findByLocal(Integer localPageId) {
         List<Post> posts = postRepo.findByPostLocal(localPageId);
         return posts.stream()
@@ -545,20 +512,19 @@ public class PostService {
                                 .collect(Collectors.toList())))
                 .collect(Collectors.toList());
     }
-
     // 게시물 최신순으로 정렬하는 메서드
+
     public List<PostReadDTO> sortByRecentPost(List<PostReadDTO> postReadDTOS) {
         return postReadDTOS.stream()
                 .sorted(Comparator.comparing(PostReadDTO::getSortTime).reversed())
                 .collect(Collectors.toList());
     }
-
     // 게시물 채택수별로 정렬하는 메서드
+
     public List<PostReadDTO> findByUpCountPost() {
         List<PostReadDTO> postReadDTOS = readAllPosts();
         return sortByUpCountPost(postReadDTOS);
     }
-
     public PostReadDTO findPostById(Long postId) {
         Post post = postRepo.findById(postId).orElseThrow(()
                 -> new RuntimeException("Error can't find post -> " + postId));
@@ -571,11 +537,17 @@ public class PostService {
     }
 
     // 수정할 게시물 정보 넘겨주기
+
     public PostUpdateDTO findPostByIdUpdateVer(Long postId) {
         Post post = postRepo.findById(postId).orElseThrow(()
                 -> new RuntimeException("Error can't find post -> " + postId));
+        User user = userRepo.findById(post.getUser().getUserId()).orElseThrow(()
+        -> new RuntimeException("Error can't find user -> " + post.getUser().getUserId()));
         List<S3Attachment> s3Attachments = post.getS3Attachments();
         List<String> fileNames = new ArrayList<>();
+
+        user = setImgDTO(post,user);
+        userRepo.save(user);
 
         for (S3Attachment s3Attachment : s3Attachments) {
             log.info(s3Attachment.getFileUrl());
@@ -583,5 +555,37 @@ public class PostService {
             fileNames.add(s3AttachmentService.extractObjectKey(s3Attachment.getFileUrl()));
         }
         return new PostUpdateDTO(post, fileNames);
+    }
+    //-----------------------------------------
+    //게시물에 있는 이미지를 Img에 저장하기
+    public User setImgDTO(Post tempPost, User user){
+        String tempProBackground = tempPost.getProBackground();
+        String tempSolution = tempPost.getSolution();
+        String tempBenefit = tempPost.getBenefit();
+
+        user = getUrl(tempProBackground,user);
+        user = getUrl(tempSolution,user);
+        user = getUrl(tempBenefit,user);
+
+        return user;
+    }
+
+    public User getUrl(String string, User user){
+        // 정규 표현식 패턴
+        String regex = "\\[이미지: (https?://[^\\s\\]]+)\\]";
+
+        // 패턴을 컴파일
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(string);
+
+        // 매칭된 URL 추출
+        while (matcher.find()) {
+            String url = matcher.group(1);
+            Img img = Img.toEntity(user,url);
+            imgRepo.save(img);
+            user.addImg(img);
+        }
+        userRepo.save(user);
+        return user;
     }
 }
