@@ -309,6 +309,7 @@ public class PostService {
     @Transactional
     //post 수정 메서드
     public ResponseEntity<?> updatePost(Long postId, PostUpdateDTO postUpdateDTO) {
+        log.info("------------------------수정 시작--------------------------");
         Post post = postRepo.findById(postId).orElseThrow(()
                 -> new RuntimeException("Error can't find post: " + postId)); //postId로 post find
 
@@ -318,14 +319,17 @@ public class PostService {
 
         // 제안배경 파싱
         String proBackgroundHtml = postUpdateDTO.getProBackground();
+        log.info("수정돼서 들어온 제안배경: {}",proBackgroundHtml);
         String proBackgroundText = parseHtml(proBackgroundHtml, user);
 
         // solution 파싱
         String solutionHtml = postUpdateDTO.getSolution();
+        log.info("수정돼서 들어온 문제해결: {}",solutionHtml);
         String solutionText = parseHtml(solutionHtml, user);
 
         // benefit 파싱
         String benefitHtml = postUpdateDTO.getBenefit();
+        log.info("수정돼서 들어온 기대효과: {}",benefitHtml);
         String benefitText = parseHtml(benefitHtml, user);
 
         try {
@@ -339,8 +343,9 @@ public class PostService {
         // post에 저장된 file이름을 통해서 s3attachmentDTO에 저장해준다.
         List<String> fileNames = postUpdateDTO.getFileNames();
 
-        if (post.getS3Attachments() != null)
+        if (post.getS3Attachments() != null) {
             post.getS3Attachments().clear(); // 기존에 있던 url제거
+        }
         for (String fileName : fileNames) {
             post.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
         }
@@ -354,7 +359,7 @@ public class PostService {
 
         userRepo.save(user);
         postRepo.save(post);
-
+        log.info("------------------------수정 시작--------------------------");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
