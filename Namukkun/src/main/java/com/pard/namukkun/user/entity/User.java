@@ -41,28 +41,28 @@ public class User {
     private Post tempPost;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostIt> postIts;
+    private List<PostIt> postIts = new ArrayList<>();
 
     // 좋아요 누른 포스트
     @ElementCollection
     @CollectionTable(name = "user_up_post_ids", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "up_comment_id")
-    private List<Long> upPostList;
+    private List<Long> upPostList = new ArrayList<>();
 
     // 좋아요 누른 덧글
     @ElementCollection
     @CollectionTable(name = "user_up_comment_ids", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "up_comment_id")
-    private List<Long> upCommentList;
+    private List<Long> upCommentList = new ArrayList<>();
 
     // 이미지
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = false)
     private List<Img> imgs = new ArrayList<>();
 
     public static User toEntity(UserCreateDTO userCreateDTO) {
@@ -84,7 +84,7 @@ public class User {
     public void updateUserinfo(String nickName, Integer local, String image) {
         this.nickName = nickName;
         this.local = local;
-        this.profileImage = image;
+        if (image != null) this.profileImage = image;
     }
 
     public void updateUpPostList(List<Long> list) {
@@ -111,6 +111,7 @@ public class User {
 
     public void deleteImg(Img img) {
         this.imgs.remove(img);
+        img.setUser(null); // 관계를 완전히 끊기 위해
     }
     // ---------------- 준현 수정 -------------
 }

@@ -57,6 +57,7 @@ public class PostReadDTO {
             this.comments = post.getComments().stream()
                     .map(CommentReadDTO::new)
                     .collect(Collectors.toList());
+            this.sortTime = post.getSortTime();
             //----------------------------------
         }
     }
@@ -80,6 +81,7 @@ public class PostReadDTO {
         this.comments = post.getComments().stream()
                 .map(CommentReadDTO::new)
                 .collect(Collectors.toList());
+        this.sortTime = post.getSortTime();
         //----------------------------------
     }
 }

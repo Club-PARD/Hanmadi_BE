@@ -37,4 +37,8 @@ public class Img {
         this.user = user;
     }
 
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
 }

@@ -6,6 +6,8 @@ import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.comment.repo.CommentRepo;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
+import com.pard.namukkun.postit.entity.PostIt;
+import com.pard.namukkun.postit.repo.PostItRepo;
 import com.pard.namukkun.user.dto.UserUpListDTO;
 import com.pard.namukkun.user.entity.User;
 import com.pard.namukkun.user.repo.UserRepo;
@@ -24,6 +26,7 @@ public class CommentService {
     private final PostRepo postRepo;
     private final CommentRepo commentRepo;
     private final UserRepo userRepo;
+    private final PostItRepo postItRepo;
 
     // 덧글 생성
     public Long createComment(Long postId, Long userId, CommentCreateDTO dto) {
@@ -52,13 +55,24 @@ public class CommentService {
 
     // 덧글 삭제
     public void deleteComment(Long commentId) {
+        Comment comment = commentRepo.findById(commentId).orElseThrow();
+        PostIt postIt = comment.getPostIt();
+
+        // 연관성 제거
+        if (postIt != null) postIt.setComment(null);
+        comment.setPostIt(null);
+
+        // 연관성 제거 저장
+        commentRepo.save(comment);
+        if (comment.getPostIt() != null) postItRepo.save(postIt);
+
+        // 댓글 제거
         commentRepo.deleteById(commentId);
     }
 
     // 덧글 작성자 아이디 가져오기
     public Long getCommentWriterId(Long commentId) {
         Long commentWriterId = commentRepo.findById(commentId).orElseThrow().getUser().getUserId();
-//        log.info(String.valueOf(commentWriterId));
         return commentWriterId;
     }
 
@@ -122,5 +136,14 @@ public class CommentService {
         }
 
         return new UserUpListDTO(list);
+    }
+
+    public List<Long> getUserCommentList(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow();
+
+        if (user.getComments() == null) return null;
+        List<Long> list = user.getComments()
+                .stream().map(Comment::getId).toList();
+        return list;
     }
 }

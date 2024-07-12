@@ -26,11 +26,10 @@ public class UserController {
     @GetMapping("/info")
     @Operation(summary = "유저 정보 전달", description = "로그인했을때 로컬에 저장하고, 로그아웃 하면 로컬에서 지우세요." + "기본적인 유저 정보를 전달합니다")
     public UserLoginInfoDTO getUserInfo(
-//            @SessionAttribute(name = "userinfo", required = false) UserSessionData data,
             @SessionAttribute(name = "userid", required = false) Long userId
-//            @RequestParam("userid") Long userId // debug
     ) {
         if (userId == null) return null;
+
         return userService.getUserLoginInfoDTO(userId);
     }
 
@@ -38,9 +37,9 @@ public class UserController {
     @Operation(summary = "유저 주요 정보", description = "마이페이지에서 사용될 유저 정보를 전달합니다")
     public ResponseEntity<?> getUserInfoAll(
             @SessionAttribute(name = "userid", required = false) Long userId
-//            @RequestParam("userid") Long userId // debug
     ) {
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
         UserReadDTO dto = userService.getUserInfoAll(userId);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
@@ -49,7 +48,6 @@ public class UserController {
     @Operation(summary = "유저 지역, 닉네임 변경", description = "유저의 아이디값, 변경할 닉네임, 지역정보를 통해 유저를 수정합니다.")
     public ResponseEntity<?> updateUser(
             @SessionAttribute(name = "userid", required = false) Long userId,
-//            @RequestParam("userid") Long userid, // debug
             @RequestBody UserUpdateDTO dto
     ) {
 

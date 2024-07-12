@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -31,6 +32,12 @@ public class CommentController {
             @RequestBody() CommentCreateDTO dto,
             @SessionAttribute(name = "userid", required = false) Long userId
     ) {
+        log.info("[POST:/post/comment] userid = {}", userId);
+
+        // 글이 존재하지 않음
+        if (!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한 확인
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
@@ -44,11 +51,16 @@ public class CommentController {
     // 덧글 읽기 전체 허용
     @GetMapping("")
     @Operation(summary = "덧글 읽기", description = "포스트에 있는 덧글을 읽어옵니다.")
-    public List<CommentReadDTO> readAllComment(
+    public ResponseEntity<?> readAllComment(
             @RequestParam("postid") Long postId
     ) {
+//        log.info("[Get:/post/comment] postId = {}", postId);
+
+        if (!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         try {
-            return commentService.readALlComment(postId);
+            List<CommentReadDTO> list = commentService.readALlComment(postId);
+            return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (Exception Ignore) {
             return null;
         }
@@ -73,6 +85,7 @@ public class CommentController {
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam(value = "commentid") Long commentId
     ) {
+        log.info("[Delete:/post/comment] uesrId = {} commentId = {}", userId, commentId);
         Long commentWriterId = commentService.getCommentWriterId(commentId);
 
         // 권한 확인
@@ -90,8 +103,9 @@ public class CommentController {
     public ResponseEntity<?> upButton(
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("commentid") Long commentId,
-            @RequestParam("up") Boolean up
-    ) {
+            @RequestParam("up") Boolean up) {
+        log.info("[Patch:/post/comment/up] userId = {}, commentId = {}", userId, commentId);
+
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         commentService.upButton(commentId, userId, up);
@@ -107,11 +121,31 @@ public class CommentController {
             @RequestParam("commentid") Long commentId,
             @RequestParam("take") Boolean take
     ) {
+        log.info("[Patch:/post/comment/take] userId = {}, postId = {}, commentId = {}, take = {}",
+                userId, postId, commentId, take);
+
+        // 포스트가 존재하지 않음
+        if (!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한 확인
         if (!postService.getWriterUserId(postId).equals(userId))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         commentService.takeComment(commentId, take);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("list/mycomment")
+    @Operation(summary = "유저의 댓글 리스트 받기", description = "리스트 형식으로 유저가 작성한 댓글의 아이디 리스트를 전송합니다")
+    public ResponseEntity<?> myCommentList(
+            @SessionAttribute(name = "userid", required = false) Long userId
+    ) {
+//        log.info("[Get:/post/comment/list/mycomment] userId = {}", userId);
+        // 권한 없음
+        if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        List<Long> commentIdList = commentService.getUserCommentList(userId);
+        return new ResponseEntity<>(commentIdList, HttpStatus.OK);
     }
 }

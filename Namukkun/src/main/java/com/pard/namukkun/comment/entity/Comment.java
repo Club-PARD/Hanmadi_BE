@@ -54,7 +54,6 @@ public class Comment {
                 .build();
     }
 
-
     //--------------------------------------
     public void addUpCounter() {
         upCounter++;

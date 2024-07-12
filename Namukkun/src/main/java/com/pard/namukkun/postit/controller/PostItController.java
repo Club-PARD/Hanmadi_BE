@@ -1,5 +1,6 @@
 package com.pard.namukkun.postit.controller;
 
+import com.pard.namukkun.post.service.PostService;
 import com.pard.namukkun.postit.dto.*;
 import com.pard.namukkun.postit.service.PostItService;
 import com.pard.namukkun.user.service.UserService;
@@ -20,15 +21,21 @@ import java.util.Objects;
 public class PostItController {
     private final PostItService postItService;
     private final UserService userService;
+    private final PostService postService;
 
     // 덧글 선택하여 포스트잇으로 만들기
     @PostMapping("/create")
     @Operation(summary = "포스트잇 생성", description = "덧글의 내용을 포스트잇으로 생성합니다.")
     public ResponseEntity<?> selectCommentToPostIt(
             @SessionAttribute(name = "userid", required = false) Long userId,
-//            @RequestParam(value = "userid", required = false) Long userId, // debug
             @RequestBody PostItCreateDTO dto
     ) {
+        log.info("[Post:/post/postit/create] userId={}, commentId={}", userId, dto.getCommentId());
+
+        // 포스터가 존재하지 않음
+        if (!postService.checkValid(dto.getPostId())) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         // 권한 없음
         if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userId))
             return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
@@ -47,21 +54,28 @@ public class PostItController {
     // 포스트잇 읽기
     @GetMapping("/read")
     @Operation(summary = "포스트잇 읽기", description = "포스트에 있는 모든 포스트잇의 내용을 읽어옵니다")
-    public List<PostItReadDTO> readPostIts(
+    public ResponseEntity<?> readPostIts(
             @RequestParam("postid") Long postId
     ) {
+//        log.info("[Get:/post/postit/read] postid={}", postId);
         // 권한 없이 가능
-        return postItService.readAllByPostId(postId);
+
+        // post가 없음
+        if (!postService.checkValid(postId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        List<PostItReadDTO> dtos = postItService.readAllByPostId(postId);
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     // 포스트잇 좌우 이동
     @PatchMapping("/sectionmove")
     @Operation(summary = "포스트잇 섹션 이동", description = "덧글의 섹션을 이동합니다." + "left, right 아니면 값을 받지 않습니다")
     public ResponseEntity<?> moveSectionPostIt(
-//            @RequestParam("userid") Long userId, // debug
             @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestParam("postitid") Long postItId,
             @RequestParam("section") String section) {
+        log.info("[Patch:/post/postit/sectionmove] userid={}, postItId={}, section={}", userId, postItId, section);
         // 로그인 안됨
         if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
@@ -81,12 +95,17 @@ public class PostItController {
     @PatchMapping("/move")
     @Operation(summary = "포스트잇 이동", description = "포스트잇의 위치를 이동시킵니다")
     public ResponseEntity<?> movePostIt(
-            @RequestParam("userid") Long userId,
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestBody() PostItMoveDTO dto
     ) {
+        log.info("[Patch:/post/postit/move] userid={}, postItId={}", userId, dto.getPostItId());
+        // 페이지가 존재하지 않음
+        if (!postService.checkValid(dto.getPostId()))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         // 권한 없음
         if (!postItService.getWriterIdByPostId(dto.getPostId()).equals(userId))
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         postItService.movePostIt(dto);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -97,10 +116,9 @@ public class PostItController {
     @Operation(summary = "포스트잇 제거", description = "포스트잇을 지웁니다")
     public ResponseEntity<?> deletePostIt(
             @SessionAttribute(name = "userid", required = false) Long userId,
-//            @RequestParam("userid") Long userId,
             @RequestParam("postitid") Long postItId
     ) {
-
+        log.info("[Delete:/post/postit/delete] userid={} postitid={}", userId, postItId);
         // 권한 없음
         if (!Objects.equals(userId, postItService.getWriterIdByPostItId(postItId)))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

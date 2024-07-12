@@ -3,6 +3,7 @@ package com.pard.namukkun.postit.service;
 
 import com.pard.namukkun.comment.entity.Comment;
 import com.pard.namukkun.comment.repo.CommentRepo;
+import com.pard.namukkun.post.dto.PostReadDTO;
 import com.pard.namukkun.post.entity.Post;
 import com.pard.namukkun.post.repo.PostRepo;
 import com.pard.namukkun.postit.dto.PostItCreateDTO;
@@ -119,6 +120,7 @@ public class PostItService {
     public List<PostItReadDTO> readAllByPostId(Long postId) {
         return postRepo.findById(postId).orElseThrow().getPostIts()
                 .stream().map(PostItReadDTO::new).collect(Collectors.toList());
+
 
     }
 }

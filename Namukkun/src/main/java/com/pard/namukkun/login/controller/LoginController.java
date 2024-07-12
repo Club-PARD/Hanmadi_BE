@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/login")
 public class LoginController {
 
-
-    //    private final  customOAuth2UserService;
     private final LoginService loginService;
-    private final SessionService sessionService;
 
     // 로그인 완료 했을떄 오는 경로
     @GetMapping("/oauth2/code/kakao")
@@ -28,17 +25,10 @@ public class LoginController {
     public ResponseEntity<?> callback(
             HttpServletRequest request,
             @RequestParam("code") String code) {
+        log.info("[Get:/login/oauth2/code/kakao] code={}",code);
 
         return loginService.oauthLogin(request, code);
     }
-
-//    @GetMapping("/test")
-//    @Operation(summary = "로그인 테스트용", description = "테스트용 토큰을 발행합니다. 1")
-//    public ResponseEntity<?> testLogIn(HttpServletRequest request) {
-//        sessionService.addSessionData(request);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
 
     // 회원가입 -> update local
     @GetMapping("/create/user")
@@ -48,6 +38,10 @@ public class LoginController {
             @SessionAttribute(name = "userinfo", required = false) UserSessionData data,
             @RequestParam("local") Integer local
     ) {
+        log.info("[Get:/login/create/user] userId ={}, local={}",data.getUserId(), local);
+
+        if (data == null)
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         return loginService.signUpLocalSet(request, data, local);
     }
 
@@ -55,17 +49,16 @@ public class LoginController {
     @Operation(summary = "로그아웃", description = "로그아웃 합니다 (세션 삭제)")
     public ResponseEntity<?> logOut(
             HttpServletRequest request
-//            @SessionAttribute(name = "userinfo", required = false) UserSessionData data
     ) {
-
         return loginService.logOut(request);
     }
 
     @PostMapping("/check")
     public ResponseEntity<?> logInCheck(
             @SessionAttribute(name = "userid", required = false) Long userId
-    ){
-        if (userId == null)  return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    ) {
+        // 자주 하는 
+        if (userId == null) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         else return new ResponseEntity<>(HttpStatus.OK);
     }
 }
