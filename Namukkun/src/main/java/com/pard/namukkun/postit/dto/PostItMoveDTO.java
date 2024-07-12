@@ -14,7 +14,7 @@ public class PostItMoveDTO {
     private Long postItId;
     private Long postId;
     private Long commentId; // null 일 수 있음
-    private Long userId;
+//    private Long userId;
 
 
     private Float x;

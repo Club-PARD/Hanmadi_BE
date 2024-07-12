@@ -95,7 +95,7 @@ public class PostItController {
     @PatchMapping("/move")
     @Operation(summary = "포스트잇 이동", description = "포스트잇의 위치를 이동시킵니다")
     public ResponseEntity<?> movePostIt(
-            @RequestParam("userid") Long userId,
+            @SessionAttribute(name = "userid", required = false) Long userId,
             @RequestBody() PostItMoveDTO dto
     ) {
         log.info("[Patch:/post/postit/move] userid={}, postItId={}", userId, dto.getPostItId());
