@@ -52,12 +52,10 @@ public class KakaoService {
                     .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
                     .bodyToMono(KakaoTokenResponseDto.class)
                     .block();
-            System.out.println(" [Kakao Service] Access Token ------> " + kakaoTokenResponseDto.getAccessToken());
-            System.out.println(" [Kakao Service] Refresh Token ------> " + kakaoTokenResponseDto.getRefreshToken());
+            log.info("[Kakao Service] Access Token ------> {}", kakaoTokenResponseDto.getAccessToken());
+            log.info("[Kakao Service] Id Token ------> {}", kakaoTokenResponseDto.getIdToken());
+            log.info("[Kakao Service] Scope ------> {}", kakaoTokenResponseDto.getScope());
             //제공 조건: OpenID Connect가 활성화 된 앱의 토큰 발급 요청인 경우 또는 scope에 openid를 포함한 추가 항목 동의 받기 요청을 거친 토큰 발급 요청인 경우
-            System.out.println(" [Kakao Service] Id Token ------> " + kakaoTokenResponseDto.getIdToken());
-            System.out.println(" [Kakao Service] Scope ------> " + kakaoTokenResponseDto.getScope());
-
             return kakaoTokenResponseDto.getAccessToken();
         } catch (Exception e) {
             System.out.println(e.getMessage());
