@@ -21,7 +21,7 @@ public class PostModifyDTO {
     private String benefit; // 기대효과
     private List<String> fileNames; // 파일이름들
 
-    private String userName;
+    private boolean isReturn;
 
     public PostModifyDTO(Post post, List<String> fileNames) {
         this.postId = post.getPostId();
@@ -30,7 +30,7 @@ public class PostModifyDTO {
         this.proBackground = post.getProBackground();
         this.solution = post.getSolution();
         this.benefit = post.getBenefit();
-        this.userName = post.getUser().getNickName();
+        this.isReturn = post.isReturn();
         this.fileNames = fileNames;
     }
 }

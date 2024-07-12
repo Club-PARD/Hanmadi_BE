@@ -107,6 +107,15 @@ public class Post {
         this.postLocal = postUpdateDTO.getPostLocal();
     }
 
+    public void updatePost(PostCreateDTO postCreateDTO, String proBackgroundText, String solutionText, String benefitText, boolean isReturn) {
+        this.proBackground = proBackgroundText;
+        this.solution = solutionText;
+        this.benefit = benefitText;
+        this.title = postCreateDTO.getTitle();
+        this.postLocal = postCreateDTO.getPostLocal();
+        this.isReturn = isReturn;
+    }
+
     public void increaseUpCountPost() {
         this.upCountPost++;
     }

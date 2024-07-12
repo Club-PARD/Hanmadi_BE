@@ -251,8 +251,40 @@ public class PostService {
         -> new RuntimeException("Error find temp post"));
         // 원래 있던 임시 게시물 삭제
         user.setTempPost(null);
-//        postRepo.delete(exsitedPost);
-        return createPost(postCreateDTO);
+
+        // 제안배경 파싱
+        String proBackgroundHtml = postCreateDTO.getProBackground();
+        String proBackgroundText = parseHtml(proBackgroundHtml, user);
+
+        // solution 파싱
+        String solutionHtml = postCreateDTO.getSolution();
+        String solutionText = parseHtml(solutionHtml, user);
+
+        // benefit 파싱
+        String benefitHtml = postCreateDTO.getBenefit();
+        String benefitText = parseHtml(benefitHtml, user);
+
+        try {
+            exsitedPost.updatePost(postCreateDTO, proBackgroundText, solutionText, benefitText,postCreateDTO.isReturn());
+            postRepo.save(exsitedPost);
+        } catch (Exception e) {
+            log.warn("post update error: " + e.getMessage());
+        }
+
+        // S3에 있는 첨부파일 삭제 및 저장은 글 쓰는 단계에서 이루어지기 때문에 지금은
+        // post에 저장된 file이름을 통해서 s3attachmentDTO에 저장해준다.
+        List<String> fileNames = postCreateDTO.getFileNames();
+
+        if (exsitedPost.getS3Attachments() != null)
+            exsitedPost.getS3Attachments().clear(); // 기존에 있던 url제거
+        for (String fileName : fileNames) {
+            exsitedPost.addS3Attachment(s3AttachmentService.getUrlWithFileName(fileName));
+        }
+
+        userRepo.save(user);
+        postRepo.save(exsitedPost);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // 모든 게시물 read
@@ -290,6 +322,7 @@ public class PostService {
 
         try {
             post.updatePost(postUpdateDTO, proBackgroundText, solutionText, benefitText);
+            postRepo.save(post);
         } catch (Exception e) {
             log.warn("post update error: " + e.getMessage());
         }
