@@ -59,12 +59,12 @@ public class CommentService {
         PostIt postIt = comment.getPostIt();
 
         // 연관성 제거
-        postIt.setComment(null);
+        if (postIt != null) postIt.setComment(null);
         comment.setPostIt(null);
 
         // 연관성 제거 저장
         commentRepo.save(comment);
-        postItRepo.save(postIt);
+        if (comment.getPostIt() != null) postItRepo.save(postIt);
 
         // 댓글 제거
         commentRepo.deleteById(commentId);
