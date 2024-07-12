@@ -55,11 +55,6 @@ public class PostService {
     private final S3AttachmentService s3AttachmentService;
     private final ImgRepo imgRepo;
 
-    private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
-    private final UserService userService;
-    private Map<String, Path> tempStorage = new HashMap<>();
-
-
     public boolean checkValid(Long postId) {
         return postRepo.existsById(postId);
     }
@@ -70,7 +65,7 @@ public class PostService {
         log.error("---------------------------------게시물 생성 시작------------------------------");
         User user = userRepo.findById(postCreateDTO.getUserId()).orElseThrow(()
                 -> new RuntimeException("Error find user -> " + postCreateDTO.getUserId()));
-//        try {
+
         Post post = makePost(postCreateDTO, user);
 
         log.info("post created");
@@ -84,9 +79,6 @@ public class PostService {
         postRepo.save(post);
         log.error("---------------------------------게시물 생성 종료------------------------------");
         return ResponseEntity.ok(post.getPostId());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("HTML 파싱 오류: " + e.getMessage());
-//        }
     }
 
 
@@ -103,23 +95,6 @@ public class PostService {
         // benefit 파싱
         String benefitHtml = postCreateDTO.getBenefit();
         String benefitText = parseHtml(benefitHtml, user);
-
-
-        // -------------- S3에 쓸모없는 이미지 저장된거 삭제 처리로직 (임시 폐기) --------//
-        // 리스트에 남은 이미지들은 S3에서 삭제한다.
-//        List<Img> imgs = user.getImgs();
-//        List<Img> tempImgs = new ArrayList<>(imgs);
-//        for (Img img : imgs) {
-//            s3AttachmentService.deleteByUrl(img.getImgUrl());
-//            tempImgs.remove(img);
-//            userRepo.save(user);
-//            log.info("이미지 삭제 완료: " + img.getImgUrl());
-//        }
-//        user.setImgs(tempImgs);
-//        userRepo.save(user);
-//        log.info("background: " + proBackgroundText);
-//        log.info("solution: " + solutionText);
-//        log.info("benefit: " + benefitText);
 
         List<Img> imgsToRemove = user.getImgs();
         for (int j = 0; j < imgsToRemove.size(); j++) {
@@ -267,16 +242,50 @@ public class PostService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    // 임시 게시물 제출하기
     public ResponseEntity<?> uploadTempPost(PostCreateDTO postCreateDTO, Long userId) {
         User user = userRepo.findById(userId).orElseThrow(()
                 -> new RuntimeException("Error find user -> " + userId));
 
         Post exsitedPost = postRepo.findById(user.getTempPost().getPostId()).orElseThrow(()
-        -> new RuntimeException("Error find temp post -> " + user.getTempPost().getPostId()));
+        -> new RuntimeException("Error find temp post"));
         // 원래 있던 임시 게시물 삭제
+        user = setImgDTO(exsitedPost,user);
         user.setTempPost(null);
         postRepo.delete(exsitedPost);
         return createPost(postCreateDTO);
+    }
+
+    // 임시 게시물에 있는 이미지를 Img에 저장하기
+    public User setImgDTO(Post tempPost, User user){
+        String tempProBackground = tempPost.getProBackground();
+        String tempSolution = tempPost.getSolution();
+        String tempBenefit = tempPost.getBenefit();
+
+        user = getUrl(tempProBackground,user);
+        user = getUrl(tempSolution,user);
+        user = getUrl(tempBenefit,user);
+
+        return user;
+    }
+
+    public User getUrl(String string, User user){
+        // 정규 표현식 패턴
+        String regex = "\\[이미지: (https?://[^\\s\\]]+)\\]";
+
+        // 패턴을 컴파일
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(string);
+
+        // 매칭된 URL 추출
+        while (matcher.find()) {
+            String url = matcher.group(1);
+            Img img = Img.toEntity(user,url);
+            imgRepo.save(img);
+            user.addImg(img);
+        }
+        userRepo.save(user);
+        return user;
     }
 
     // 모든 게시물 read
